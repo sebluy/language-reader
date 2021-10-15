@@ -1,0 +1,30 @@
+<!--index.html-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <title>Language Reader!</title>
+    <link rel="stylesheet" type="text/css" href="./index.css">
+</head>
+<body>
+    <div id="word-lookup">
+        <span id="original"></span>
+        <input id="definition"/>
+        <button id="highlight-translated">Highlight Translated</button>
+        <button id="un-highlight-translated">Un-highlight Translated</button>
+        <button id="google-translate">Google Translate</button>
+        <p id="stats"></p>
+    </div>
+    <div id="text">
+        <p></p>
+    </div>
+
+<!-- You can also require other files to run in this process -->
+<!--<script src="./renderer.js"></script>-->
+
+</body>
+</html>

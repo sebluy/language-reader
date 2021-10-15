@@ -1,0 +1,42 @@
+#word-lookup {
+    position: fixed;
+    width: 250px;
+    font-size: x-large;
+    text-align: center;
+}
+
+#stats {
+    font-size: medium;
+}
+
+#original {
+    display: block;
+    margin: 10px;
+}
+
+#definition {
+    width: 230px;
+    margin: 10px;
+    text-align: center;
+    font-size: x-large;
+}
+
+div {
+    margin: 10px;
+}
+
+.selected {
+    background-color: yellowgreen;
+}
+
+.translated {
+    background-color: aqua;
+}
+
+#text {
+    margin-left: 280px;
+}
+
+#text p {
+    line-height: 30px;
+}
