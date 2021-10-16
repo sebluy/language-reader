@@ -7,24 +7,23 @@ module.exports = class LanguageText {
         this.originalE = document.getElementById('original')
         this.definitionE = document.getElementById('definition')
         this.statsE = document.getElementById('stats')
-        this.hlightTranslatedB = document.getElementById('highlight-translated')
-        this.unhlightTranslatedB = document.getElementById('un-highlight-translated')
+        this.highlightTranslatedCB = document.getElementById('highlight-translated')
         this.googleTranslateB = document.getElementById('google-translate')
+        this.updateStatsB = document.getElementById('update-stats')
 
         this.db = new sqlite3.Database('./words.db')
         this.numberOfWords = 0
         this.words = new Map()
         this.text = text
-        this.highlightTranslatedOn = false;
         this.extractWords()
         setTimeout(this.updateStats.bind(this), 1000);
 
         this.element.addEventListener('click', this.clickWord.bind(this))
         this.definitionE.addEventListener('focusout', this.updateDefinition.bind(this))
         this.definitionE.addEventListener('keydown', this.nextWord.bind(this))
-        this.hlightTranslatedB.addEventListener('click', this.highlightTranslated.bind(this))
-        this.unhlightTranslatedB.addEventListener('click', this.unhighlightTranslated.bind(this))
+        this.highlightTranslatedCB.addEventListener('change', this.highlightTranslated.bind(this))
         this.googleTranslateB.addEventListener('click', this.googleTranslate.bind(this))
+        this.updateStatsB.addEventListener('click', this.updateStats.bind(this))
     }
 
     addWordToDisplay(word) {
@@ -102,10 +101,9 @@ module.exports = class LanguageText {
     }
 
     updateHighlightTranslated(word) {
-        if (!this.highlightTranslatedOn) return;
         const data = this.words.get(word)
         data.spans.forEach((span) => {
-            if (data.definition === '') {
+            if (data.definition === '' || !this.highlightTranslatedCB.checked) {
                 span.classList.remove('translated')
             } else {
                 span.classList.add('translated')
@@ -113,15 +111,8 @@ module.exports = class LanguageText {
         })
     }
 
-    highlightTranslated() {
-        this.highlightTranslatedOn = true;
+    highlightTranslated(e) {
         this.words.forEach((data, word) => this.updateHighlightTranslated(word))
-    }
-
-    unhighlightTranslated() {
-        this.highlightTranslatedOn = false;
-        const spans = document.querySelectorAll('#text p span.translated');
-        spans.forEach((span) => span.classList.remove('translated'));
     }
 
     googleTranslate() {
@@ -138,10 +129,9 @@ module.exports = class LanguageText {
     updateStats() {
         let countTranslated = 0
         this.words.forEach((data) => {
-            console.log(data)
-            if (data.definition !== '') countTranslated++
+            if (data.definition !== '') countTranslated += data.spans.length
         })
-        const percent = countTranslated === 0 ? 0 : countTranslated / this.words.size
+        const percent = countTranslated === 0 ? 0 : countTranslated / this.numberOfWords
         this.statsE.innerText =
             'Number of words: ' + this.numberOfWords + "\n" +
             'Number of distinct words: ' + this.words.size + "\n" +

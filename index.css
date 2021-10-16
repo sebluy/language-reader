@@ -40,3 +40,15 @@ div {
 #text p {
     line-height: 30px;
 }
+
+button {
+    display: block;
+    width: 200px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 5px;
+}
+
+label {
+    font-size: medium;
+}
