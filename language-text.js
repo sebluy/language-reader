@@ -10,6 +10,7 @@ module.exports = class LanguageText {
         this.highlightTranslatedCB = document.getElementById('highlight-translated')
         this.googleTranslateB = document.getElementById('google-translate')
         this.updateStatsB = document.getElementById('update-stats')
+        this.selectRandomB = document.getElementById('select-random')
 
         this.db = new sqlite3.Database('./words.db')
         this.numberOfWords = 0
@@ -24,6 +25,7 @@ module.exports = class LanguageText {
         this.highlightTranslatedCB.addEventListener('change', this.highlightTranslated.bind(this))
         this.googleTranslateB.addEventListener('click', this.googleTranslate.bind(this))
         this.updateStatsB.addEventListener('click', this.updateStats.bind(this))
+        this.selectRandomB.addEventListener('click', this.selectRandom.bind(this))
     }
 
     addWordToDisplay(word) {
@@ -137,5 +139,16 @@ module.exports = class LanguageText {
             'Number of distinct words: ' + this.words.size + "\n" +
             'Number of translated words: ' + countTranslated + "\n" +
             'Percent translated: ' + (percent * 100).toFixed(2) + '%'
+    }
+
+    selectRandom() {
+        let values = Array.from(this.words.values()).filter(e => e.definition !== '')
+        if (values.length === 0) return;
+        let index = Math.floor(Math.random() * values.length)
+        let data = values[index];
+        index = Math.floor(Math.random() * data.spans.length)
+        let span = data.spans[index]
+        span.scrollIntoView({block: 'center'});
+        span.click()
     }
 }
