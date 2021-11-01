@@ -26,11 +26,20 @@ div {
 }
 
 .selected {
-    background-color: yellowgreen;
+    border: black solid 2px;
+    padding: 5px;
 }
 
-.translated {
-    background-color: aqua;
+.known {
+    background-color: lightgreen;
+}
+
+.unknown {
+    background-color: white;
+}
+
+.learning {
+    background-color: indianred;
 }
 
 #text {

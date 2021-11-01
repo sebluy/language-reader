@@ -1,0 +1,9 @@
+Add a "fill in the blank" game.
+Give a sentence with a word missing, and give a set of options to fill in the blank.
+
+Ideally, these exercises should have the following goals:
+1. Fun
+2. Appropriate difficulty
+3. No (or little) L1 necessary
+4. Automatic answer checking
+5. Includes audio.

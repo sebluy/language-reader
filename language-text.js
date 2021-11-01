@@ -1,5 +1,5 @@
-const sqlite3 = require('sqlite3');
-const fetch = require('node-fetch');
+const sqlite3 = require('sqlite3')
+const fetch = require('node-fetch')
 
 module.exports = class LanguageText {
     constructor(text) {
@@ -7,7 +7,7 @@ module.exports = class LanguageText {
         this.originalE = document.getElementById('original')
         this.definitionE = document.getElementById('definition')
         this.statsE = document.getElementById('stats')
-        this.highlightTranslatedCB = document.getElementById('highlight-translated')
+        this.highlightCB = document.getElementById('highlight')
         this.googleTranslateB = document.getElementById('google-translate')
         this.updateStatsB = document.getElementById('update-stats')
         this.selectRandomB = document.getElementById('select-random')
@@ -17,12 +17,12 @@ module.exports = class LanguageText {
         this.words = new Map()
         this.text = text
         this.extractWords()
-        setTimeout(this.updateStats.bind(this), 1000);
+        setTimeout(this.updateStats.bind(this), 1000)
 
         this.element.addEventListener('click', this.clickWord.bind(this))
-        this.definitionE.addEventListener('focusout', this.updateDefinition.bind(this))
+        this.definitionE.addEventListener('focusout', this.updateWord.bind(this))
         this.definitionE.addEventListener('keydown', this.nextWord.bind(this))
-        this.highlightTranslatedCB.addEventListener('change', this.highlightTranslated.bind(this))
+        this.highlightCB.addEventListener('change', this.highlight.bind(this))
         this.googleTranslateB.addEventListener('click', this.googleTranslate.bind(this))
         this.updateStatsB.addEventListener('click', this.updateStats.bind(this))
         this.selectRandomB.addEventListener('click', this.selectRandom.bind(this))
@@ -32,8 +32,8 @@ module.exports = class LanguageText {
         const span = document.createElement('span')
         span.innerHTML = word
         this.element.appendChild(span)
-        this.element.appendChild(document.createTextNode(' '));
-        return span;
+        this.element.appendChild(document.createTextNode(' '))
+        return span
     }
 
     cleanWord(word) {
@@ -44,34 +44,46 @@ module.exports = class LanguageText {
     extractWords() {
         const clean = this.text.replaceAll('-\n', '')
         const words = clean.split(/\s+/)
-        this.numberOfWords = words.length;
+        this.numberOfWords = words.length
         words.forEach((word) => {
             let span = this.addWordToDisplay(word)
             word = this.cleanWord(word)
             if (!this.words.has(word)) {
-                this.words.set(word, {spans: [],})
-                this.lookupDefinition(word, def => this.words.get(word).definition = def)
+                this.words.set(word, {
+                    spans: [],
+                    status: 'unknown',
+                    definition: ''
+                })
+                this.lookupWord(word, (row) => {
+                    if (row === undefined) return
+                    let wordData = this.words.get(word)
+                    wordData.definition = row.definition
+                    wordData.status = row.status
+                })
             }
             this.words.get(word).spans.push(span)
         })
     }
 
-    lookupDefinition(word, cb) {
-        this.db.get("SELECT definition FROM words WHERE original = ?", [word], (err, row) => {
-            cb(row !== undefined ? row.definition : '')
-        })
+    lookupWord(word, cb) {
+        this.db.get("SELECT * FROM words WHERE original = ?", [word], (err, row) => cb(row))
     }
 
-    updateDefinition() {
+    updateWord() {
         const definition = this.definitionE.value
         const original = this.originalE.innerHTML
-        this.words.get(original).definition = definition;
-        console.log('Updating definition... for ' + original + ' to ' + definition);
-        let sql = 'INSERT OR IGNORE INTO words (original, definition) VALUES ($original, $definition)'
-        this.db.run(sql, {$definition: definition, $original: original})
-        sql = 'UPDATE words SET definition = $definition WHERE original = $original'
-        this.db.run(sql, {$definition: definition, $original: original})
-        this.updateHighlightTranslated(original)
+        const wordData = this.words.get(original)
+        wordData.definition = definition
+        if (definition !== '' && wordData.status === 'unknown') wordData.status = 'learning'
+        const status = wordData.status
+        console.log('Updating definition... for ' + original + ' to ' + definition)
+        let sql = 'INSERT OR IGNORE INTO words (original, definition, status)' +
+            ' VALUES ($original, $definition, $status)'
+        const params =  {$definition: definition, $original: original, $status: status}
+        this.db.run(sql, params)
+        sql = 'UPDATE words SET definition = $definition, status = $status WHERE original = $original'
+        this.db.run(sql, params)
+        this.updateHighlighting(original)
     }
 
     clickWord(e) {
@@ -79,7 +91,6 @@ module.exports = class LanguageText {
             const oldWordE = document.querySelector('span.selected')
             if (oldWordE) oldWordE.classList.remove('selected')
             e.target.classList.add('selected')
-
             const word = this.cleanWord(e.target.innerHTML)
             console.log('Switching word... to ' + word)
             console.log(this.words.get(word))
@@ -91,36 +102,59 @@ module.exports = class LanguageText {
 
     nextWord(e) {
         if (e.key === 'Tab') {
-            e.preventDefault();
-            console.log('Pressed tab');
-            const current = document.querySelector('span.selected');
-            if (!current) return;
+            e.preventDefault()
+            console.log('Pressed tab')
+            const current = document.querySelector('span.selected')
+            if (!current) return
             console.log('Current word: ' + current.innerHTML)
             this.definitionE.blur()
-            const sibling = current.nextElementSibling;
-            if (sibling) sibling.click();
+            const sibling = current.nextElementSibling
+            if (sibling) sibling.click()
+        }
+        if (e.key === 'ArrowDown') {
+            e.preventDefault()
+            this.changeStatus(-1)
+        }
+        if (e.key === 'ArrowUp') {
+            e.preventDefault()
+            this.changeStatus(1)
         }
     }
 
-    updateHighlightTranslated(word) {
+    changeStatus(n) {
+        const current = document.querySelector('span.selected')
+        if (!current) return
+        let word = this.cleanWord(current.innerHTML)
+        let wordData = this.words.get(word)
+        let statuses = ['known', 'learning', 'unknown']
+        let index = statuses.indexOf(wordData.status) + n
+        if (index > 2) index -= 3
+        if (index < 0) index += 3
+        console.log('Old status for ' + word + ' is ' + wordData.status)
+        wordData.status = statuses[index]
+        this.updateHighlighting(word)
+    }
+
+    updateHighlighting(word) {
         const data = this.words.get(word)
+        console.log('Updating status for ' + word + ' to ' + data.status)
         data.spans.forEach((span) => {
-            if (data.definition === '' || !this.highlightTranslatedCB.checked) {
-                span.classList.remove('translated')
-            } else {
-                span.classList.add('translated')
+            let statuses = ['unknown', 'learning', 'known']
+            span.classList.remove(...statuses)
+            if (this.highlightCB.checked) {
+                span.classList.add(data.status)
             }
         })
     }
 
-    highlightTranslated(e) {
-        this.words.forEach((data, word) => this.updateHighlightTranslated(word))
+    highlight(e) {
+        this.words.forEach((data, word) => this.updateHighlighting(word))
     }
 
     googleTranslate() {
         const original = this.originalE.innerText
-        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + original;
-        console.log(url);
+        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + original
+        console.log(url)
         fetch(url).then(res => res.json()).then(res => {
             console.log(res)
             this.definitionE.value = res[0][0][0]
@@ -143,12 +177,12 @@ module.exports = class LanguageText {
 
     selectRandom() {
         let values = Array.from(this.words.values()).filter(e => e.definition !== '')
-        if (values.length === 0) return;
+        if (values.length === 0) return
         let index = Math.floor(Math.random() * values.length)
-        let data = values[index];
+        let data = values[index]
         index = Math.floor(Math.random() * data.spans.length)
         let span = data.spans[index]
-        span.scrollIntoView({block: 'center'});
+        span.scrollIntoView({block: 'center'})
         span.click()
     }
 }
