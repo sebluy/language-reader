@@ -15,6 +15,7 @@ module.exports = class LanguageText {
         this.updateStatsB = document.getElementById('update-stats')
         this.selectRandomB = document.getElementById('select-random')
         this.openFileB = document.getElementById('open-file')
+        this.vocabMatchingB = document.getElementById('vocab-matching')
 
         this.db = new sqlite3.Database('./words.db')
         this.numberOfWords = 0
@@ -31,6 +32,7 @@ module.exports = class LanguageText {
         this.updateStatsB.addEventListener('click', this.updateStats.bind(this))
         this.selectRandomB.addEventListener('click', this.selectRandom.bind(this))
         this.openFileB.addEventListener('click', this.openFile.bind(this))
+        this.vocabMatchingB.addEventListener('click', this.vocabMatching.bind(this))
     }
 
     addWordToDisplay(word) {
@@ -203,9 +205,91 @@ module.exports = class LanguageText {
                 setTimeout(this.updateStats.bind(this), 1000)
             })
         });
-        // console.log(dialog)
-        // const filePaths = dialog.showOpenDialogSync()
-        // console.log(filePaths)
-        // const path = '/home/sebluy/Documents/czech+greece/czech-language/hunger-games/hg-clean-ch1.txt'
+    }
+
+    randomWord() {
+        let defined = []
+        this.words.forEach((value, key) => {
+            if (value.definition === '') return;
+            defined.push([key, value])
+        })
+        if (defined.length === 0) return
+        let index = Math.floor(Math.random() * defined.length)
+        return defined[index];
+    }
+
+    shuffle(a) {
+        for (let i = a.length - 1; i > 0; i--) {
+            let r = Math.floor(Math.random() * (i + 1));
+            [a[i], a[r]] = [a[r], a[i]]
+        }
+    }
+
+    createDraggableItem(id, text, solution) {
+        let td = document.createElement('td')
+        td.id = id
+        td.classList.add('matching-item')
+        td.innerText = text
+        td.draggable = true
+        td.dataset.solution = solution
+
+        td.addEventListener('drop', (e) => {
+            e.preventDefault()
+            let other = document.getElementById(e.dataTransfer.getData('text/plain'))
+            let thisHTML = e.target.innerHTML
+            e.target.innerHTML = other.innerHTML
+            other.innerHTML = thisHTML
+            e.target.classList.remove('drag-over')
+            if (e.target.dataset.solution === '') return;
+            if (e.target.innerHTML === e.target.dataset.solution) {
+                e.target.classList.add('correct-match')
+            } else {
+                e.target.classList.add('incorrect-match')
+            }
+        });
+        td.addEventListener('dragenter', (e) => {
+            e.preventDefault()
+            e.target.classList.add('drag-over')
+        });
+        td.addEventListener('dragover', (e) => {
+            e.preventDefault()
+            e.target.classList.add('drag-over')
+        });
+        td.addEventListener('dragleave', (e) => {
+            e.target.classList.remove('drag-over')
+        });
+        td.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', e.target.id)
+            e.target.classList.remove('correct-match', 'incorrect-match')
+        })
+        return td
+    }
+
+    vocabMatching() {
+        this.titleE.textContent = 'Vocabulary Matching'
+        this.element.innerHTML = ''
+        let words = [];
+        let definitions = [];
+        for (let i = 0; i < 8; i++) {
+            let [word, data] = this.randomWord()
+            words.push(word)
+            definitions.push(data.definition)
+        }
+        let shuffled = [...definitions]
+        this.shuffle(shuffled)
+        let table = document.createElement('table')
+        let tbody = document.createElement('tbody')
+        for (let i in words) {
+            let tr = document.createElement('tr')
+            let td = document.createElement('td')
+            td.classList.add('matching-item')
+            td.innerText = words[i]
+            tr.append(td)
+            tr.append(this.createDraggableItem('matching-blank-' + i, '', definitions[i]))
+            tr.append(this.createDraggableItem('matching-definition-' + i, shuffled[i], ''))
+            tbody.append(tr)
+        }
+        table.append(tbody)
+        this.element.append(table)
     }
 }
