@@ -1,7 +1,7 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, dialog, ipcMain } = require('electron')
 const path = require('path')
 
 function createWindow () {
@@ -12,6 +12,10 @@ function createWindow () {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js')
         }
+    })
+
+    ipcMain.handle('open-file', (event) => {
+        return dialog.showOpenDialogSync({defaultPath: './texts'})
     })
 
     // and load the index.html of the app.

@@ -1,9 +1,12 @@
 const sqlite3 = require('sqlite3')
 const fetch = require('node-fetch')
+const { ipcRenderer } = require('electron')
+const fs = require('fs')
 
 module.exports = class LanguageText {
     constructor(text) {
         this.element = document.querySelector('#text p')
+        this.titleE = document.querySelector('#text h2')
         this.originalE = document.getElementById('original')
         this.definitionE = document.getElementById('definition')
         this.statsE = document.getElementById('stats')
@@ -11,6 +14,7 @@ module.exports = class LanguageText {
         this.googleTranslateB = document.getElementById('google-translate')
         this.updateStatsB = document.getElementById('update-stats')
         this.selectRandomB = document.getElementById('select-random')
+        this.openFileB = document.getElementById('open-file')
 
         this.db = new sqlite3.Database('./words.db')
         this.numberOfWords = 0
@@ -26,6 +30,7 @@ module.exports = class LanguageText {
         this.googleTranslateB.addEventListener('click', this.googleTranslate.bind(this))
         this.updateStatsB.addEventListener('click', this.updateStats.bind(this))
         this.selectRandomB.addEventListener('click', this.selectRandom.bind(this))
+        this.openFileB.addEventListener('click', this.openFile.bind(this))
     }
 
     addWordToDisplay(word) {
@@ -45,6 +50,7 @@ module.exports = class LanguageText {
         const clean = this.text.replaceAll('-\n', '')
         const words = clean.split(/\s+/)
         this.numberOfWords = words.length
+        this.element.innerHTML = ''
         words.forEach((word) => {
             let span = this.addWordToDisplay(word)
             word = this.cleanWord(word)
@@ -184,5 +190,22 @@ module.exports = class LanguageText {
         let span = data.spans[index]
         span.scrollIntoView({block: 'center'})
         span.click()
+    }
+
+    openFile() {
+        ipcRenderer.invoke('open-file').then((result) => {
+            fs.readFile(result[0], (err, contents) => {
+                this.titleE.textContent = result[0]
+                this.numberOfWords = 0
+                this.words = new Map()
+                this.text = contents.toString()
+                this.extractWords()
+                setTimeout(this.updateStats.bind(this), 1000)
+            })
+        });
+        // console.log(dialog)
+        // const filePaths = dialog.showOpenDialogSync()
+        // console.log(filePaths)
+        // const path = '/home/sebluy/Documents/czech+greece/czech-language/hunger-games/hg-clean-ch1.txt'
     }
 }
