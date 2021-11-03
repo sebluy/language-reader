@@ -22,7 +22,6 @@ module.exports = class LanguageText {
         this.words = new Map()
         this.text = text
         this.extractWords()
-        setTimeout(this.updateStats.bind(this), 1000)
 
         this.element.addEventListener('click', this.clickWord.bind(this))
         this.definitionE.addEventListener('focusout', this.updateWord.bind(this))
@@ -202,7 +201,7 @@ module.exports = class LanguageText {
                 this.words = new Map()
                 this.text = contents.toString()
                 this.extractWords()
-                setTimeout(this.updateStats.bind(this), 1000)
+                fs.writeFile('runtime-data.json', JSON.stringify({openFile: result[0]}), err => {})
             })
         });
     }
@@ -277,19 +276,32 @@ module.exports = class LanguageText {
         }
         let shuffled = [...definitions]
         this.shuffle(shuffled)
-        let table = document.createElement('table')
-        let tbody = document.createElement('tbody')
+        let rows = []
         for (let i in words) {
-            let tr = document.createElement('tr')
-            let td = document.createElement('td')
-            td.classList.add('matching-item')
-            td.innerText = words[i]
-            tr.append(td)
-            tr.append(this.createDraggableItem('matching-blank-' + i, '', definitions[i]))
-            tr.append(this.createDraggableItem('matching-definition-' + i, shuffled[i], ''))
-            tbody.append(tr)
+            rows.push(['tr',
+                ['td', {className: 'matching-item'}, words[i]],
+                this.createDraggableItem('matching-blank-' + i, '', definitions[i]),
+                this.createDraggableItem('matching-definition-' + i, shuffled[i], ''),
+            ])
         }
-        table.append(tbody)
-        this.element.append(table)
+        this.element.append(this.createHTML(['table', ['tbody', ...rows]]))
+    }
+
+    createHTML(a) {
+        let [tag, ...rest] = a
+        let element = document.createElement(tag)
+        for (let i in rest) {
+            let item = rest[i]
+            if (Array.isArray(item)) {
+                element.append(this.createHTML(item))
+            } else if (typeof item === 'string' || item instanceof Element) {
+                element.append(item)
+            } else if (typeof item === 'object') {
+                for (let prop in item) {
+                    element[prop] = item[prop]
+                }
+            }
+        }
+        return element
     }
 }
