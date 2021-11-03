@@ -182,15 +182,19 @@ module.exports = class LanguageText {
 
     updateStats() {
         let countTranslated = 0
+        let mastered = 0
         this.words.forEach((data) => {
-            if (data.definition !== '') countTranslated += data.spans.length
+            mastered += data.mastery
+            if (data.definition === '') return;
+            countTranslated += data.spans.length
         })
         const percent = countTranslated === 0 ? 0 : countTranslated / this.numberOfWords
         this.statsE.innerText =
             'Number of words: ' + this.numberOfWords + "\n" +
             'Number of distinct words: ' + this.words.size + "\n" +
             'Number of translated words: ' + countTranslated + "\n" +
-            'Percent translated: ' + (percent * 100).toFixed(2) + '%'
+            'Percent translated: ' + (percent * 100).toFixed(2) + '%' + "\n" +
+            'Percent mastered: ' + ((1 - mastered / this.words.size) * 100).toFixed(2) + '%'
     }
 
     selectRandom() {
