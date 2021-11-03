@@ -58,14 +58,14 @@ module.exports = class LanguageText {
             if (!this.words.has(word)) {
                 this.words.set(word, {
                     spans: [],
-                    status: 'unknown',
+                    mastery: 1.0,
                     definition: ''
                 })
                 this.lookupWord(word, (row) => {
                     if (row === undefined) return
                     let wordData = this.words.get(word)
                     wordData.definition = row.definition
-                    wordData.status = row.status
+                    wordData.mastery = row.mastery
                 })
             }
             this.words.get(word).spans.push(span)
@@ -81,16 +81,27 @@ module.exports = class LanguageText {
         const original = this.originalE.innerHTML
         const wordData = this.words.get(original)
         wordData.definition = definition
-        if (definition !== '' && wordData.status === 'unknown') wordData.status = 'learning'
-        const status = wordData.status
         console.log('Updating definition... for ' + original + ' to ' + definition)
-        let sql = 'INSERT OR IGNORE INTO words (original, definition, status)' +
-            ' VALUES ($original, $definition, $status)'
-        const params =  {$definition: definition, $original: original, $status: status}
+        let sql = 'INSERT OR IGNORE INTO words (original, definition)' +
+            ' VALUES ($original, $definition)'
+        const params =  {$definition: definition, $original: original}
         this.db.run(sql, params)
-        sql = 'UPDATE words SET definition = $definition, status = $status WHERE original = $original'
+        sql = 'UPDATE words SET definition = $definition WHERE original = $original'
         this.db.run(sql, params)
         this.updateHighlighting(original)
+    }
+
+    updateMastery(word, success) {
+        let data = this.words.get(word)
+        let sql
+        if (success) {
+            data.mastery /= 2
+            sql = 'UPDATE words SET mastery = mastery / 2  WHERE original = $original'
+        } else {
+            data.mastery = 1
+            sql = 'UPDATE words SET mastery = 1 WHERE original = $original'
+        }
+        this.db.run(sql, {$original: word})
     }
 
     clickWord(e) {
@@ -128,28 +139,28 @@ module.exports = class LanguageText {
         }
     }
 
-    changeStatus(n) {
-        const current = document.querySelector('span.selected')
-        if (!current) return
-        let word = this.cleanWord(current.innerHTML)
-        let wordData = this.words.get(word)
-        let statuses = ['known', 'learning', 'unknown']
-        let index = statuses.indexOf(wordData.status) + n
-        if (index > 2) index -= 3
-        if (index < 0) index += 3
-        console.log('Old status for ' + word + ' is ' + wordData.status)
-        wordData.status = statuses[index]
-        this.updateHighlighting(word)
-    }
+    // changeStatus(n) {
+    //     const current = document.querySelector('span.selected')
+    //     if (!current) return
+    //     let word = this.cleanWord(current.innerHTML)
+    //     let wordData = this.words.get(word)
+    //     let statuses = ['known', 'learning', 'unknown']
+    //     let index = statuses.indexOf(wordData.status) + n
+    //     if (index > 2) index -= 3
+    //     if (index < 0) index += 3
+    //     console.log('Old status for ' + word + ' is ' + wordData.status)
+    //     wordData.status = statuses[index]
+    //     this.updateHighlighting(word)
+    // }
 
     updateHighlighting(word) {
         const data = this.words.get(word)
-        console.log('Updating status for ' + word + ' to ' + data.status)
         data.spans.forEach((span) => {
-            let statuses = ['unknown', 'learning', 'known']
-            span.classList.remove(...statuses)
-            if (this.highlightCB.checked) {
-                span.classList.add(data.status)
+            if (this.highlightCB.checked && data.definition !== '') {
+                let hue = ((1 - data.mastery) * 120).toString(10)
+                span.style.backgroundColor = 'hsl(' + hue + ',100%,75%)'
+            } else {
+                span.style.backgroundColor = 'white'
             }
         })
     }
@@ -206,15 +217,17 @@ module.exports = class LanguageText {
         });
     }
 
-    randomWord() {
+    weightedRandomWord() {
         let defined = []
+        let cumWeight = 0
         this.words.forEach((value, key) => {
             if (value.definition === '') return;
-            defined.push([key, value])
+            cumWeight += value.mastery
+            defined.push([key, value, cumWeight])
         })
         if (defined.length === 0) return
-        let index = Math.floor(Math.random() * defined.length)
-        return defined[index];
+        let index = Math.floor(Math.random() * cumWeight)
+        return defined.find(([v, k, cumWeight]) => index < cumWeight)
     }
 
     shuffle(a) {
@@ -224,34 +237,41 @@ module.exports = class LanguageText {
         }
     }
 
-    createDraggableItem(id, text, solution) {
+    createDraggableItem(id, word, text, solution) {
         let td = document.createElement('td')
         td.id = id
         td.classList.add('matching-item')
         td.innerText = text
         td.draggable = true
-        td.dataset.solution = solution
 
         td.addEventListener('drop', (e) => {
             e.preventDefault()
-            let other = document.getElementById(e.dataTransfer.getData('text/plain'))
-            let thisHTML = e.target.innerHTML
-            e.target.innerHTML = other.innerHTML
-            other.innerHTML = thisHTML
-            e.target.classList.remove('drag-over')
-            if (e.target.dataset.solution === '') return;
-            if (e.target.innerHTML === e.target.dataset.solution) {
-                e.target.classList.add('correct-match')
+            let source = document.getElementById(e.dataTransfer.getData('text/plain'))
+            let dest = e.target
+            if (dest.draggable === false) return
+            let destHTML = dest.innerHTML
+            dest.innerHTML = source.innerHTML
+            source.innerHTML = destHTML
+            dest.classList.remove('drag-over')
+            if (solution === '') return;
+            if (dest.innerHTML === solution) {
+                this.updateMastery(word, true)
+                dest.draggable = false
+                dest.classList.remove('incorrect-match')
+                dest.classList.add('correct-match')
             } else {
-                e.target.classList.add('incorrect-match')
+                this.updateMastery(word, false)
+                dest.classList.add('incorrect-match')
             }
         });
         td.addEventListener('dragenter', (e) => {
             e.preventDefault()
+            if (e.target.draggable === false) return
             e.target.classList.add('drag-over')
         });
         td.addEventListener('dragover', (e) => {
             e.preventDefault()
+            if (e.target.draggable === false) return
             e.target.classList.add('drag-over')
         });
         td.addEventListener('dragleave', (e) => {
@@ -259,7 +279,7 @@ module.exports = class LanguageText {
         });
         td.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', e.target.id)
-            e.target.classList.remove('correct-match', 'incorrect-match')
+            e.target.classList.remove('incorrect-match')
         })
         return td
     }
@@ -270,7 +290,7 @@ module.exports = class LanguageText {
         let words = [];
         let definitions = [];
         for (let i = 0; i < 8; i++) {
-            let [word, data] = this.randomWord()
+            let [word, data] = this.weightedRandomWord()
             words.push(word)
             definitions.push(data.definition)
         }
@@ -280,8 +300,8 @@ module.exports = class LanguageText {
         for (let i in words) {
             rows.push(['tr',
                 ['td', {className: 'matching-item'}, words[i]],
-                this.createDraggableItem('matching-blank-' + i, '', definitions[i]),
-                this.createDraggableItem('matching-definition-' + i, shuffled[i], ''),
+                this.createDraggableItem('matching-blank-' + i, words[i], '', definitions[i]),
+                this.createDraggableItem('matching-definition-' + i, words[i], shuffled[i], ''),
             ])
         }
         this.element.append(this.createHTML(['table', ['tbody', ...rows]]))
