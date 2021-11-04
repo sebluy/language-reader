@@ -7,7 +7,6 @@ const LanguageText = require('./language-text');
 // It has the same sandbox as a Chrome extension.
 window.addEventListener('DOMContentLoaded', () => {
     fs.readFile('runtime-data.json', (err, contents) => {
-        console.log(contents.toJSON())
         if (contents === undefined) {
             new LanguageText('')
             return

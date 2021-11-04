@@ -38,7 +38,6 @@ module.exports = class LanguageText {
         const span = document.createElement('span')
         span.innerHTML = word
         this.element.appendChild(span)
-        this.element.appendChild(document.createTextNode(' '))
         return span
     }
 
@@ -50,9 +49,14 @@ module.exports = class LanguageText {
     extractWords() {
         const clean = this.text.replaceAll('-\n', '')
         const words = clean.split(/\s+/)
+        const wordsAndSpaces = clean.split(/(\s+)/)
         this.numberOfWords = words.length
         this.element.innerHTML = ''
-        words.forEach((word) => {
+        wordsAndSpaces.forEach((word) => {
+            if (word.trim() === '') {
+                this.element.appendChild(document.createTextNode(word))
+                return
+            }
             let span = this.addWordToDisplay(word)
             word = this.cleanWord(word)
             if (!this.words.has(word)) {

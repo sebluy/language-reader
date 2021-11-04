@@ -67,6 +67,7 @@ div {
 
 #text p {
     line-height: 30px;
+    white-space: pre-wrap;
 }
 
 button {
