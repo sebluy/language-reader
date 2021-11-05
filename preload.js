@@ -17,7 +17,11 @@ window.addEventListener('DOMContentLoaded', () => {
             return
         }
         fs.readFile(openFile, (err, contents) => {
-            new LanguageText(contents.toString())
+            if (err !== null) {
+                new LanguageText('')
+                return
+            }
+            new LanguageText(contents.toString(), openFile)
         })
     })
 })

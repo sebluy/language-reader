@@ -4,7 +4,7 @@ const { ipcRenderer } = require('electron')
 const fs = require('fs')
 
 module.exports = class LanguageText {
-    constructor(text) {
+    constructor(text, filename) {
         this.element = document.querySelector('#text p')
         this.titleE = document.querySelector('#text h2')
         this.originalE = document.getElementById('original')
@@ -22,6 +22,7 @@ module.exports = class LanguageText {
         this.words = new Map()
         this.text = text
         this.extractWords()
+        this.titleE.textContent = filename
 
         this.element.addEventListener('click', this.clickWord.bind(this))
         this.definitionE.addEventListener('focusout', this.updateWord.bind(this))
