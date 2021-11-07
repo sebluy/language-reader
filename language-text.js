@@ -16,12 +16,16 @@ module.exports = class LanguageText {
         this.selectRandomB = document.getElementById('select-random')
         this.openFileB = document.getElementById('open-file')
         this.vocabMatchingB = document.getElementById('vocab-matching')
+        this.fillInTheBlanksB = document.getElementById('fill-in-the-blanks')
 
         this.db = new sqlite3.Database('./words.db')
         this.numberOfWords = 0
         this.words = new Map()
         this.text = text
+        this.sentences = []
+        this.cleanText()
         this.extractWords()
+        this.extractSentences()
         this.titleE.textContent = filename
 
         this.element.addEventListener('click', this.clickWord.bind(this))
@@ -33,6 +37,7 @@ module.exports = class LanguageText {
         this.selectRandomB.addEventListener('click', this.selectRandom.bind(this))
         this.openFileB.addEventListener('click', this.openFile.bind(this))
         this.vocabMatchingB.addEventListener('click', this.vocabMatching.bind(this))
+        this.fillInTheBlanksB.addEventListener('click', this.fillInTheBlanks.bind(this))
     }
 
     addWordToDisplay(word) {
@@ -47,10 +52,15 @@ module.exports = class LanguageText {
         return word.replaceAll(punctuation, '').toLowerCase()
     }
 
+    cleanText() {
+        this.text = this.text.replaceAll('-\n', '')
+        this.text = this.text.replaceAll('\n', ' ')
+        this.text = this.text.replaceAll('\t', '\n\t')
+    }
+
     extractWords() {
-        const clean = this.text.replaceAll('-\n', '')
-        const words = clean.split(/\s+/)
-        const wordsAndSpaces = clean.split(/(\s+)/)
+        const words = this.text.split(/\s+/)
+        const wordsAndSpaces = this.text.split(/(\s+)/)
         this.numberOfWords = words.length
         this.element.innerHTML = ''
         wordsAndSpaces.forEach((word) => {
@@ -190,7 +200,7 @@ module.exports = class LanguageText {
         let mastered = 0
         this.words.forEach((data) => {
             mastered += data.mastery
-            if (data.definition === '') return;
+            if (data.definition === '') return
             countTranslated += data.spans.length
         })
         const percent = countTranslated === 0 ? 0 : countTranslated / this.numberOfWords
@@ -223,14 +233,14 @@ module.exports = class LanguageText {
                 this.extractWords()
                 fs.writeFile('runtime-data.json', JSON.stringify({openFile: result[0]}), err => {})
             })
-        });
+        })
     }
 
     weightedRandomWord() {
         let defined = []
         let cumWeight = 0
         this.words.forEach((value, key) => {
-            if (value.definition === '') return;
+            if (value.definition === '') return
             cumWeight += value.mastery
             defined.push([key, value, cumWeight])
         })
@@ -333,4 +343,55 @@ module.exports = class LanguageText {
         }
         return element
     }
+
+    fillInTheBlanks() {
+        this.titleE.textContent = 'Fill in the Blanks'
+        let sentenceIndex = Math.floor(Math.random() * (this.sentences.length - 10))
+        let startText = this.sentences[sentenceIndex].index
+        let endText = this.sentences[sentenceIndex + 10].index
+        this.element.innerHTML = this.text.substring(startText, endText)
+        // pick a weighted random word from each sentence
+        // add blanks
+        // add choices
+        // drag and drop
+        // allow click translation
+        // move to another class
+    }
+
+    extractSentences() {
+        let i = 0;
+        while (true) {
+            let endPos = this.nextPos(this.text, i);
+            if (endPos === false) return
+            let line = (this.text).substring(i, endPos + 1).trim();
+            this.sentences.push({line: line, index: i})
+            i = endPos + 1
+        }
+    }
+
+    isEndChar(char)
+    {
+        return char.match(/[.?!]/) !== null
+    }
+
+    nextPos(book, i)
+    {
+        let inQuote = false
+        while (true) {
+            let char = book.substring(i, i + 1)
+            if (char === false || char === '') return false
+            if (char === '„') inQuote = true
+            if (inQuote) {
+                if (char === '“') inQuote = false
+                i++
+                continue
+            }
+            let match = this.isEndChar(char)
+            if (match) break
+            i++
+        }
+        while (this.isEndChar(book.substring(i + 1, i + 2))) i++
+        return i
+    }
+
 }
