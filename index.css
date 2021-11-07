@@ -45,6 +45,12 @@ div {
     min-width: 100px;
 }
 
+span.matching-item {
+    display: inline-block;
+    padding: 10px;
+    margin: 0;
+}
+
 .correct-match {
     border: 2px dotted green;
 }

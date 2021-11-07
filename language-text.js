@@ -144,14 +144,14 @@ module.exports = class LanguageText {
             const sibling = current.nextElementSibling
             if (sibling) sibling.click()
         }
-        if (e.key === 'ArrowDown') {
-            e.preventDefault()
-            this.changeStatus(-1)
-        }
-        if (e.key === 'ArrowUp') {
-            e.preventDefault()
-            this.changeStatus(1)
-        }
+        // if (e.key === 'ArrowDown') {
+        //     e.preventDefault()
+        //     this.changeStatus(-1)
+        // }
+        // if (e.key === 'ArrowUp') {
+        //     e.preventDefault()
+        //     this.changeStatus(1)
+        // }
     }
 
     // changeStatus(n) {
@@ -236,10 +236,10 @@ module.exports = class LanguageText {
         })
     }
 
-    weightedRandomWord() {
+    weightedRandomWord(words) {
         let defined = []
         let cumWeight = 0
-        this.words.forEach((value, key) => {
+        words.forEach((value, key) => {
             if (value.definition === '') return
             cumWeight += value.mastery
             defined.push([key, value, cumWeight])
@@ -249,6 +249,10 @@ module.exports = class LanguageText {
         return defined.find(([v, k, cumWeight]) => index < cumWeight)
     }
 
+    randomElement(a) {
+        return a[Math.floor(Math.random() * a.length)]
+    }
+
     shuffle(a) {
         for (let i = a.length - 1; i > 0; i--) {
             let r = Math.floor(Math.random() * (i + 1));
@@ -256,14 +260,14 @@ module.exports = class LanguageText {
         }
     }
 
-    createDraggableItem(id, word, text, solution) {
-        let td = document.createElement('td')
-        td.id = id
-        td.classList.add('matching-item')
-        td.innerText = text
-        td.draggable = true
+    createDraggableItem(id, word, text, solution, element = 'td') {
+        let el = document.createElement(element)
+        el.id = id
+        el.classList.add('matching-item')
+        el.innerText = text
+        el.draggable = true
 
-        td.addEventListener('drop', (e) => {
+        el.addEventListener('drop', (e) => {
             e.preventDefault()
             let source = document.getElementById(e.dataTransfer.getData('text/plain'))
             let dest = e.target
@@ -273,6 +277,7 @@ module.exports = class LanguageText {
             source.innerHTML = destHTML
             dest.classList.remove('drag-over')
             if (solution === '') return;
+            console.log(dest.innerHTML, solution)
             if (dest.innerHTML === solution) {
                 this.updateMastery(word, true)
                 dest.draggable = false
@@ -283,24 +288,24 @@ module.exports = class LanguageText {
                 dest.classList.add('incorrect-match')
             }
         });
-        td.addEventListener('dragenter', (e) => {
+        el.addEventListener('dragenter', (e) => {
             e.preventDefault()
             if (e.target.draggable === false) return
             e.target.classList.add('drag-over')
         });
-        td.addEventListener('dragover', (e) => {
+        el.addEventListener('dragover', (e) => {
             e.preventDefault()
             if (e.target.draggable === false) return
             e.target.classList.add('drag-over')
         });
-        td.addEventListener('dragleave', (e) => {
+        el.addEventListener('dragleave', (e) => {
             e.target.classList.remove('drag-over')
         });
-        td.addEventListener('dragstart', (e) => {
+        el.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', e.target.id)
             e.target.classList.remove('incorrect-match')
         })
-        return td
+        return el
     }
 
     vocabMatching() {
@@ -309,7 +314,7 @@ module.exports = class LanguageText {
         let words = [];
         let definitions = [];
         for (let i = 0; i < 8; i++) {
-            let [word, data] = this.weightedRandomWord()
+            let [word, data] = this.weightedRandomWord(this.words)
             words.push(word)
             definitions.push(data.definition)
         }
@@ -347,11 +352,46 @@ module.exports = class LanguageText {
     fillInTheBlanks() {
         this.titleE.textContent = 'Fill in the Blanks'
         let sentenceIndex = Math.floor(Math.random() * (this.sentences.length - 10))
-        let startText = this.sentences[sentenceIndex].index
-        let endText = this.sentences[sentenceIndex + 10].index
-        this.element.innerHTML = this.text.substring(startText, endText)
-        // pick a weighted random word from each sentence
-        // add blanks
+        let sentences = []
+        this.element.innerHTML = ''
+        for (let i = 0; i < 10; i++) {
+            let text = this.sentences[sentenceIndex + i].text
+            let sentenceData = {
+                text: text,
+                words: new Map()
+            }
+            let wordsAndSpaces = text.split(/(\s+)/)
+            wordsAndSpaces.forEach((word) => {
+                if (word.trim() === '') {
+                    this.element.appendChild(document.createTextNode(word))
+                    return
+                }
+                let span = this.addWordToDisplay(word)
+                word = this.cleanWord(word)
+                if (!sentenceData.words.has(word)) {
+                    let wordData = {...this.words.get(word)}
+                    wordData.spans = []
+                    sentenceData.words.set(word, wordData)
+                }
+                sentenceData.words.get(word).spans.push(span)
+            })
+            sentences.push(sentenceData)
+        }
+
+        let choices = []
+        for (let i = 0; i < sentences.length; i++) {
+            let [word, data] = this.weightedRandomWord(sentences[i].words)
+            let span = this.randomElement(data.spans)
+            let blank = this.createDraggableItem('matching-blank-' + i, word, '', word, 'span')
+            choices.push([word, data])
+            span.parentNode.replaceChild(blank, span)
+        }
+        this.shuffle(choices)
+        this.element.append('\n')
+        choices.forEach(([word, data], i) => {
+            let item = this.createDraggableItem('matching-word-' + i, word, word, '', 'span')
+            this.element.append(item)
+        })
         // add choices
         // drag and drop
         // allow click translation
@@ -363,8 +403,8 @@ module.exports = class LanguageText {
         while (true) {
             let endPos = this.nextPos(this.text, i);
             if (endPos === false) return
-            let line = (this.text).substring(i, endPos + 1).trim();
-            this.sentences.push({line: line, index: i})
+            let text = (this.text).substring(i, endPos + 1);
+            this.sentences.push({text: text, index: i})
             i = endPos + 1
         }
     }
