@@ -47,8 +47,9 @@ div {
 
 span.matching-item {
     display: inline-block;
-    padding: 10px;
-    margin: 0;
+    padding: 0;
+    margin: 2px;
+    text-align: center;
 }
 
 .correct-match {

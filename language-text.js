@@ -2,6 +2,7 @@ const sqlite3 = require('sqlite3')
 const SideBar = require('./side-bar')
 
 module.exports = class LanguageText {
+
     constructor() {
         this.element = document.querySelector('#text p')
         this.titleE = document.querySelector('#text h2')
@@ -19,6 +20,7 @@ module.exports = class LanguageText {
         this.extractWords()
         this.extractSentences()
         this.titleE.textContent = filename
+        this.addText({text: this.text, words: this.words})
     }
 
     addWordToDisplay(word) {
@@ -40,16 +42,10 @@ module.exports = class LanguageText {
     }
 
     extractWords() {
-        const words = this.text.split(/\s+/)
-        const wordsAndSpaces = this.text.split(/(\s+)/)
-        this.numberOfWords = words.length
         this.element.innerHTML = ''
-        wordsAndSpaces.forEach((word) => {
-            if (word.trim() === '') {
-                this.element.appendChild(document.createTextNode(word))
-                return
-            }
-            let span = this.addWordToDisplay(word)
+        const words = this.text.split(/\s+/)
+        this.numberOfWords = words.length
+        words.forEach((word) => {
             word = this.cleanWord(word)
             if (!this.words.has(word)) {
                 this.words.set(word, {
@@ -64,7 +60,6 @@ module.exports = class LanguageText {
                     wordData.mastery = row.mastery
                 })
             }
-            this.words.get(word).spans.push(span)
         })
     }
 
@@ -116,20 +111,6 @@ module.exports = class LanguageText {
         const sibling = current.nextElementSibling
         if (sibling) sibling.click()
     }
-
-    // changeStatus(n) {
-    //     const current = document.querySelector('span.selected')
-    //     if (!current) return
-    //     let word = this.cleanWord(current.innerHTML)
-    //     let wordData = this.words.get(word)
-    //     let statuses = ['known', 'learning', 'unknown']
-    //     let index = statuses.indexOf(wordData.status) + n
-    //     if (index > 2) index -= 3
-    //     if (index < 0) index += 3
-    //     console.log('Old status for ' + word + ' is ' + wordData.status)
-    //     wordData.status = statuses[index]
-    //     this.updateHighlighting(word)
-    // }
 
     updateHighlighting(word) {
         const data = this.words.get(word)
@@ -185,10 +166,6 @@ module.exports = class LanguageText {
         if (defined.length === 0) return
         let index = Math.floor(Math.random() * cumWeight)
         return defined.find(([v, k, cumWeight]) => index < cumWeight)
-    }
-
-    randomElement(a) {
-        return a[Math.floor(Math.random() * a.length)]
     }
 
     shuffle(a) {
@@ -287,62 +264,13 @@ module.exports = class LanguageText {
         return element
     }
 
-    fillInTheBlanks() {
-        this.titleE.textContent = 'Fill in the Blanks'
-        let sentenceIndex = Math.floor(Math.random() * (this.sentences.length - 10))
-        let sentences = []
-        this.element.innerHTML = ''
-        for (let i = 0; i < 10; i++) {
-            let text = this.sentences[sentenceIndex + i].text
-            let sentenceData = {
-                text: text,
-                words: new Map()
-            }
-            let wordsAndSpaces = text.split(/(\s+)/)
-            wordsAndSpaces.forEach((word) => {
-                if (word.trim() === '') {
-                    this.element.appendChild(document.createTextNode(word))
-                    return
-                }
-                let span = this.addWordToDisplay(word)
-                word = this.cleanWord(word)
-                if (!sentenceData.words.has(word)) {
-                    let wordData = {...this.words.get(word)}
-                    wordData.spans = []
-                    sentenceData.words.set(word, wordData)
-                }
-                sentenceData.words.get(word).spans.push(span)
-            })
-            sentences.push(sentenceData)
-        }
-
-        let choices = []
-        for (let i = 0; i < sentences.length; i++) {
-            let [word, data] = this.weightedRandomWord(sentences[i].words)
-            let span = this.randomElement(data.spans)
-            let blank = this.createDraggableItem('matching-blank-' + i, word, '', word, 'span')
-            choices.push([word, data])
-            span.parentNode.replaceChild(blank, span)
-        }
-        this.shuffle(choices)
-        this.element.append('\n')
-        choices.forEach(([word, data], i) => {
-            let item = this.createDraggableItem('matching-word-' + i, word, word, '', 'span')
-            this.element.append(item)
-        })
-        // add choices
-        // drag and drop
-        // allow click translation
-        // move to another class
-    }
-
     extractSentences() {
         let i = 0;
         while (true) {
             let endPos = this.nextPos(this.text, i);
             if (endPos === false) return
             let text = (this.text).substring(i, endPos + 1);
-            this.sentences.push({text: text, index: i})
+            this.sentences.push(text)
             i = endPos + 1
         }
     }
@@ -372,4 +300,40 @@ module.exports = class LanguageText {
         return i
     }
 
+    getRandomSentenceBlock(n)
+    {
+        let sentenceIndex = Math.floor(Math.random() * (this.sentences.length - n))
+        let block = []
+        for (let i = 0; i < n; i++) {
+            let text = this.sentences[sentenceIndex + i]
+            let sentenceData = {
+                text: text,
+                words: new Map()
+            }
+            let words = text.split(/\s+/)
+            words.forEach((word) => {
+                word = this.cleanWord(word)
+                if (!sentenceData.words.has(word)) {
+                    let wordData = {...this.words.get(word)}
+                    wordData.spans = []
+                    sentenceData.words.set(word, wordData)
+                }
+            })
+            block.push(sentenceData)
+        }
+        return block
+    }
+
+    addText(textData) {
+        let wordsAndSpaces = textData.text.split(/(\s+)/)
+        wordsAndSpaces.forEach((word) => {
+            if (word.trim() === '') {
+                this.element.appendChild(document.createTextNode(word))
+                return
+            }
+            let span = this.addWordToDisplay(word)
+            word = this.cleanWord(word)
+            textData.words.get(word).spans.push(span)
+        })
+    }
 }

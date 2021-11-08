@@ -1,6 +1,7 @@
 const fetch = require('node-fetch')
 const { ipcRenderer } = require('electron')
 const fs = require('fs')
+const FillInTheBlanks = require('./fill-in-the-blanks')
 
 module.exports = class SideBar {
     constructor(languageText) {
@@ -24,7 +25,7 @@ module.exports = class SideBar {
         this.selectRandomB.addEventListener('click', () => this.languageText.selectRandom())
         this.openFileB.addEventListener('click', () => this.openFile())
         this.vocabMatchingB.addEventListener('click', () => this.languageText.vocabMatching())
-        this.fillInTheBlanksB.addEventListener('click', () => this.languageText.fillInTheBlanks())
+        this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this.languageText))
     }
 
     updateWord() {
