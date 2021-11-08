@@ -8,20 +8,21 @@ const LanguageText = require('./language-text');
 window.addEventListener('DOMContentLoaded', () => {
     fs.readFile('runtime-data.json', (err, contents) => {
         if (contents === undefined) {
-            new LanguageText('')
+            new LanguageText()
             return
         }
         let openFile = JSON.parse(contents.toString()).openFile
         if (typeof openFile !== 'string') {
-            new LanguageText('')
+            new LanguageText()
             return
         }
         fs.readFile(openFile, (err, contents) => {
             if (err !== null) {
-                new LanguageText('')
+                new LanguageText()
                 return
             }
-            new LanguageText(contents.toString(), openFile)
+            let text = new LanguageText()
+            text.loadText(contents.toString(), openFile)
         })
     })
 })

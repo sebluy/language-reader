@@ -1,24 +1,16 @@
 const sqlite3 = require('sqlite3')
-const fetch = require('node-fetch')
-const { ipcRenderer } = require('electron')
-const fs = require('fs')
+const SideBar = require('./side-bar')
 
 module.exports = class LanguageText {
-    constructor(text, filename) {
+    constructor() {
         this.element = document.querySelector('#text p')
         this.titleE = document.querySelector('#text h2')
-        this.originalE = document.getElementById('original')
-        this.definitionE = document.getElementById('definition')
-        this.statsE = document.getElementById('stats')
-        this.highlightCB = document.getElementById('highlight')
-        this.googleTranslateB = document.getElementById('google-translate')
-        this.updateStatsB = document.getElementById('update-stats')
-        this.selectRandomB = document.getElementById('select-random')
-        this.openFileB = document.getElementById('open-file')
-        this.vocabMatchingB = document.getElementById('vocab-matching')
-        this.fillInTheBlanksB = document.getElementById('fill-in-the-blanks')
-
+        this.element.addEventListener('click', (e) => this.clickWord(e))
         this.db = new sqlite3.Database('./words.db')
+        this.sidebar = new SideBar(this)
+    }
+
+    loadText(text, filename) {
         this.numberOfWords = 0
         this.words = new Map()
         this.text = text
@@ -27,17 +19,6 @@ module.exports = class LanguageText {
         this.extractWords()
         this.extractSentences()
         this.titleE.textContent = filename
-
-        this.element.addEventListener('click', this.clickWord.bind(this))
-        this.definitionE.addEventListener('focusout', this.updateWord.bind(this))
-        this.definitionE.addEventListener('keydown', this.nextWord.bind(this))
-        this.highlightCB.addEventListener('change', this.highlight.bind(this))
-        this.googleTranslateB.addEventListener('click', this.googleTranslate.bind(this))
-        this.updateStatsB.addEventListener('click', this.updateStats.bind(this))
-        this.selectRandomB.addEventListener('click', this.selectRandom.bind(this))
-        this.openFileB.addEventListener('click', this.openFile.bind(this))
-        this.vocabMatchingB.addEventListener('click', this.vocabMatching.bind(this))
-        this.fillInTheBlanksB.addEventListener('click', this.fillInTheBlanks.bind(this))
     }
 
     addWordToDisplay(word) {
@@ -91,9 +72,7 @@ module.exports = class LanguageText {
         this.db.get("SELECT * FROM words WHERE original = ?", [word], (err, row) => cb(row))
     }
 
-    updateWord() {
-        const definition = this.definitionE.value
-        const original = this.originalE.innerHTML
+    updateWord(original, definition) {
         const wordData = this.words.get(original)
         wordData.definition = definition
         console.log('Updating definition... for ' + original + ' to ' + definition)
@@ -127,31 +106,15 @@ module.exports = class LanguageText {
             const word = this.cleanWord(e.target.innerHTML)
             console.log('Switching word... to ' + word)
             console.log(this.words.get(word))
-            this.originalE.innerText = word
-            this.definitionE.value = this.words.get(word).definition
-            this.definitionE.focus()
+            this.sidebar.showWordAndDefinition(word, this.words.get(word).definition)
         }
     }
 
-    nextWord(e) {
-        if (e.key === 'Tab') {
-            e.preventDefault()
-            console.log('Pressed tab')
-            const current = document.querySelector('span.selected')
-            if (!current) return
-            console.log('Current word: ' + current.innerHTML)
-            this.definitionE.blur()
-            const sibling = current.nextElementSibling
-            if (sibling) sibling.click()
-        }
-        // if (e.key === 'ArrowDown') {
-        //     e.preventDefault()
-        //     this.changeStatus(-1)
-        // }
-        // if (e.key === 'ArrowUp') {
-        //     e.preventDefault()
-        //     this.changeStatus(1)
-        // }
+    nextWord() {
+        const current = document.querySelector('span.selected')
+        if (!current) return
+        const sibling = current.nextElementSibling
+        if (sibling) sibling.click()
     }
 
     // changeStatus(n) {
@@ -171,7 +134,7 @@ module.exports = class LanguageText {
     updateHighlighting(word) {
         const data = this.words.get(word)
         data.spans.forEach((span) => {
-            if (this.highlightCB.checked && data.definition !== '') {
+            if (this.sidebar.isHighlightChecked() && data.definition !== '') {
                 let hue = ((1 - data.mastery) * 120).toString(10)
                 span.style.backgroundColor = 'hsl(' + hue + ',100%,75%)'
             } else {
@@ -184,17 +147,6 @@ module.exports = class LanguageText {
         this.words.forEach((data, word) => this.updateHighlighting(word))
     }
 
-    googleTranslate() {
-        const original = this.originalE.innerText
-        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + original
-        console.log(url)
-        fetch(url).then(res => res.json()).then(res => {
-            console.log(res)
-            this.definitionE.value = res[0][0][0]
-            this.definitionE.focus()
-        })
-    }
-
     updateStats() {
         let countTranslated = 0
         let mastered = 0
@@ -203,13 +155,12 @@ module.exports = class LanguageText {
             if (data.definition === '') return
             countTranslated += data.spans.length
         })
-        const percent = countTranslated === 0 ? 0 : countTranslated / this.numberOfWords
-        this.statsE.innerText =
-            'Number of words: ' + this.numberOfWords + "\n" +
-            'Number of distinct words: ' + this.words.size + "\n" +
-            'Number of translated words: ' + countTranslated + "\n" +
-            'Percent translated: ' + (percent * 100).toFixed(2) + '%' + "\n" +
-            'Percent mastered: ' + ((1 - mastered / this.words.size) * 100).toFixed(2) + '%'
+        return {
+            numberOfWords: this.numberOfWords,
+            numberOfDistinctWords: this.words.size,
+            countTranslated: countTranslated,
+            mastered: mastered
+        }
     }
 
     selectRandom() {
@@ -221,19 +172,6 @@ module.exports = class LanguageText {
         let span = data.spans[index]
         span.scrollIntoView({block: 'center'})
         span.click()
-    }
-
-    openFile() {
-        ipcRenderer.invoke('open-file').then((result) => {
-            fs.readFile(result[0], (err, contents) => {
-                this.titleE.textContent = result[0]
-                this.numberOfWords = 0
-                this.words = new Map()
-                this.text = contents.toString()
-                this.extractWords()
-                fs.writeFile('runtime-data.json', JSON.stringify({openFile: result[0]}), err => {})
-            })
-        })
     }
 
     weightedRandomWord(words) {
