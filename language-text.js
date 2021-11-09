@@ -40,8 +40,9 @@ module.exports = class LanguageText {
     }
 
     cleanWord(word) {
-        const punctuation = /[,.!?"“„:-]/g
-        return word.replaceAll(punctuation, '').toLowerCase()
+        const punctuation = /[,.!?"“„:\-–;]+/
+        const regex = new RegExp('^' + punctuation.source + '|' + punctuation.source + '$', 'g')
+        return word.replaceAll(regex, '').toLowerCase()
     }
 
     cleanText() {
@@ -360,6 +361,7 @@ module.exports = class LanguageText {
             }
             let span = this.addWordToDisplay(word)
             word = this.cleanWord(word)
+            if (word === '') return
             textData.words.get(word).spans.push(span)
         })
     }
