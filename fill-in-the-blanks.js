@@ -23,10 +23,13 @@ module.exports = class FillInTheBlanks {
     {
         let choices = []
         for (let i = 0; i < sentences.length; i++) {
-            let [word, data] = this.languageText.weightedRandomWord(sentences[i].words)
+            let randomWord = this.languageText.weightedRandomWords(sentences[i].words, 1)
+            console.log(randomWord)
+            if (randomWord.length === 0) continue
+            let [word, data] = randomWord[0]
             let span = this.randomElement(data.spans)
             let blank = this.languageText.createDraggableItem(
-                'matching-blank-' + i, word, '          ', word, 'span'
+                'matching-blank-' + i, word, '          ', word, () => {}, 'span'
             )
             choices.push([word, data])
             span.parentNode.replaceChild(blank, span)
@@ -34,7 +37,9 @@ module.exports = class FillInTheBlanks {
         this.languageText.shuffle(choices)
         this.element.append('\n')
         choices.forEach(([word, data], i) => {
-            let item = this.languageText.createDraggableItem('matching-word-' + i, word, word, '', 'span')
+            let item = this.languageText.createDraggableItem(
+                'matching-word-' + i, word, word, '', () => {}, 'span'
+            )
             this.element.append(item)
         })
     }

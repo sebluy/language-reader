@@ -40,7 +40,7 @@ module.exports = class LanguageText {
     }
 
     cleanWord(word) {
-        const punctuation = /[,.!?"“„]/g
+        const punctuation = /[,.!?"“„:-]/g
         return word.replaceAll(punctuation, '').toLowerCase()
     }
 
@@ -56,6 +56,7 @@ module.exports = class LanguageText {
         this.numberOfWords = words.length
         words.forEach((word) => {
             word = this.cleanWord(word)
+            if (word === '') return
             if (!this.words.has(word)) {
                 this.words.set(word, {
                     spans: [],
@@ -164,7 +165,7 @@ module.exports = class LanguageText {
         span.click()
     }
 
-    weightedRandomWord(words) {
+    weightedRandomWords(words, n) {
         let defined = []
         let cumWeight = 0
         words.forEach((value, key) => {
@@ -172,9 +173,16 @@ module.exports = class LanguageText {
             cumWeight += value.mastery
             defined.push([key, value, cumWeight])
         })
-        if (defined.length === 0) return
-        let index = Math.floor(Math.random() * cumWeight)
-        return defined.find(([v, k, cumWeight]) => index < cumWeight)
+        if (defined.length < n) return []
+
+        let random = []
+        while (random.length < n) {
+            let index = Math.floor(Math.random() * cumWeight)
+            let word = defined.find(([k, v, cumWeight]) => index < cumWeight)
+            if (random.find(chosen => chosen[0] === word[0])) continue
+            random.push(word)
+        }
+        return random
     }
 
     shuffle(a) {
@@ -184,7 +192,7 @@ module.exports = class LanguageText {
         }
     }
 
-    createDraggableItem(id, word, text, solution, element = 'td') {
+    createDraggableItem(id, word, text, solution, correctCb, element = 'td') {
         let el = document.createElement(element)
         el.id = id
         el.classList.add('matching-item')
@@ -207,6 +215,7 @@ module.exports = class LanguageText {
                 dest.draggable = false
                 dest.classList.remove('incorrect-match')
                 dest.classList.add('correct-match')
+                correctCb()
             } else {
                 this.updateMastery(word, false)
                 dest.classList.add('incorrect-match')
@@ -235,21 +244,29 @@ module.exports = class LanguageText {
     vocabMatching() {
         this.titleE.textContent = 'Vocabulary Matching'
         this.element.innerHTML = ''
+        this.sidebar.updateStats()
         let words = [];
         let definitions = [];
-        for (let i = 0; i < 8; i++) {
-            let [word, data] = this.weightedRandomWord(this.words)
+        let randomWords = this.weightedRandomWords(this.words, 8)
+        randomWords.forEach(([word, data]) => {
             words.push(word)
             definitions.push(data.definition)
-        }
+        })
         let shuffled = [...definitions]
         this.shuffle(shuffled)
         let rows = []
+        let numCorrect = 0
+        let correctCb = () => {
+            numCorrect += 1
+            if (numCorrect === words.length) {
+                this.vocabMatching()
+            }
+        }
         for (let i in words) {
             rows.push(['tr',
                 ['td', {className: 'matching-item'}, words[i]],
-                this.createDraggableItem('matching-blank-' + i, words[i], '', definitions[i]),
-                this.createDraggableItem('matching-definition-' + i, words[i], shuffled[i], ''),
+                this.createDraggableItem('matching-blank-' + i, words[i], '', definitions[i], correctCb),
+                this.createDraggableItem('matching-definition-' + i, words[i], shuffled[i], '', correctCb),
             ])
         }
         this.element.append(this.createHTML(['table', ['tbody', ...rows]]))
@@ -322,6 +339,7 @@ module.exports = class LanguageText {
             let words = text.split(/\s+/)
             words.forEach((word) => {
                 word = this.cleanWord(word)
+                if (word === '') return
                 if (!sentenceData.words.has(word)) {
                     let wordData = {...this.words.get(word)}
                     wordData.spans = []
