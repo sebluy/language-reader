@@ -85,6 +85,10 @@ button {
     margin-top: 5px;
 }
 
+audio {
+    width: 200px;
+}
+
 label {
     font-size: medium;
 }

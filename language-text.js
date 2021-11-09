@@ -7,6 +7,7 @@ module.exports = class LanguageText {
         this.element = document.querySelector('#text p')
         this.titleE = document.querySelector('#text h2')
         this.element.addEventListener('click', (e) => this.clickWord(e))
+        document.addEventListener('keydown', (e) => this.sidebar.handleKey(e))
         this.db = new sqlite3.Database('./words.db')
         this.sidebar = new SideBar(this)
     }
@@ -16,11 +17,19 @@ module.exports = class LanguageText {
         this.words = new Map()
         this.text = text
         this.sentences = []
+        this.extractAudio()
         this.cleanText()
         this.extractWords()
         this.extractSentences()
         this.titleE.textContent = filename
         this.addText({text: this.text, words: this.words})
+    }
+
+    extractAudio() {
+        let match = this.text.match(/<audio>([\d:]+)<\/audio>/)
+        if (match === null) return
+        this.sidebar.setAudio(match[1])
+        this.text = this.text.replace(match[0], '')
     }
 
     addWordToDisplay(word) {

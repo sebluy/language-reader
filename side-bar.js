@@ -16,6 +16,7 @@ module.exports = class SideBar {
         this.openFileB = document.getElementById('open-file')
         this.vocabMatchingB = document.getElementById('vocab-matching')
         this.fillInTheBlanksB = document.getElementById('fill-in-the-blanks')
+        this.audioE = document.getElementById('audio')
 
         this.definitionE.addEventListener('focusout', () => this.updateWord())
         this.definitionE.addEventListener('keydown', (e) => this.nextWord(e))
@@ -26,6 +27,25 @@ module.exports = class SideBar {
         this.openFileB.addEventListener('click', () => this.openFile())
         this.vocabMatchingB.addEventListener('click', () => this.languageText.vocabMatching())
         this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this.languageText))
+    }
+
+    setAudio(currentTime) {
+        let [minutes, seconds] = currentTime.split(':')
+        this.audioStart = parseInt(minutes) * 60 + parseInt(seconds)
+        this.audioE.currentTime = this.audioStart
+    }
+
+    handleKey(e) {
+        console.log(e)
+        if (e.key === 'p') {
+            if (this.audioE.paused) {
+                this.audioE.play()
+            } else {
+                this.audioE.pause()
+            }
+        } else if (e.key === 'r') {
+            this.audioE.currentTime = this.audioStart
+        }
     }
 
     updateWord() {
@@ -51,6 +71,7 @@ module.exports = class SideBar {
             this.definitionE.blur()
             this.languageText.nextWord()
         }
+        e.stopPropagation()
     }
 
     googleTranslate() {
