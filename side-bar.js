@@ -85,15 +85,13 @@ module.exports = class SideBar {
 
     updateStats() {
         let stats = this.languageText.updateStats()
-        const percent = stats.countTranslated === 0 ? 0 : stats.countTranslated / stats.numberOfWords
-        const percentMastered = ((1 - stats.mastered / stats.numberOfDistinctWords) * 100).toFixed(2) + '%'
+        let fp = (p) => (p * 100).toFixed(2) + '%'
         let newTable = this.languageText.createHTML(
             ['tbody',
                 ['tr', ['td', 'Number of words'], ['td', stats.numberOfWords]],
                 ['tr', ['td', 'Number of distinct words'], ['td', stats.numberOfDistinctWords]],
-                ['tr', ['td', 'Number of translated words'], ['td', stats.countTranslated]],
-                ['tr', ['td', 'Percent translated'], ['td', (percent * 100).toFixed(2) + '%']],
-                ['tr', ['td', 'Percent mastered'], ['td', percentMastered]],
+                ['tr', ['td', 'Percent translated'], ['td', fp(stats.percentTranslated)]],
+                ['tr', ['td', 'Percent mastered'], ['td', fp(stats.percentMastered)]],
             ]
         )
         this.statsE.replaceChild(newTable, this.statsE.childNodes[0])

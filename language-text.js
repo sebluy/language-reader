@@ -13,7 +13,6 @@ module.exports = class LanguageText {
     }
 
     loadText(text, filename) {
-        this.numberOfWords = 0
         this.words = new Map()
         this.filename = filename
         this.text = text
@@ -23,7 +22,6 @@ module.exports = class LanguageText {
         this.extractWords()
         this.extractSentences()
         this.loadPage()
-        this.sidebar.updateStats()
     }
 
     loadPage() {
@@ -61,7 +59,7 @@ module.exports = class LanguageText {
 
     extractWords() {
         const words = this.text.split(/\s+/)
-        this.numberOfWords = words.length
+        let promises = []
         words.forEach((word) => {
             word = this.cleanWord(word)
             if (word === '') return
@@ -71,13 +69,26 @@ module.exports = class LanguageText {
                     mastery: 1.0,
                     definition: ''
                 })
-                this.lookupWord(word, (row) => {
-                    if (row === undefined) return
-                    let wordData = this.words.get(word)
-                    wordData.definition = row.definition
-                    wordData.mastery = row.mastery
+                let promise = new Promise(resolve => {
+                    this.lookupWord(word, (row) => {
+                        if (row === undefined) {
+                            resolve()
+                            return
+                        }
+                        let wordData = this.words.get(word)
+                        wordData.definition = row.definition
+                        wordData.mastery = row.mastery
+                        resolve()
+                    })
                 })
+                promises.push(promise)
             }
+        })
+        let start = (new Date()).getTime()
+        Promise.all(promises).then(() => {
+            let end = (new Date()).getTime()
+            console.log(end - start)
+            this.sidebar.updateStats()
         })
     }
 
@@ -149,16 +160,20 @@ module.exports = class LanguageText {
     updateStats() {
         let countTranslated = 0
         let mastered = 0
+        let numberOfWords = 0
         this.words.forEach((data) => {
             mastered += data.mastery
+            numberOfWords += data.spans.length
             if (data.definition === '') return
             countTranslated += data.spans.length
         })
+        let percentTranslated = countTranslated === 0 ? 0 : countTranslated / numberOfWords
+        let percentMastered = 1 - (mastered / this.words.size)
         return {
-            numberOfWords: this.numberOfWords,
+            numberOfWords: numberOfWords,
             numberOfDistinctWords: this.words.size,
-            countTranslated: countTranslated,
-            mastered: mastered
+            percentTranslated: percentTranslated,
+            percentMastered: percentMastered,
         }
     }
 
