@@ -135,7 +135,7 @@ module.exports = class LanguageText {
         })
     }
 
-    highlight(e) {
+    highlight() {
         this.words.forEach((data, word) => this.updateHighlighting(word))
     }
 
@@ -171,17 +171,18 @@ module.exports = class LanguageText {
         let cumWeight = 0
         words.forEach((value, key) => {
             if (value.definition === '') return
+            defined.push([key, value, cumWeight, cumWeight + value.mastery])
             cumWeight += value.mastery
-            defined.push([key, value, cumWeight])
         })
         if (defined.length < n) return []
 
         let random = []
         while (random.length < n) {
-            let index = Math.floor(Math.random() * cumWeight)
-            let word = defined.find(([k, v, cumWeight]) => index < cumWeight)
+            let index = Math.random() * cumWeight
+            let word = defined.find(([k, v, start, end]) => start <= index && index < end)
             if (random.find(chosen => chosen[0] === word[0])) continue
             random.push(word)
+            console.log(word[1].mastery)
         }
         return random
     }
@@ -280,7 +281,7 @@ module.exports = class LanguageText {
             let item = rest[i]
             if (Array.isArray(item)) {
                 element.append(this.createHTML(item))
-            } else if (typeof item === 'string' || item instanceof Element) {
+            } else if (typeof item === 'string' || typeof item === 'number' || item instanceof Element) {
                 element.append(item)
             } else if (typeof item === 'object') {
                 for (let prop in item) {
