@@ -59,7 +59,6 @@ module.exports = class LanguageText {
 
     extractWords() {
         const words = this.text.split(/\s+/)
-        let promises = []
         words.forEach((word) => {
             word = this.cleanWord(word)
             if (word === '') return
@@ -69,31 +68,22 @@ module.exports = class LanguageText {
                     mastery: 1.0,
                     definition: ''
                 })
-                let promise = new Promise(resolve => {
-                    this.lookupWord(word, (row) => {
-                        if (row === undefined) {
-                            resolve()
-                            return
-                        }
-                        let wordData = this.words.get(word)
-                        wordData.definition = row.definition
-                        wordData.mastery = row.mastery
-                        resolve()
-                    })
-                })
-                promises.push(promise)
+
             }
         })
-        let start = (new Date()).getTime()
-        Promise.all(promises).then(() => {
-            let end = (new Date()).getTime()
-            console.log(end - start)
+        this.fetchWords((rows) => {
+            rows.forEach((row) => {
+                if (!this.words.has(row.original)) return
+                let wordData = this.words.get(row.original)
+                wordData.definition = row.definition
+                wordData.mastery = row.mastery
+            })
             this.sidebar.updateStats()
         })
     }
 
-    lookupWord(word, cb) {
-        this.db.get("SELECT * FROM words WHERE original = ?", [word], (err, row) => cb(row))
+    fetchWords(cb) {
+        this.db.all("SELECT * FROM words", (err, rows) => cb(rows))
     }
 
     updateWord(original, definition) {
