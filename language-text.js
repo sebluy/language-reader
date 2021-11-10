@@ -15,13 +15,21 @@ module.exports = class LanguageText {
     loadText(text, filename) {
         this.numberOfWords = 0
         this.words = new Map()
+        this.filename = filename
         this.text = text
         this.sentences = []
         this.extractAudio()
         this.cleanText()
         this.extractWords()
         this.extractSentences()
-        this.titleE.textContent = filename
+        this.loadPage()
+        this.sidebar.updateStats()
+    }
+
+    loadPage() {
+        this.element.innerHTML = ''
+        this.titleE.textContent = this.filename
+        this.words.forEach((v, k) => v.spans = [])
         this.addText({text: this.text, words: this.words})
     }
 
@@ -52,7 +60,6 @@ module.exports = class LanguageText {
     }
 
     extractWords() {
-        this.element.innerHTML = ''
         const words = this.text.split(/\s+/)
         this.numberOfWords = words.length
         words.forEach((word) => {
@@ -153,17 +160,6 @@ module.exports = class LanguageText {
             countTranslated: countTranslated,
             mastered: mastered
         }
-    }
-
-    selectRandom() {
-        let values = Array.from(this.words.values()).filter(e => e.definition !== '')
-        if (values.length === 0) return
-        let index = Math.floor(Math.random() * values.length)
-        let data = values[index]
-        index = Math.floor(Math.random() * data.spans.length)
-        let span = data.spans[index]
-        span.scrollIntoView({block: 'center'})
-        span.click()
     }
 
     weightedRandomWords(words, n) {

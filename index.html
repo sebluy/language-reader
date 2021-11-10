@@ -11,20 +11,41 @@
     <link rel="stylesheet" type="text/css" href="./index.css">
 </head>
 <body>
-    <div id="word-lookup">
-        <span id="original"></span>
-        <input id="definition"/>
-        <button id="open-file">Open File</button>
-        <button id="google-translate">Google Translate</button>
-        <button id="select-random">Select Random</button>
-        <button id="vocab-matching">Vocabulary Matching</button>
-        <button id="update-stats">Update Stats</button>
-        <button id="fill-in-the-blanks">Fill in the Blanks</button>
-        <table id="stats"><tbody></tbody></table>
-        <input type="checkbox" id="highlight"/>
-        <label for="highlight">Highlight</label>
-        <audio id="audio" controls src="../../czech+greece/czech-language/hunger-games/Audiobook/02 Arena smrti - Splatci.mp3">
-        </audio>
+    <div id="side-bar">
+        <div class="sidebar-group">
+            <button id="open-file">Open File</button>
+        </div>
+        <div class="sidebar-group">
+            <div>
+                <input type="radio" id="reader" name="mode" checked>
+                <label for="reader">Reader</label>
+            </div>
+            <div>
+                <input type="radio" id="vocab-matching" name="mode">
+                <label for="vocab-matching">Vocabulary Matching</label>
+            </div>
+            <div>
+                <input type="radio" id="fill-in-the-blanks" name="mode">
+                <label for="fill-in-the-blanks">Fill in the Blanks</label>
+            </div>
+        </div>
+        <div class="sidebar-group">
+            <span id="original">...</span>
+            <input id="definition"/>
+            <button id="google-translate">Google Translate</button>
+        </div>
+        <div class="sidebar-group">
+            <table id="stats"><tbody></tbody></table>
+            <button id="update-stats">Update Stats</button>
+        </div>
+        <div class="sidebar-group">
+            <input type="checkbox" id="highlight"/>
+            <label for="highlight">Highlight Mastery</label>
+        </div>
+        <div class="sidebar-group">
+            <audio id="audio" controls src="../../czech+greece/czech-language/hunger-games/Audiobook/02 Arena smrti - Splatci.mp3">
+            </audio>
+        </div>
     </div>
     <div id="text">
         <h2></h2>
