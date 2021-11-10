@@ -1,8 +1,13 @@
 /* Side bar */
-#side-bar {
+.side-bar {
     position: fixed;
     width: 250px;
     padding: 10px;
+}
+
+.right {
+    top: 0;
+    left: 800px;
 }
 
 .sidebar-group {
@@ -10,7 +15,7 @@
     margin-bottom: 10px;
 }
 
-#side-bar button {
+.side-bar button {
     text-align: center;
     display: block;
     width: 250px;
@@ -18,7 +23,7 @@
     margin-bottom: 5px;
 }
 
-#side-bar input[type=checkbox] {
+.side-bar input[type=checkbox] {
     transform: scale(1.5);
     margin: 10px;
 }
@@ -100,6 +105,9 @@ span.matching-item {
 
 #text {
     margin-left: 280px;
+    width: 500px;
+    padding: 5px;
+    border: 1px solid black;
 }
 
 #text p {

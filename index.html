@@ -11,7 +11,22 @@
     <link rel="stylesheet" type="text/css" href="./index.css">
 </head>
 <body>
-    <div id="side-bar">
+    <div class="side-bar">
+        <div class="sidebar-group">
+            <span id="original">...</span>
+            <input id="definition"/>
+            <button id="google-translate">Google Translate</button>
+        </div>
+        <div class="sidebar-group">
+            <audio id="audio" controls src="../../czech+greece/czech-language/hunger-games/Audiobook/02 Arena smrti - Splatci.mp3">
+            </audio>
+        </div>
+    </div>
+    <div id="text">
+        <h2></h2>
+        <p></p>
+    </div>
+    <div class="side-bar right">
         <div class="sidebar-group">
             <button id="open-file">Open File</button>
         </div>
@@ -30,11 +45,6 @@
             </div>
         </div>
         <div class="sidebar-group">
-            <span id="original">...</span>
-            <input id="definition"/>
-            <button id="google-translate">Google Translate</button>
-        </div>
-        <div class="sidebar-group">
             <table id="stats"><tbody></tbody></table>
             <button id="update-stats">Update Stats</button>
         </div>
@@ -42,14 +52,6 @@
             <input type="checkbox" id="highlight"/>
             <label for="highlight">Highlight Mastery</label>
         </div>
-        <div class="sidebar-group">
-            <audio id="audio" controls src="../../czech+greece/czech-language/hunger-games/Audiobook/02 Arena smrti - Splatci.mp3">
-            </audio>
-        </div>
-    </div>
-    <div id="text">
-        <h2></h2>
-        <p></p>
     </div>
 
 <!-- You can also require other files to run in this process -->
