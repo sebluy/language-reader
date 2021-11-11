@@ -24,7 +24,10 @@ module.exports = class SideBar {
         this.googleTranslateB.addEventListener('click', () => this.googleTranslate())
         this.updateStatsB.addEventListener('click', () => this.updateStats())
         this.openFileB.addEventListener('click', () => this.openFile())
-        this.readerB.addEventListener('click', () => this.languageText.loadPage())
+        this.readerB.addEventListener('click', () => {
+            this.languageText.loadPage()
+            this.languageText.highlight()
+        })
         this.vocabMatchingB.addEventListener('click', () => this.languageText.vocabMatching())
         this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this.languageText))
     }

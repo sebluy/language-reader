@@ -25,8 +25,8 @@ module.exports = class LanguageText {
     }
 
     loadPage() {
-        this.element.innerHTML = ''
         this.titleE.textContent = this.filename
+        this.element.innerHTML = ''
         this.words.forEach((v, k) => v.spans = [])
         this.addText({text: this.text, words: this.words})
     }
@@ -64,7 +64,6 @@ module.exports = class LanguageText {
             if (word === '') return
             if (!this.words.has(word)) {
                 this.words.set(word, {
-                    spans: [],
                     mastery: 1.0,
                     definition: ''
                 })
@@ -79,6 +78,7 @@ module.exports = class LanguageText {
                 wordData.mastery = row.mastery
             })
             this.sidebar.updateStats()
+            this.highlight()
         })
     }
 
