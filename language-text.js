@@ -1,50 +1,25 @@
-const sqlite3 = require('sqlite3')
-const SideBar = require('./side-bar')
 const Utility = require('./utility')
 const LanguageDB = require('./language-db')
 
 module.exports = class LanguageText {
 
-    constructor() {
-        this.element = document.querySelector('#text p')
-        this.titleE = document.querySelector('#text h2')
-        this.element.addEventListener('click', (e) => this.clickWord(e))
-        document.addEventListener('keydown', (e) => this.sidebar.handleKey(e))
+    constructor(filename, text) {
         this.db = new LanguageDB()
-        this.sidebar = new SideBar(this)
-    }
-
-    loadText(text, filename) {
         this.words = new Map()
         this.filename = filename
         this.text = text
         this.sentences = []
-        this.extractAudio()
+        this.audio = this.extractAudio()
         this.cleanText()
         this.extractWords()
         this.extractSentences()
-        this.loadPage()
-    }
-
-    loadPage() {
-        this.titleE.textContent = this.filename
-        this.element.innerHTML = ''
-        this.words.forEach((v, k) => v.spans = [])
-        this.addText({text: this.text, words: this.words})
     }
 
     extractAudio() {
         let match = this.text.match(/<audio>([\d:]+)<\/audio>/)
-        if (match === null) return
-        this.sidebar.setAudio(match[1])
+        if (match === null) return null
         this.text = this.text.replace(match[0], '')
-    }
-
-    addWordToDisplay(word) {
-        const span = document.createElement('span')
-        span.innerHTML = word
-        this.element.appendChild(span)
-        return span
+        return match[1]
     }
 
     cleanWord(word) {
@@ -64,12 +39,14 @@ module.exports = class LanguageText {
         words.forEach((word) => {
             word = this.cleanWord(word)
             if (word === '') return
-            if (!this.words.has(word)) {
+            if (this.words.has(word)) {
+                this.words.get(word).count += 1
+            } else {
                 this.words.set(word, {
                     mastery: 1.0,
-                    definition: ''
+                    definition: '',
+                    count: 1,
                 })
-
             }
         })
         this.db.fetchWords((rows) => {
@@ -79,17 +56,16 @@ module.exports = class LanguageText {
                 wordData.definition = row.definition
                 wordData.mastery = row.mastery
             })
-            this.sidebar.updateStats()
-            this.highlight()
+            this.onUpdate()
         })
     }
 
     updateWord(word, definition) {
+        console.log(word, definition)
         const wordData = this.words.get(word)
         wordData.definition = definition
-        console.log('Updating definition... for ' + original + ' to ' + definition)
+        console.log('Updating definition... for ' + word + ' to ' + definition)
         this.db.updateWord(word, definition)
-        this.updateHighlighting(word)
     }
 
     updateMastery(word, success) {
@@ -98,50 +74,15 @@ module.exports = class LanguageText {
         this.db.updateMastery(word, data.mastery)
     }
 
-    clickWord(e) {
-        if (e.target.matches('span')) {
-            const oldWordE = document.querySelector('span.selected')
-            if (oldWordE) oldWordE.classList.remove('selected')
-            e.target.classList.add('selected')
-            const word = this.cleanWord(e.target.innerHTML)
-            console.log('Switching word... to ' + word)
-            console.log(this.words.get(word))
-            this.sidebar.showWordAndDefinition(word, this.words.get(word).definition)
-        }
-    }
-
-    nextWord() {
-        const current = document.querySelector('span.selected')
-        if (!current) return
-        const sibling = current.nextElementSibling
-        if (sibling) sibling.click()
-    }
-
-    updateHighlighting(word) {
-        const data = this.words.get(word)
-        data.spans.forEach((span) => {
-            if (this.sidebar.isHighlightChecked() && data.definition !== '') {
-                let hue = ((1 - data.mastery) * 120).toString(10)
-                span.style.backgroundColor = 'hsl(' + hue + ',100%,75%)'
-            } else {
-                span.style.backgroundColor = 'white'
-            }
-        })
-    }
-
-    highlight() {
-        this.words.forEach((data, word) => this.updateHighlighting(word))
-    }
-
     updateStats() {
         let countTranslated = 0
         let mastered = 0
         let numberOfWords = 0
         this.words.forEach((data) => {
             mastered += data.mastery
-            numberOfWords += data.spans.length
+            numberOfWords += data.count
             if (data.definition === '') return
-            countTranslated += data.spans.length
+            countTranslated += data.count
         })
         let percentTranslated = countTranslated === 0 ? 0 : countTranslated / numberOfWords
         let percentMastered = 1 - (mastered / this.words.size)
@@ -179,9 +120,7 @@ module.exports = class LanguageText {
                 word = this.cleanWord(word)
                 if (word === '') return
                 if (!sentenceData.words.has(word)) {
-                    let wordData = {...this.words.get(word)}
-                    wordData.spans = []
-                    sentenceData.words.set(word, wordData)
+                    sentenceData.words.set(word, this.words.get(word))
                 }
             })
             block.push(sentenceData)
@@ -189,17 +128,4 @@ module.exports = class LanguageText {
         return block
     }
 
-    addText(textData) {
-        let wordsAndSpaces = textData.text.split(/(\s+)/)
-        wordsAndSpaces.forEach((word) => {
-            if (word.trim() === '') {
-                this.element.appendChild(document.createTextNode(word))
-                return
-            }
-            let span = this.addWordToDisplay(word)
-            word = this.cleanWord(word)
-            if (word === '') return
-            textData.words.get(word).spans.push(span)
-        })
-    }
 }

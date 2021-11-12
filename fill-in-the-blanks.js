@@ -1,19 +1,13 @@
 const Utility = require('./utility')
 
 module.exports = class FillInTheBlanks {
-    constructor(languageText) {
-        this.languageText = languageText
-
-        this.element = document.querySelector('#text p')
-        this.titleE = document.querySelector('#text h2')
-
-        this.element.innerHTML = ''
-        this.titleE.textContent = 'Fill in the Blanks'
-
+    constructor(sidebar) {
+        this.sidebar = sidebar
+        this.languageText = sidebar.languageText
+        this.reader = this.sidebar.reader
         let sentences = this.languageText.getRandomSentenceBlock(7)
-        sentences.forEach((sentence) => {
-            this.languageText.addText(sentence)
-        })
+        let text = sentences.map((v) => v.text).join()
+        this.reader.load('Fill in the Blanks', text)
         this.createBlanksAndChoices(sentences)
     }
 
@@ -28,7 +22,7 @@ module.exports = class FillInTheBlanks {
             this.languageText.updateMastery(word, correct)
             numCorrect += 1
             if (numCorrect === sentences.length) {
-                new FillInTheBlanks(this.languageText)
+                new FillInTheBlanks(this.sidebar)
             }
         }
         let choices = []
@@ -49,14 +43,14 @@ module.exports = class FillInTheBlanks {
             span.parentNode.replaceChild(blank, span)
         }
         Utility.shuffle(choices)
-        this.element.append('\n')
+        this.reader.element.append('\n')
         choices.forEach(([word, data], i) => {
             let item = Utility.createDraggableItem({
                 tag: 'span',
                 id: 'matching-word-' + i,
                 text: word,
             })
-            this.element.append(item)
+            this.reader.element.append(item)
         })
     }
 

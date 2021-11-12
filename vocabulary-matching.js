@@ -2,14 +2,15 @@ const Utility = require('./utility')
 
 module.exports = class VocabularyMatching {
 
-    constructor(languageText) {
-        this.languageText = languageText
+    constructor(sidebar) {
+        this.sidebar = sidebar
+        this.languageText = sidebar.languageText
 
         this.element = document.querySelector('#text p')
         this.titleE = document.querySelector('#text h2')
 
         this.titleE.textContent = 'Vocabulary Matching'
-        this.languageText.sidebar.updateStats()
+        this.sidebar.updateStats()
 
         this.buildGrid(this.getRandomWords())
     }
@@ -34,7 +35,7 @@ module.exports = class VocabularyMatching {
             this.languageText.updateMastery(word, success)
             numCorrect += 1
             if (numCorrect === words.length) {
-                new VocabularyMatching(this.languageText)
+                new VocabularyMatching(this.sidebar)
             }
         }
         let rows = []

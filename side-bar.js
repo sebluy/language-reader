@@ -4,10 +4,25 @@ const fs = require('fs')
 const FillInTheBlanks = require('./fill-in-the-blanks')
 const VocabularyMatching = require('./vocabulary-matching')
 const Utility = require('./utility')
+const LanguageText = require('./language-text')
+const Reader = require('./reader')
 
 module.exports = class SideBar {
+
+    static createView(filename, text) {
+        let languageText = new LanguageText(filename, text)
+        let sidebar = new SideBar(languageText)
+        sidebar.reader = new Reader(sidebar)
+        sidebar.reader.load(languageText.filename, languageText.text)
+        languageText.onUpdate = () => {
+            sidebar.updateStats()
+            sidebar.reader.highlight()
+        }
+    }
+
     constructor(languageText) {
         this.languageText = languageText
+
         this.originalE = document.getElementById('original')
         this.definitionE = document.getElementById('definition')
         this.statsE = document.getElementById('stats')
@@ -22,19 +37,23 @@ module.exports = class SideBar {
 
         this.definitionE.addEventListener('focusout', () => this.updateWord())
         this.definitionE.addEventListener('keydown', (e) => this.nextWord(e))
-        this.highlightCB.addEventListener('change', () => this.languageText.highlight())
+        this.highlightCB.addEventListener('change', () => this.reader.highlight())
         this.googleTranslateB.addEventListener('click', () => this.googleTranslate())
         this.updateStatsB.addEventListener('click', () => this.updateStats())
         this.openFileB.addEventListener('click', () => this.openFile())
         this.readerB.addEventListener('click', () => {
-            this.languageText.loadPage()
-            this.languageText.highlight()
+            this.reader.load(this.languageText.filename, this.languageText.text)
+            this.reader.highlight()
         })
-        this.vocabMatchingB.addEventListener('click', () => new VocabularyMatching(this.languageText))
-        this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this.languageText))
+        this.vocabMatchingB.addEventListener('click', () => new VocabularyMatching(this))
+        this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this))
+
+        this.setAudio()
     }
 
-    setAudio(currentTime) {
+    setAudio() {
+        let currentTime = this.languageText.audio
+        if (currentTime === undefined) return
         let [minutes, seconds] = currentTime.split(':')
         this.audioStart = parseInt(minutes) * 60 + parseInt(seconds)
         this.audioE.currentTime = this.audioStart
@@ -57,6 +76,7 @@ module.exports = class SideBar {
         const original = this.originalE.innerHTML
         const definition = this.definitionE.value
         this.languageText.updateWord(original, definition)
+        this.reader.updateHighlighting(original)
     }
 
     showWordAndDefinition(word, definition)
@@ -74,7 +94,7 @@ module.exports = class SideBar {
         if (e.key === 'Tab') {
             e.preventDefault()
             this.definitionE.blur()
-            this.languageText.nextWord()
+            this.reader.nextWord()
         }
         e.stopPropagation()
     }
@@ -105,10 +125,20 @@ module.exports = class SideBar {
     openFile() {
         ipcRenderer.invoke('open-file').then((result) => {
             fs.readFile(result[0], (err, contents) => {
-                this.languageText.loadText(contents.toString(), result[0])
+                this.loadFile(result[0], contents.toString())
                 fs.writeFile('runtime-data.json', JSON.stringify({openFile: result[0]}), err => {})
             })
         })
+    }
+
+    loadFile(filename, text) {
+        this.languageText = new LanguageText(filename, text)
+        this.reader.languageText = this.languageText
+        this.reader.load(this.languageText.filename, this.languageText.text)
+        this.languageText.onUpdate = () => {
+            this.updateStats()
+            this.reader.highlight()
+        }
     }
 
 }
