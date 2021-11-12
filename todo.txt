@@ -1,7 +1,10 @@
 Refactor into classes (sidebar, reader, matching, text model).
+Find a way to do unscramble the sentence with audio. 
+- Maybe mark each sentence with the audio time somehow?
+Automatically divide text on paragraphs.
+- Present user 3 or 4 paragraphs for study.
+- Allow marking audio start for each paragraph.
 
-Give a sentence with a word missing, and give a set of options to fill in the blank.
-Add a "fill in the blank" game.
 Add a matching game with pictures.
 
 Ideally, these exercises should have the following goals:

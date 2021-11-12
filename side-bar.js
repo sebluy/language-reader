@@ -2,6 +2,7 @@ const fetch = require('node-fetch')
 const { ipcRenderer } = require('electron')
 const fs = require('fs')
 const FillInTheBlanks = require('./fill-in-the-blanks')
+const VocabularyMatching = require('./vocabulary-matching')
 
 module.exports = class SideBar {
     constructor(languageText) {
@@ -28,7 +29,7 @@ module.exports = class SideBar {
             this.languageText.loadPage()
             this.languageText.highlight()
         })
-        this.vocabMatchingB.addEventListener('click', () => this.languageText.vocabMatching())
+        this.vocabMatchingB.addEventListener('click', () => new VocabularyMatching(this.languageText))
         this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this.languageText))
     }
 

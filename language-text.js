@@ -244,37 +244,6 @@ module.exports = class LanguageText {
         return el
     }
 
-    vocabMatching() {
-        this.titleE.textContent = 'Vocabulary Matching'
-        this.element.innerHTML = ''
-        this.sidebar.updateStats()
-        let words = [];
-        let definitions = [];
-        let randomWords = this.weightedRandomWords(this.words, 8)
-        randomWords.forEach(([word, data]) => {
-            words.push(word)
-            definitions.push(data.definition)
-        })
-        let shuffled = [...definitions]
-        this.shuffle(shuffled)
-        let rows = []
-        let numCorrect = 0
-        let correctCb = () => {
-            numCorrect += 1
-            if (numCorrect === words.length) {
-                this.vocabMatching()
-            }
-        }
-        for (let i in words) {
-            rows.push(['tr',
-                ['td', {className: 'matching-item'}, words[i]],
-                this.createDraggableItem('matching-blank-' + i, words[i], '', definitions[i], correctCb),
-                this.createDraggableItem('matching-definition-' + i, words[i], shuffled[i], '', correctCb),
-            ])
-        }
-        this.element.append(this.createHTML(['table', ['tbody', ...rows]]))
-    }
-
     createHTML(a) {
         let [tag, ...rest] = a
         let element = document.createElement(tag)
