@@ -51,27 +51,41 @@ module.exports = class SideBar {
         this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this))
         this.unscrambleB.addEventListener('click', () => new Unscramble(this))
 
-        this.setAudio()
+        if (this.languageText.audio) {
+            this.setAudio(this.languageText.audio)
+        }
     }
 
-    setAudio() {
-        let currentTime = this.languageText.audio
-        if (currentTime === undefined) return
-        let [minutes, seconds] = currentTime.split(':')
-        this.audioStart = parseInt(minutes) * 60 + parseInt(seconds)
-        this.audioE.currentTime = this.audioStart
+    setAudio(startTime, endTime = null) {
+        this.audioStart = startTime
+        this.audioEnd = endTime
+        this.audioE.currentTime = startTime
+    }
+
+    playAudio() {
+        clearTimeout(this.timeout)
+        this.audioE.play()
+        if (this.audioEnd) {
+            let remaining = this.audioEnd - this.audioE.currentTime
+            this.timeout = setTimeout(() => {
+                this.audioE.currentTime = this.audioStart
+                this.audioE.pause()
+            }, remaining * 1000)
+        }
     }
 
     handleKey(e) {
         console.log(e)
         if (e.key === 'p') {
             if (this.audioE.paused) {
-                this.audioE.play()
+                this.playAudio()
             } else {
+                clearTimeout(this.timeout)
                 this.audioE.pause()
             }
         } else if (e.key === 'r') {
             this.audioE.currentTime = this.audioStart
+            this.playAudio()
         } else if (e.key === 'm') {
             this.markAudio()
         }

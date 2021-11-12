@@ -8,7 +8,6 @@ module.exports = class LanguageText {
         this.words = new Map()
         this.filename = filename
         this.text = text
-        this.sentences = []
         this.audio = this.extractAudio()
         this.onUpdate = () => {}
         this.cleanText()
@@ -20,7 +19,8 @@ module.exports = class LanguageText {
         let match = this.text.match(/<audio>([\d:]+)<\/audio>\n/)
         if (match === null) return null
         this.text = this.text.replace(match[0], '')
-        return match[1]
+        let [minutes, seconds] = match[1].split(':')
+        return parseInt(minutes) * 60 + parseInt(seconds)
     }
 
     cleanWord(word) {
@@ -102,7 +102,7 @@ module.exports = class LanguageText {
             let endPos = Utility.nextEndPos(this.text, i);
             if (endPos === false) break
             let text = (this.text).substring(i, endPos + 1);
-            this.sentences.put(text, {})
+            this.sentences.set(text, {text: text})
             i = endPos + 1
         }
         this.db.fetchSentences((rows) => {
@@ -117,10 +117,12 @@ module.exports = class LanguageText {
 
     getRandomSentenceBlock(n)
     {
-        let sentenceIndex = Math.floor(Math.random() * (this.sentences.length - n))
+        let sentences = Array.from(this.sentences.keys())
+        let sentenceIndex = Math.floor(Math.random() * (sentences.length - n))
         let block = []
         for (let i = 0; i < n; i++) {
-            let sentenceData = this.sentences[sentenceIndex + i]
+            let sentence = sentences[sentenceIndex + i]
+            let sentenceData = this.sentences.get(sentence)
             sentenceData.words = new Map()
             let words = sentenceData.text.split(/\s+/)
             words.forEach((word) => {

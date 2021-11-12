@@ -13,7 +13,9 @@ module.exports = class Unscramble {
 
         let sentence = this.languageText.getRandomSentenceBlock(1)[0]
         this.build(sentence)
+        console.log(sentence)
         this.sidebar.setAudio(sentence.startTime, sentence.endTime)
+        this.sidebar.playAudio()
     }
 
     build(sentence) {
