@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron')
 const fs = require('fs')
 const FillInTheBlanks = require('./fill-in-the-blanks')
 const VocabularyMatching = require('./vocabulary-matching')
+const Utility = require('./utility')
 
 module.exports = class SideBar {
     constructor(languageText) {
@@ -90,7 +91,7 @@ module.exports = class SideBar {
     updateStats() {
         let stats = this.languageText.updateStats()
         let fp = (p) => (p * 100).toFixed(2) + '%'
-        let newTable = this.languageText.createHTML(
+        let newTable = Utility.createHTML(
             ['tbody',
                 ['tr', ['td', 'Number of words'], ['td', stats.numberOfWords]],
                 ['tr', ['td', 'Number of distinct words'], ['td', stats.numberOfDistinctWords]],

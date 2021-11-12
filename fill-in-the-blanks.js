@@ -1,3 +1,5 @@
+const Utility = require('./utility')
+
 module.exports = class FillInTheBlanks {
     constructor(languageText) {
         this.languageText = languageText
@@ -30,7 +32,7 @@ module.exports = class FillInTheBlanks {
         }
         let choices = []
         for (let i = 0; i < sentences.length; i++) {
-            let randomWord = this.languageText.weightedRandomWords(sentences[i].words, 1)
+            let randomWord = Utility.weightedRandomWords(sentences[i].words, 1)
             if (randomWord.length === 0) continue
             let [word, data] = randomWord[0]
             let span = this.randomElement(data.spans)
@@ -40,7 +42,7 @@ module.exports = class FillInTheBlanks {
             choices.push([word, data])
             span.parentNode.replaceChild(blank, span)
         }
-        this.languageText.shuffle(choices)
+        Utility.shuffle(choices)
         this.element.append('\n')
         choices.forEach(([word, data], i) => {
             let item = this.languageText.createDraggableItem(
