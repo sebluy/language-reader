@@ -11,11 +11,11 @@ module.exports = class VocabularyMatching {
         this.titleE.textContent = 'Vocabulary Matching'
         this.languageText.sidebar.updateStats()
 
-        this.buildGrid()
+        this.buildGrid(this.getRandomWords())
     }
 
-    buildGrid() {
-        this.element.innerHTML = ''
+    getRandomWords()
+    {
         let words = [];
         let definitions = [];
         let randomWords = Utility.weightedRandomWords(this.languageText.words, 8)
@@ -25,7 +25,10 @@ module.exports = class VocabularyMatching {
         })
         let shuffled = [...definitions]
         Utility.shuffle(shuffled)
-        let rows = []
+        return [words, definitions, shuffled]
+    }
+
+    buildGrid([words, definitions, shuffled]) {
         let numCorrect = 0
         let onMatch = (word, success) => {
             this.languageText.updateMastery(word, success)
@@ -34,6 +37,7 @@ module.exports = class VocabularyMatching {
                 new VocabularyMatching(this.languageText)
             }
         }
+        let rows = []
         for (let i in words) {
             rows.push(['tr',
                 ['td', {className: 'matching-item'}, words[i]],
@@ -52,6 +56,7 @@ module.exports = class VocabularyMatching {
                 })
             ])
         }
+        this.element.innerHTML = ''
         this.element.append(Utility.createHTML(['table', ['tbody', ...rows]]))
     }
 
