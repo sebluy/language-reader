@@ -153,55 +153,6 @@ module.exports = class LanguageText {
         }
     }
 
-    createDraggableItem(id, word, text, solution, correctCb, element = 'td') {
-        let el = document.createElement(element)
-        el.id = id
-        el.classList.add('matching-item')
-        el.innerText = text
-        el.draggable = true
-
-        el.addEventListener('drop', (e) => {
-            e.preventDefault()
-            let source = document.getElementById(e.dataTransfer.getData('text/plain'))
-            let dest = e.target
-            if (dest.draggable === false) return
-            let destHTML = dest.innerHTML
-            dest.innerHTML = source.innerHTML
-            source.innerHTML = destHTML
-            dest.classList.remove('drag-over')
-            if (solution === '') return;
-            console.log(dest.innerHTML, solution)
-            if (dest.innerHTML === solution) {
-                this.updateMastery(word, true)
-                dest.draggable = false
-                dest.classList.remove('incorrect-match')
-                dest.classList.add('correct-match')
-                correctCb()
-            } else {
-                this.updateMastery(word, false)
-                dest.classList.add('incorrect-match')
-            }
-        });
-        el.addEventListener('dragenter', (e) => {
-            e.preventDefault()
-            if (e.target.draggable === false) return
-            e.target.classList.add('drag-over')
-        });
-        el.addEventListener('dragover', (e) => {
-            e.preventDefault()
-            if (e.target.draggable === false) return
-            e.target.classList.add('drag-over')
-        });
-        el.addEventListener('dragleave', (e) => {
-            e.target.classList.remove('drag-over')
-        });
-        el.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', e.target.id)
-            e.target.classList.remove('incorrect-match')
-        })
-        return el
-    }
-
     extractSentences() {
         let i = 0;
         while (true) {

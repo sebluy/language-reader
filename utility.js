@@ -71,4 +71,52 @@ module.exports = class Utility {
         return i
     }
 
+    static createDraggableItem(props) {
+        let el = document.createElement(props.tag)
+        el.id = props.id
+        el.classList.add('matching-item')
+        el.innerText = props.text
+        el.draggable = true
+
+        el.addEventListener('drop', (e) => {
+            e.preventDefault()
+            let source = document.getElementById(e.dataTransfer.getData('text/plain'))
+            let dest = e.target
+            if (dest.draggable === false) return
+            let destHTML = dest.innerHTML
+            dest.innerHTML = source.innerHTML
+            source.innerHTML = destHTML
+            dest.classList.remove('drag-over')
+            if (props.solution === undefined) return;
+            console.log(dest.innerHTML, props.solution)
+            if (dest.innerHTML === props.solution) {
+                dest.draggable = false
+                dest.classList.remove('incorrect-match')
+                dest.classList.add('correct-match')
+                props.onMatch(props.word, true)
+            } else {
+                dest.classList.add('incorrect-match')
+                props.onMatch(props.word, false)
+            }
+        });
+        el.addEventListener('dragenter', (e) => {
+            e.preventDefault()
+            if (e.target.draggable === false) return
+            e.target.classList.add('drag-over')
+        });
+        el.addEventListener('dragover', (e) => {
+            e.preventDefault()
+            if (e.target.draggable === false) return
+            e.target.classList.add('drag-over')
+        });
+        el.addEventListener('dragleave', (e) => {
+            e.target.classList.remove('drag-over')
+        });
+        el.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', e.target.id)
+            e.target.classList.remove('incorrect-match')
+        })
+        return el
+    }
+
 }

@@ -27,7 +27,8 @@ module.exports = class VocabularyMatching {
         Utility.shuffle(shuffled)
         let rows = []
         let numCorrect = 0
-        let correctCb = () => {
+        let onMatch = (word, success) => {
+            this.languageText.updateMastery(word, success)
             numCorrect += 1
             if (numCorrect === words.length) {
                 new VocabularyMatching(this.languageText)
@@ -36,8 +37,19 @@ module.exports = class VocabularyMatching {
         for (let i in words) {
             rows.push(['tr',
                 ['td', {className: 'matching-item'}, words[i]],
-                this.languageText.createDraggableItem('matching-blank-' + i, words[i], '', definitions[i], correctCb),
-                this.languageText.createDraggableItem('matching-definition-' + i, words[i], shuffled[i], '', correctCb),
+                Utility.createDraggableItem({
+                    tag: 'td',
+                    id: 'matching-blank-' + i,
+                    word: words[i],
+                    text: '',
+                    solution: definitions[i],
+                    onMatch: onMatch
+                }),
+                Utility.createDraggableItem({
+                    tag: 'td',
+                    id: 'matching-definition-' + i,
+                    text: shuffled[i],
+                })
             ])
         }
         this.element.append(Utility.createHTML(['table', ['tbody', ...rows]]))
