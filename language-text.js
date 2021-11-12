@@ -1,6 +1,7 @@
 const sqlite3 = require('sqlite3')
 const SideBar = require('./side-bar')
 const Utility = require('./utility')
+const LanguageDB = require('./language-db')
 
 module.exports = class LanguageText {
 
@@ -9,7 +10,7 @@ module.exports = class LanguageText {
         this.titleE = document.querySelector('#text h2')
         this.element.addEventListener('click', (e) => this.clickWord(e))
         document.addEventListener('keydown', (e) => this.sidebar.handleKey(e))
-        this.db = new sqlite3.Database('./words.db')
+        this.db = new LanguageDB()
         this.sidebar = new SideBar(this)
     }
 
@@ -71,7 +72,7 @@ module.exports = class LanguageText {
 
             }
         })
-        this.fetchWords((rows) => {
+        this.db.fetchWords((rows) => {
             rows.forEach((row) => {
                 if (!this.words.has(row.original)) return
                 let wordData = this.words.get(row.original)
@@ -83,34 +84,18 @@ module.exports = class LanguageText {
         })
     }
 
-    fetchWords(cb) {
-        this.db.all("SELECT * FROM words", (err, rows) => cb(rows))
-    }
-
-    updateWord(original, definition) {
-        const wordData = this.words.get(original)
+    updateWord(word, definition) {
+        const wordData = this.words.get(word)
         wordData.definition = definition
         console.log('Updating definition... for ' + original + ' to ' + definition)
-        let sql = 'INSERT OR IGNORE INTO words (original, definition)' +
-            ' VALUES ($original, $definition)'
-        const params =  {$definition: definition, $original: original}
-        this.db.run(sql, params)
-        sql = 'UPDATE words SET definition = $definition WHERE original = $original'
-        this.db.run(sql, params)
-        this.updateHighlighting(original)
+        this.db.updateWord(word, definition)
+        this.updateHighlighting(word)
     }
 
     updateMastery(word, success) {
         let data = this.words.get(word)
-        let sql
-        if (success) {
-            data.mastery /= 2
-            sql = 'UPDATE words SET mastery = mastery / 2  WHERE original = $original'
-        } else {
-            data.mastery = 1
-            sql = 'UPDATE words SET mastery = 1 WHERE original = $original'
-        }
-        this.db.run(sql, {$original: word})
+        data.mastery = success ? (data.mastery / 2) : 1
+        this.db.updateMastery(word, data.mastery)
     }
 
     clickWord(e) {
