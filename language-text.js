@@ -10,13 +10,14 @@ module.exports = class LanguageText {
         this.text = text
         this.sentences = []
         this.audio = this.extractAudio()
+        this.onUpdate = () => {}
         this.cleanText()
         this.extractWords()
         this.extractSentences()
     }
 
     extractAudio() {
-        let match = this.text.match(/<audio>([\d:]+)<\/audio>/)
+        let match = this.text.match(/<audio>([\d:]+)<\/audio>\n/)
         if (match === null) return null
         this.text = this.text.replace(match[0], '')
         return match[1]
@@ -96,13 +97,22 @@ module.exports = class LanguageText {
 
     extractSentences() {
         let i = 0;
+        this.sentences = new Map()
         while (true) {
             let endPos = Utility.nextEndPos(this.text, i);
-            if (endPos === false) return
+            if (endPos === false) break
             let text = (this.text).substring(i, endPos + 1);
-            this.sentences.push(text)
+            this.sentences.put(text, {})
             i = endPos + 1
         }
+        this.db.fetchSentences((rows) => {
+            rows.forEach((row) => {
+                if (!this.sentences.has(row.sentence)) return
+                let sentence = this.sentences.get(row.sentence)
+                sentence.startTime = row.startTime
+                sentence.endTime = row.endTime
+            })
+        })
     }
 
     getRandomSentenceBlock(n)
@@ -110,12 +120,9 @@ module.exports = class LanguageText {
         let sentenceIndex = Math.floor(Math.random() * (this.sentences.length - n))
         let block = []
         for (let i = 0; i < n; i++) {
-            let text = this.sentences[sentenceIndex + i]
-            let sentenceData = {
-                text: text,
-                words: new Map()
-            }
-            let words = text.split(/\s+/)
+            let sentenceData = this.sentences[sentenceIndex + i]
+            sentenceData.words = new Map()
+            let words = sentenceData.text.split(/\s+/)
             words.forEach((word) => {
                 word = this.cleanWord(word)
                 if (word === '') return
@@ -126,6 +133,13 @@ module.exports = class LanguageText {
             block.push(sentenceData)
         }
         return block
+    }
+
+    updateSentenceTimes(sentence, startTime, endTime)
+    {
+        if (startTime !== null) sentence.startTime = startTime
+        if (endTime !== null) sentence.endTime = endTime
+        this.db.updateSentenceTimes(sentence)
     }
 
 }

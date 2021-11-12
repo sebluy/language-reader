@@ -10,6 +10,10 @@ module.exports = class LanguageDB {
         this.db.all("SELECT * FROM words", (err, rows) => cb(rows))
     }
 
+    fetchSentences(cb) {
+        this.db.all("SELECT * FROM sentences", (err, rows) => cb(rows))
+    }
+
     updateWord(word, definition) {
         let sql = 'INSERT OR IGNORE INTO words (original, definition)' +
             ' VALUES ($original, $definition)'
@@ -22,6 +26,19 @@ module.exports = class LanguageDB {
     updateMastery(word, mastery) {
         let sql = 'UPDATE words SET mastery = $mastery WHERE original = $original'
         this.db.run(sql, {$original: word, $mastery: mastery})
+    }
+
+    updateSentenceTimes(sentence) {
+        let params = {
+            $sentence: sentence.text,
+            $startTime: sentence.startTime,
+            $endTime: sentence.endTime
+        }
+        let sql = 'INSERT OR IGNORE INTO sentences (sentence, startTime, endTime)' +
+            ' VALUES ($sentence, $startTime, $endTime)'
+        this.db.run(sql, params)
+        sql = 'UPDATE sentences SET startTime = $startTime, endTime = $endTime WHERE sentence = $sentence'
+        this.db.run(sql, params)
     }
 
 }

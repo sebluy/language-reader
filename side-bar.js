@@ -6,6 +6,7 @@ const VocabularyMatching = require('./vocabulary-matching')
 const Utility = require('./utility')
 const LanguageText = require('./language-text')
 const Reader = require('./reader')
+const Unscramble = require('./unscramble')
 
 module.exports = class SideBar {
 
@@ -13,7 +14,7 @@ module.exports = class SideBar {
         let languageText = new LanguageText(filename, text)
         let sidebar = new SideBar(languageText)
         sidebar.reader = new Reader(sidebar)
-        sidebar.reader.load(languageText.filename, languageText.text)
+        sidebar.reader.load()
         languageText.onUpdate = () => {
             sidebar.updateStats()
             sidebar.reader.highlight()
@@ -33,6 +34,7 @@ module.exports = class SideBar {
         this.readerB = document.getElementById('reader')
         this.vocabMatchingB = document.getElementById('vocab-matching')
         this.fillInTheBlanksB = document.getElementById('fill-in-the-blanks')
+        this.unscrambleB = document.getElementById('unscramble')
         this.audioE = document.getElementById('audio')
 
         this.definitionE.addEventListener('focusout', () => this.updateWord())
@@ -42,11 +44,12 @@ module.exports = class SideBar {
         this.updateStatsB.addEventListener('click', () => this.updateStats())
         this.openFileB.addEventListener('click', () => this.openFile())
         this.readerB.addEventListener('click', () => {
-            this.reader.load(this.languageText.filename, this.languageText.text)
+            this.reader.load()
             this.reader.highlight()
         })
         this.vocabMatchingB.addEventListener('click', () => new VocabularyMatching(this))
         this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this))
+        this.unscrambleB.addEventListener('click', () => new Unscramble(this))
 
         this.setAudio()
     }
@@ -69,6 +72,8 @@ module.exports = class SideBar {
             }
         } else if (e.key === 'r') {
             this.audioE.currentTime = this.audioStart
+        } else if (e.key === 'm') {
+            this.markAudio()
         }
     }
 
@@ -134,11 +139,31 @@ module.exports = class SideBar {
     loadFile(filename, text) {
         this.languageText = new LanguageText(filename, text)
         this.reader.languageText = this.languageText
-        this.reader.load(this.languageText.filename, this.languageText.text)
+        this.reader.load()
         this.languageText.onUpdate = () => {
             this.updateStats()
             this.reader.highlight()
         }
+    }
+
+    markAudio() {
+        let sentences = this.languageText.sentences
+        if (this.marker === undefined) {
+            this.audioE.play()
+            this.marker = 0
+        }
+        if (this.marker > 0) {
+            this.languageText.updateSentenceTimes(sentences[this.marker - 1], null, this.audioE.currentTime)
+            this.reader.removeSentenceHighlighting(sentences[this.marker - 1])
+        }
+        if (this.marker === sentences.length) {
+            this.audioE.pause()
+            this.marker = undefined
+            return
+        }
+        this.reader.highlightSentence(sentences[this.marker])
+        this.languageText.updateSentenceTimes(sentences[this.marker], this.audioE.currentTime, null)
+        this.marker += 1
     }
 
 }

@@ -13,18 +13,13 @@ module.exports = class Reader {
         document.addEventListener('keydown', (e) => this.sidebar.handleKey(e))
     }
 
-    load(title, text) {
+    load(title = null, sentences = null) {
+        if (title === null) title = this.languageText.filename
+        if (sentences === null) sentences = this.languageText.sentences
         this.languageText.words.forEach((v, k) => v.spans = [])
         this.titleE.textContent = title
         this.element.innerHTML = ''
-        this.addText(text)
-    }
-
-    addWordToDisplay(word) {
-        const span = document.createElement('span')
-        span.innerHTML = word
-        this.element.appendChild(span)
-        return span
+        this.addSentences(sentences)
     }
 
     cleanWord(word) {
@@ -58,7 +53,7 @@ module.exports = class Reader {
                 let hue = ((1 - data.mastery) * 120).toString(10)
                 span.style.backgroundColor = 'hsl(' + hue + ',100%,75%)'
             } else {
-                span.style.backgroundColor = 'white'
+                span.style.backgroundColor = ''
             }
         })
     }
@@ -67,17 +62,31 @@ module.exports = class Reader {
         this.languageText.words.forEach((data, word) => this.updateHighlighting(word))
     }
 
-    addText(text) {
-        let wordsAndSpaces = text.split(/(\s+)/)
-        wordsAndSpaces.forEach((word) => {
-            if (word.trim() === '') {
-                this.element.appendChild(document.createTextNode(word))
-                return
-            }
-            let span = this.addWordToDisplay(word)
-            word = this.cleanWord(word)
-            if (word === '') return
-            this.languageText.words.get(word).spans.push(span)
+    addSentences(sentences) {
+        sentences.forEach((sentence) => {
+            let wordsAndSpaces = sentence.text.split(/(\s+)/)
+            sentence.span = document.createElement('span')
+            this.element.appendChild(sentence.span)
+            wordsAndSpaces.forEach((word) => {
+                if (word.trim() === '') {
+                    sentence.span.appendChild(document.createTextNode(word))
+                    return
+                }
+                const span = document.createElement('span')
+                span.innerHTML = word
+                sentence.span.appendChild(span)
+                word = this.cleanWord(word)
+                if (word === '') return
+                this.languageText.words.get(word).spans.push(span)
+            })
         })
+    }
+
+    highlightSentence(sentence) {
+        sentence.span.classList.add('highlight-sentence')
+    }
+
+    removeSentenceHighlighting(sentence) {
+        sentence.span.classList.remove('highlight-sentence')
     }
 }

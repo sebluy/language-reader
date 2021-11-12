@@ -6,8 +6,7 @@ module.exports = class FillInTheBlanks {
         this.languageText = sidebar.languageText
         this.reader = this.sidebar.reader
         let sentences = this.languageText.getRandomSentenceBlock(7)
-        let text = sentences.map((v) => v.text).join()
-        this.reader.load('Fill in the Blanks', text)
+        this.reader.load('Fill in the Blanks', sentences)
         this.createBlanksAndChoices(sentences)
     }
 
