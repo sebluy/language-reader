@@ -29,12 +29,18 @@ module.exports = class VocabularyMatching {
         return [words, definitions, shuffled]
     }
 
+    checkAnswer(rows, definitions) {
+        for (let i = 0; i < rows.length; i++) {
+            let el = rows[i][2]
+            if (el.innerHTML !== definitions[i]) return false
+        }
+        return true
+    }
+
     buildGrid([words, definitions, shuffled]) {
-        let numCorrect = 0
-        let onMatch = (word, success) => {
-            this.languageText.updateMastery(word, success)
-            numCorrect += 1
-            if (numCorrect === words.length) {
+        let onDrop = () => {
+            if (this.checkAnswer(rows, definitions)) {
+                words.forEach((word) => this.languageText.updateMastery(word, true))
                 new VocabularyMatching(this.sidebar)
             }
         }
@@ -45,10 +51,8 @@ module.exports = class VocabularyMatching {
                 Utility.createDraggableItem({
                     tag: 'td',
                     id: 'matching-blank-' + i,
-                    word: words[i],
                     text: '',
-                    solution: definitions[i],
-                    onMatch: onMatch
+                    onDrop: onDrop
                 }),
                 Utility.createDraggableItem({
                     tag: 'td',

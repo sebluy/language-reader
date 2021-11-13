@@ -87,17 +87,7 @@ module.exports = class Utility {
             dest.innerHTML = source.innerHTML
             source.innerHTML = destHTML
             dest.classList.remove('drag-over')
-            if (props.solution === undefined) return;
-            console.log(dest.innerHTML, props.solution)
-            if (dest.innerHTML === props.solution) {
-                dest.draggable = false
-                dest.classList.remove('incorrect-match')
-                dest.classList.add('correct-match')
-                props.onMatch(props.word, true)
-            } else {
-                dest.classList.add('incorrect-match')
-                props.onMatch(props.word, false)
-            }
+            if (props.onDrop) props.onDrop(source, dest, props)
         });
         el.addEventListener('dragenter', (e) => {
             e.preventDefault()
@@ -114,7 +104,7 @@ module.exports = class Utility {
         });
         el.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', e.target.id)
-            e.target.classList.remove('incorrect-match')
+            // e.target.classList.remove('incorrect-match')
         })
         return el
     }
