@@ -53,21 +53,25 @@ module.exports = class Utility {
 
     static nextEndPos(book, i)
     {
-        let inQuote = false
         while (true) {
             let char = book.substring(i, i + 1)
             if (char === false || char === '') return false
-            if (char === '„') inQuote = true
-            if (inQuote) {
-                if (char === '“') inQuote = false
-                i++
-                continue
-            }
             let match = this.isEndChar(char)
             if (match) break
-            i++
+            i += 1
         }
-        while (this.isEndChar(book.substring(i + 1, i + 2))) i++
+        while (true) {
+            let char = book.substring(i + 1, i + 2)
+            let match = this.isEndChar(char)
+            if (!match) break
+            i += 1
+        }
+        while (true) {
+            let char = book.substring(i + 1, i + 2)
+            let match = char.match(/[\s“]/) !== null
+            if (!match) break
+            i += 1
+        }
         return i
     }
 

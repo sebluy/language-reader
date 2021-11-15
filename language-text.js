@@ -3,13 +3,13 @@ const LanguageDB = require('./language-db')
 
 module.exports = class LanguageText {
 
-    constructor(filename, text) {
+    constructor(sidebar, filename, text) {
+        this.sidebar = sidebar
         this.db = new LanguageDB()
         this.words = new Map()
         this.filename = filename
         this.text = text
         this.audio = this.extractAudio()
-        this.onUpdate = () => {}
         this.cleanText()
         this.extractWords()
         this.extractSentences()
@@ -57,7 +57,8 @@ module.exports = class LanguageText {
                 wordData.definition = row.definition
                 wordData.mastery = row.mastery
             })
-            this.onUpdate()
+            this.sidebar.updateStats()
+            this.sidebar.reader.highlight()
         })
     }
 
@@ -103,6 +104,7 @@ module.exports = class LanguageText {
             if (endPos === false) break
             let text = (this.text).substring(i, endPos + 1);
             this.sentences.set(text, {text: text})
+            console.log(text)
             i = endPos + 1
         }
         this.db.fetchSentences((rows) => {

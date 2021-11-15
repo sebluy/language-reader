@@ -10,27 +10,24 @@ const Unscramble = require('./unscramble')
 
 module.exports = class SideBar {
 
-    static createView(filename, text) {
-        let languageText = new LanguageText(filename, text)
-        let sidebar = new SideBar(languageText)
-        sidebar.reader = new Reader(sidebar)
-        sidebar.reader.load()
-        languageText.onUpdate = () => {
-            sidebar.updateStats()
-            sidebar.reader.highlight()
-        }
+    constructor() {
+        this.setElementsAndListeners()
+        this.getRuntimeData((json) => {
+            console.log(json)
+            if (json.openTextFile) this.loadTextFile(json.openTextFile)
+            if (json.openAudioFile) this.loadAudioFile(json.openAudioFile)
+        })
     }
 
-    constructor(languageText) {
-        this.languageText = languageText
-
+    setElementsAndListeners() {
         this.originalE = document.getElementById('original')
         this.definitionE = document.getElementById('definition')
         this.statsE = document.getElementById('stats')
         this.highlightCB = document.getElementById('highlight')
         this.googleTranslateB = document.getElementById('google-translate')
         this.updateStatsB = document.getElementById('update-stats')
-        this.openFileB = document.getElementById('open-file')
+        this.openTextFileB = document.getElementById('open-text-file')
+        this.openAudioFileB = document.getElementById('open-audio-file')
         this.readerB = document.getElementById('reader')
         this.vocabMatchingB = document.getElementById('vocab-matching')
         this.fillInTheBlanksB = document.getElementById('fill-in-the-blanks')
@@ -42,7 +39,8 @@ module.exports = class SideBar {
         this.highlightCB.addEventListener('change', () => this.reader.highlight())
         this.googleTranslateB.addEventListener('click', () => this.googleTranslate())
         this.updateStatsB.addEventListener('click', () => this.updateStats())
-        this.openFileB.addEventListener('click', () => this.openFile())
+        this.openTextFileB.addEventListener('click', () => this.openTextFile())
+        this.openAudioFileB.addEventListener('click', () => this.openAudioFile())
         this.readerB.addEventListener('click', () => {
             this.reader.load()
             this.reader.highlight()
@@ -50,10 +48,6 @@ module.exports = class SideBar {
         this.vocabMatchingB.addEventListener('click', () => new VocabularyMatching(this))
         this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this))
         this.unscrambleB.addEventListener('click', () => new Unscramble(this))
-
-        if (this.languageText.audio) {
-            this.setAudio(this.languageText.audio)
-        }
     }
 
     setAudio(startTime, endTime = null) {
@@ -141,42 +135,70 @@ module.exports = class SideBar {
         this.statsE.replaceChild(newTable, this.statsE.childNodes[0])
     }
 
-    openFile() {
+    openTextFile() {
         ipcRenderer.invoke('open-file').then((result) => {
-            fs.readFile(result[0], (err, contents) => {
-                this.loadFile(result[0], contents.toString())
-                fs.writeFile('runtime-data.json', JSON.stringify({openFile: result[0]}), err => {})
-            })
+            this.loadTextFile(result[0])
         })
     }
 
-    loadFile(filename, text) {
-        this.languageText = new LanguageText(filename, text)
-        this.reader.languageText = this.languageText
-        this.reader.load()
-        this.languageText.onUpdate = () => {
-            this.updateStats()
-            this.reader.highlight()
-        }
+    openAudioFile() {
+        ipcRenderer.invoke('open-file').then((result) => {
+            this.loadAudioFile(result[0])
+        })
+    }
+
+    loadAudioFile(filename) {
+        this.audioE.src = filename
+        this.runtimeData.openAudioFile = filename
+        this.updateRuntimeData()
+    }
+
+    loadTextFile(filename) {
+        fs.readFile(filename, (err, contents) => {
+            if (err != null) return
+            this.languageText = new LanguageText(this, filename, contents.toString())
+            if (!this.reader) this.reader = new Reader(this)
+            this.reader.languageText = this.languageText
+            this.reader.load()
+            this.runtimeData.openTextFile = filename
+            this.updateRuntimeData()
+        })
+    }
+
+    getRuntimeData(f) {
+        fs.readFile('runtime-data.json', (err, contents) => {
+            if (contents === undefined) {
+                this.runtimeData = {}
+            } else {
+                this.runtimeData = JSON.parse(contents.toString())
+            }
+            f(this.runtimeData)
+        })
+    }
+
+    updateRuntimeData() {
+        fs.writeFile('runtime-data.json', JSON.stringify(this.runtimeData), err => {})
     }
 
     markAudio() {
-        let sentences = this.languageText.sentences
+        let sentences = Array.from(this.languageText.sentences.keys())
         if (this.marker === undefined) {
             this.audioE.play()
             this.marker = 0
         }
         if (this.marker > 0) {
-            this.languageText.updateSentenceTimes(sentences[this.marker - 1], null, this.audioE.currentTime)
-            this.reader.removeSentenceHighlighting(sentences[this.marker - 1])
+            let lastSentence = this.languageText.sentences.get(sentences[this.marker - 1])
+            this.languageText.updateSentenceTimes(lastSentence, null, this.audioE.currentTime)
+            this.reader.removeSentenceHighlighting(lastSentence)
         }
         if (this.marker === sentences.length) {
             this.audioE.pause()
             this.marker = undefined
             return
         }
-        this.reader.highlightSentence(sentences[this.marker])
-        this.languageText.updateSentenceTimes(sentences[this.marker], this.audioE.currentTime, null)
+        let sentence = this.languageText.sentences.get(sentences[this.marker])
+        this.reader.highlightSentence(sentence)
+        this.languageText.updateSentenceTimes(sentence, this.audioE.currentTime, null)
         this.marker += 1
     }
 
