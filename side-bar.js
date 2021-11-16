@@ -130,6 +130,8 @@ module.exports = class SideBar {
                 ['tr', ['td', 'Number of distinct words'], ['td', stats.numberOfDistinctWords]],
                 ['tr', ['td', 'Percent translated'], ['td', fp(stats.percentTranslated)]],
                 ['tr', ['td', 'Percent mastered'], ['td', fp(stats.percentMastered)]],
+                ['tr', ['td', 'Today\'s XP'], ['td', this.runtimeData.xp.today]],
+                ['tr', ['td', 'Yesterday\'s XP'], ['td', this.runtimeData.xp.yesterday]]
             ]
         )
         this.statsE.replaceChild(newTable, this.statsE.childNodes[0])
@@ -150,7 +152,7 @@ module.exports = class SideBar {
     loadAudioFile(filename) {
         this.audioE.src = filename
         this.runtimeData.openAudioFile = filename
-        this.updateRuntimeData()
+        this.writeRuntimeData()
     }
 
     loadTextFile(filename) {
@@ -161,7 +163,7 @@ module.exports = class SideBar {
             this.reader.languageText = this.languageText
             this.reader.load()
             this.runtimeData.openTextFile = filename
-            this.updateRuntimeData()
+            this.writeRuntimeData()
         })
     }
 
@@ -172,11 +174,28 @@ module.exports = class SideBar {
             } else {
                 this.runtimeData = JSON.parse(contents.toString())
             }
+            if (this.runtimeData.xp === undefined) {
+                this.runtimeData.xp = {
+                    today: 0,
+                    yesterday: 0,
+                    date: (new Date()).toLocaleDateString()
+                }
+            } else if (this.runtimeData.xp.date !== (new Date()).toLocaleDateString()) {
+                this.runtimeData.xp.yesterday = this.runtimeData.xp.today
+                this.runtimeData.xp.today = 0
+                this.runtimeData.xp.date = (new Date()).toLocaleDateString()
+                this.writeRuntimeData()
+            }
             f(this.runtimeData)
         })
     }
 
-    updateRuntimeData() {
+    addXP(n) {
+        this.runtimeData.xp.today += n
+        this.writeRuntimeData()
+    }
+
+    writeRuntimeData() {
         fs.writeFile('runtime-data.json', JSON.stringify(this.runtimeData), err => {})
     }
 

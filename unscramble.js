@@ -26,6 +26,8 @@ module.exports = class Unscramble {
             console.log(this.words[i], current[i])
             if (this.words[i] !== current[i]) return
         }
+        this.sidebar.addXP(this.words.length * 3)
+        this.sidebar.updateStats()
         new Unscramble(this.sidebar)
     }
 

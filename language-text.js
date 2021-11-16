@@ -65,14 +65,16 @@ module.exports = class LanguageText {
     updateWord(word, definition) {
         console.log(word, definition)
         const wordData = this.words.get(word)
+        if (wordData.definition === definition) return
         wordData.definition = definition
         console.log('Updating definition... for ' + word + ' to ' + definition)
         this.db.updateWord(word, definition)
+        this.sidebar.addXP(5)
     }
 
-    updateMastery(word, success) {
+    updateMastery(word) {
         let data = this.words.get(word)
-        data.mastery = success ? (data.mastery / 2) : 1
+        data.mastery = data.mastery / 2
         this.db.updateMastery(word, data.mastery)
     }
 

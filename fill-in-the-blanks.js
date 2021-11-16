@@ -16,15 +16,16 @@ module.exports = class FillInTheBlanks {
 
     createBlanksAndChoices(sentences)
     {
-        let numCorrect = 0
-        let onMatch = (word, correct) => {
-            this.languageText.updateMastery(word, correct)
-            numCorrect += 1
-            if (numCorrect === sentences.length) {
+        let onDrop = () => {
+            if (this.checkAnswer(words, blanks)) {
+                words.forEach(([word]) => this.languageText.updateMastery(word))
+                this.sidebar.addXP(sentences.length * 2)
+                this.sidebar.updateStats()
                 new FillInTheBlanks(this.sidebar)
             }
         }
-        let choices = []
+        let blanks = []
+        let words = []
         for (let i = 0; i < sentences.length; i++) {
             let randomWord = Utility.weightedRandomWords(sentences[i].words, 1)
             if (randomWord.length === 0) continue
@@ -33,14 +34,14 @@ module.exports = class FillInTheBlanks {
             let blank = Utility.createDraggableItem({
                 tag: 'span',
                 id: 'matching-blank-' + i,
-                word: word,
                 text: '           ',
-                solution: word,
-                onMatch: onMatch
+                onDrop: onDrop
             })
-            choices.push([word, data])
+            words.push([word, data])
+            blanks.push(blank)
             span.parentNode.replaceChild(blank, span)
         }
+        let choices = [...words]
         Utility.shuffle(choices)
         this.reader.element.append('\n')
         choices.forEach(([word, data], i) => {
@@ -53,4 +54,8 @@ module.exports = class FillInTheBlanks {
         })
     }
 
+    checkAnswer(words, blanks) {
+        let wrong = words.find(([word], i) => blanks[i].innerHTML !== word)
+        return wrong === undefined
+    }
 }

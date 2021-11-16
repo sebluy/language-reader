@@ -40,7 +40,8 @@ module.exports = class VocabularyMatching {
     buildGrid([words, definitions, shuffled]) {
         let onDrop = () => {
             if (this.checkAnswer(rows, definitions)) {
-                words.forEach((word) => this.languageText.updateMastery(word, true))
+                words.forEach((word) => this.languageText.updateMastery(word))
+                this.sidebar.addXP(definitions.length)
                 new VocabularyMatching(this.sidebar)
             }
         }
