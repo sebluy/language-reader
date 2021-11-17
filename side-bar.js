@@ -69,7 +69,6 @@ module.exports = class SideBar {
     }
 
     handleKey(e) {
-        console.log(e)
         if (e.key === 'p') {
             if (this.audioE.paused) {
                 this.playAudio()
@@ -200,14 +199,15 @@ module.exports = class SideBar {
     }
 
     markAudio() {
-        let sentences = Array.from(this.languageText.sentences.keys())
+        let sentences = this.languageText.sentences
         if (this.marker === undefined) {
             this.audioE.play()
             this.marker = 0
         }
         if (this.marker > 0) {
-            let lastSentence = this.languageText.sentences.get(sentences[this.marker - 1])
-            this.languageText.updateSentenceTimes(lastSentence, null, this.audioE.currentTime)
+            let lastSentence = sentences[this.marker - 1]
+            let lastData = this.languageText.sentenceMap.get(lastSentence.text)
+            this.languageText.updateSentenceTimes(lastData, null, this.audioE.currentTime)
             this.reader.removeSentenceHighlighting(lastSentence)
         }
         if (this.marker === sentences.length) {
@@ -215,9 +215,10 @@ module.exports = class SideBar {
             this.marker = undefined
             return
         }
-        let sentence = this.languageText.sentences.get(sentences[this.marker])
+        let sentence = sentences[this.marker]
+        let sentenceData = this.languageText.sentenceMap.get(sentence.text)
         this.reader.highlightSentence(sentence)
-        this.languageText.updateSentenceTimes(sentence, this.audioE.currentTime, null)
+        this.languageText.updateSentenceTimes(sentenceData, this.audioE.currentTime, null)
         this.marker += 1
     }
 

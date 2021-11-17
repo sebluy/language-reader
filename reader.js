@@ -1,3 +1,4 @@
+const Utility = require('./utility')
 
 module.exports = class Reader {
 
@@ -22,19 +23,12 @@ module.exports = class Reader {
         this.addSentences(sentences)
     }
 
-    cleanWord(word) {
-        const punctuation = /[,.!?"“„:\-–;]+/
-        const regex = new RegExp('^' + punctuation.source + '|' + punctuation.source + '$', 'g')
-        return word.replaceAll(regex, '').toLowerCase()
-    }
-
     clickWord(e) {
         if (e.target.matches('span')) {
             const oldWordE = document.querySelector('span.selected')
             if (oldWordE) oldWordE.classList.remove('selected')
             e.target.classList.add('selected')
-            const word = this.cleanWord(e.target.innerHTML)
-            console.log('Switching word... to ' + word)
+            const word = Utility.cleanWord(e.target.innerHTML)
             this.sidebar.showWordAndDefinition(word, this.languageText.words.get(word).definition)
         }
     }
@@ -42,8 +36,15 @@ module.exports = class Reader {
     nextWord() {
         const current = document.querySelector('span.selected')
         if (!current) return
-        const sibling = current.nextElementSibling
-        if (sibling) sibling.click()
+        let sibling = current.nextElementSibling
+        if (sibling) {
+            sibling.click()
+            return
+        }
+        let parentSibling = current.parentNode.nextSibling
+        if (parentSibling && parentSibling.firstChild) {
+            parentSibling.firstChild.click()
+        }
     }
 
     updateHighlighting(word) {
@@ -75,8 +76,9 @@ module.exports = class Reader {
                 const span = document.createElement('span')
                 span.innerHTML = word
                 sentence.span.appendChild(span)
-                word = this.cleanWord(word)
+                word = Utility.cleanWord(word)
                 if (word === '') return
+                // TODO: FIX THIS
                 this.languageText.words.get(word).spans.push(span)
             })
         })

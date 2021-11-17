@@ -23,12 +23,6 @@ module.exports = class LanguageText {
         return parseInt(minutes) * 60 + parseInt(seconds)
     }
 
-    cleanWord(word) {
-        const punctuation = /[,.!?"“„:\-–;]+/
-        const regex = new RegExp('^' + punctuation.source + '|' + punctuation.source + '$', 'g')
-        return word.replaceAll(regex, '').toLowerCase()
-    }
-
     cleanText() {
         this.text = this.text.replaceAll('-\n', '')
         this.text = this.text.replaceAll('\n', ' ')
@@ -38,7 +32,7 @@ module.exports = class LanguageText {
     extractWords() {
         const words = this.text.split(/\s+/)
         words.forEach((word) => {
-            word = this.cleanWord(word)
+            word = Utility.cleanWord(word)
             if (word === '') return
             if (this.words.has(word)) {
                 this.words.get(word).count += 1
@@ -63,13 +57,12 @@ module.exports = class LanguageText {
     }
 
     updateWord(word, definition) {
-        console.log(word, definition)
         const wordData = this.words.get(word)
         if (wordData.definition === definition) return
+        if (wordData.definition === '') this.sidebar.addXP(5)
         wordData.definition = definition
         console.log('Updating definition... for ' + word + ' to ' + definition)
         this.db.updateWord(word, definition)
-        this.sidebar.addXP(5)
     }
 
     updateMastery(word) {
@@ -100,19 +93,20 @@ module.exports = class LanguageText {
 
     extractSentences() {
         let i = 0;
-        this.sentences = new Map()
+        this.sentences = []
+        this.sentenceMap = new Map()
         while (true) {
             let endPos = Utility.nextEndPos(this.text, i);
             if (endPos === false) break
             let text = (this.text).substring(i, endPos + 1);
-            this.sentences.set(text, {text: text})
-            console.log(text)
+            this.sentences.push({text: text})
+            this.sentenceMap.set(text, {text: text})
             i = endPos + 1
         }
         this.db.fetchSentences((rows) => {
             rows.forEach((row) => {
-                if (!this.sentences.has(row.sentence)) return
-                let sentence = this.sentences.get(row.sentence)
+                if (!this.sentenceMap.has(row.sentence)) return
+                let sentence = this.sentenceMap.get(row.sentence)
                 sentence.startTime = row.startTime
                 sentence.endTime = row.endTime
             })
@@ -121,16 +115,14 @@ module.exports = class LanguageText {
 
     getRandomSentenceBlock(n)
     {
-        let sentences = Array.from(this.sentences.keys())
-        let sentenceIndex = Math.floor(Math.random() * (sentences.length - n))
+        let sentenceIndex = Math.floor(Math.random() * (this.sentences.length - n))
         let block = []
         for (let i = 0; i < n; i++) {
-            let sentence = sentences[sentenceIndex + i]
-            let sentenceData = this.sentences.get(sentence)
+            let sentenceData = this.sentences[sentenceIndex + i]
             sentenceData.words = new Map()
             let words = sentenceData.text.split(/\s+/)
             words.forEach((word) => {
-                word = this.cleanWord(word)
+                word = Utility.cleanWord(word)
                 if (word === '') return
                 if (!sentenceData.words.has(word)) {
                     sentenceData.words.set(word, this.words.get(word))

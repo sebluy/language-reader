@@ -12,18 +12,18 @@ module.exports = class Unscramble {
         this.titleE.textContent = 'Unscramble'
 
         let sentence = this.languageText.getRandomSentenceBlock(1)[0]
+        let sentenceData = this.languageText.sentenceMap.get(sentence.text)
         this.words = sentence.text.split(/\s+/).filter((word) => word !== '')
         let shuffled = [...this.words]
         Utility.shuffle(shuffled)
         this.build(shuffled)
-        this.sidebar.setAudio(sentence.startTime, sentence.endTime)
+        this.sidebar.setAudio(sentenceData.startTime, sentenceData.endTime)
         this.sidebar.playAudio()
     }
 
     checkAnswer() {
         let current = this.getCurrentOrder()
         for (let i = 0; i < this.words.length; i++) {
-            console.log(this.words[i], current[i])
             if (this.words[i] !== current[i]) return
         }
         this.sidebar.addXP(this.words.length * 3)

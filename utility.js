@@ -16,9 +16,14 @@ module.exports = class Utility {
             let word = defined.find(([k, v, start, end]) => start <= index && index < end)
             if (random.find(chosen => chosen[0] === word[0])) continue
             random.push(word)
-            console.log(word[1].mastery)
         }
         return random
+    }
+
+    static cleanWord(word) {
+        const punctuation = /[,.!?"“„:\-–;…]+/
+        const regex = new RegExp('^' + punctuation.source + '|' + punctuation.source + '$', 'g')
+        return word.replaceAll(regex, '').toLowerCase()
     }
 
     static shuffle(a) {

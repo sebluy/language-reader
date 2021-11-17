@@ -26,10 +26,12 @@ module.exports = class FillInTheBlanks {
         }
         let blanks = []
         let words = []
+        console.log(sentences)
         for (let i = 0; i < sentences.length; i++) {
             let randomWord = Utility.weightedRandomWords(sentences[i].words, 1)
             if (randomWord.length === 0) continue
             let [word, data] = randomWord[0]
+            // TODO: Fix this. Right now spans is all spans in text matching the word, not just for the sentence.
             let span = this.randomElement(data.spans)
             let blank = Utility.createDraggableItem({
                 tag: 'span',
