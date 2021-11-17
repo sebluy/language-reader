@@ -20,6 +20,9 @@ module.exports = class Reader {
         this.languageText.words.forEach((v, k) => v.spans = [])
         this.titleE.textContent = title
         this.element.innerHTML = ''
+        this.spansByWord = new Map()
+        this.spansBySentence = []
+        this.spansBySentenceAndWord = []
         this.addSentences(sentences)
     }
 
@@ -49,7 +52,8 @@ module.exports = class Reader {
 
     updateHighlighting(word) {
         const data = this.languageText.words.get(word)
-        data.spans.forEach((span) => {
+        let spans = this.spansByWord.get(word)
+        spans.forEach((span) => {
             if (this.sidebar.isHighlightChecked() && data.definition !== '') {
                 let hue = ((1 - data.mastery) * 120).toString(10)
                 span.style.backgroundColor = 'hsl(' + hue + ',100%,75%)'
@@ -64,31 +68,36 @@ module.exports = class Reader {
     }
 
     addSentences(sentences) {
-        sentences.forEach((sentence) => {
+        sentences.forEach((sentence, i) => {
             let wordsAndSpaces = sentence.text.split(/(\s+)/)
-            sentence.span = document.createElement('span')
-            this.element.appendChild(sentence.span)
+            let sentenceSpan = document.createElement('span')
+            this.spansBySentence.push(sentenceSpan)
+            this.spansBySentenceAndWord[i] = new Map()
+            this.element.appendChild(sentenceSpan)
             wordsAndSpaces.forEach((word) => {
                 if (word.trim() === '') {
-                    sentence.span.appendChild(document.createTextNode(word))
+                    sentenceSpan.appendChild(document.createTextNode(word))
                     return
                 }
                 const span = document.createElement('span')
-                span.innerHTML = word
-                sentence.span.appendChild(span)
+                span.innerText = word
+                sentenceSpan.appendChild(span)
                 word = Utility.cleanWord(word)
                 if (word === '') return
-                // TODO: FIX THIS
-                this.languageText.words.get(word).spans.push(span)
+                if (!this.spansByWord.has(word)) this.spansByWord.set(word, [])
+                this.spansByWord.get(word).push(span)
+                let spansSW = this.spansBySentenceAndWord[i]
+                if (!spansSW.has(word)) spansSW.set(word, [])
+                spansSW.get(word).push(span)
             })
         })
     }
 
-    highlightSentence(sentence) {
-        sentence.span.classList.add('highlight-sentence')
+    highlightSentence(i) {
+        this.spansBySentence[i].classList.add('highlight-sentence')
     }
 
-    removeSentenceHighlighting(sentence) {
-        sentence.span.classList.remove('highlight-sentence')
+    removeSentenceHighlighting(i) {
+        this.spansBySentence[i].classList.remove('highlight-sentence')
     }
 }

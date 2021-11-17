@@ -18,7 +18,7 @@ module.exports = class FillInTheBlanks {
     {
         let onDrop = () => {
             if (this.checkAnswer(words, blanks)) {
-                words.forEach(([word]) => this.languageText.updateMastery(word))
+                words.forEach((word) => this.languageText.updateMastery(word))
                 this.sidebar.addXP(sentences.length * 2)
                 this.sidebar.updateStats()
                 new FillInTheBlanks(this.sidebar)
@@ -26,27 +26,25 @@ module.exports = class FillInTheBlanks {
         }
         let blanks = []
         let words = []
-        console.log(sentences)
         for (let i = 0; i < sentences.length; i++) {
             let randomWord = Utility.weightedRandomWords(sentences[i].words, 1)
             if (randomWord.length === 0) continue
-            let [word, data] = randomWord[0]
-            // TODO: Fix this. Right now spans is all spans in text matching the word, not just for the sentence.
-            let span = this.randomElement(data.spans)
+            let [word] = randomWord[0]
+            let span = this.randomElement(this.reader.spansBySentenceAndWord[i].get(word))
             let blank = Utility.createDraggableItem({
                 tag: 'span',
                 id: 'matching-blank-' + i,
                 text: '           ',
                 onDrop: onDrop
             })
-            words.push([word, data])
+            words.push(word)
             blanks.push(blank)
             span.parentNode.replaceChild(blank, span)
         }
         let choices = [...words]
         Utility.shuffle(choices)
         this.reader.element.append('\n')
-        choices.forEach(([word, data], i) => {
+        choices.forEach((word, i) => {
             let item = Utility.createDraggableItem({
                 tag: 'span',
                 id: 'matching-word-' + i,
@@ -57,7 +55,7 @@ module.exports = class FillInTheBlanks {
     }
 
     checkAnswer(words, blanks) {
-        let wrong = words.find(([word], i) => blanks[i].innerHTML !== word)
+        let wrong = words.find((word, i) => blanks[i].innerHTML !== word)
         return wrong === undefined
     }
 }
