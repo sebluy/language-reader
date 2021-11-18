@@ -79,16 +79,19 @@ module.exports = class Reader {
                     sentenceSpan.appendChild(document.createTextNode(word))
                     return
                 }
+                let cWord = Utility.cleanWord(word)
+                if (cWord === '') {
+                    sentenceSpan.appendChild(document.createTextNode(word))
+                    return
+                }
                 const span = document.createElement('span')
                 span.innerText = word
                 sentenceSpan.appendChild(span)
-                word = Utility.cleanWord(word)
-                if (word === '') return
-                if (!this.spansByWord.has(word)) this.spansByWord.set(word, [])
-                this.spansByWord.get(word).push(span)
+                if (!this.spansByWord.has(cWord)) this.spansByWord.set(cWord, [])
+                this.spansByWord.get(cWord).push(span)
                 let spansSW = this.spansBySentenceAndWord[i]
-                if (!spansSW.has(word)) spansSW.set(word, [])
-                spansSW.get(word).push(span)
+                if (!spansSW.has(cWord)) spansSW.set(cWord, [])
+                spansSW.get(cWord).push(span)
             })
         })
     }

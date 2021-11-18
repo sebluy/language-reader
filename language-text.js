@@ -11,8 +11,8 @@ module.exports = class LanguageText {
         this.text = text
         this.audio = this.extractAudio()
         this.cleanText()
-        this.extractWords()
         this.extractSentences()
+        this.extractWords()
     }
 
     extractAudio() {
@@ -30,29 +30,31 @@ module.exports = class LanguageText {
     }
 
     extractWords() {
-        const words = this.text.split(/\s+/)
-        words.forEach((word) => {
-            word = Utility.cleanWord(word)
-            if (word === '') return
-            if (this.words.has(word)) {
-                this.words.get(word).count += 1
-            } else {
-                this.words.set(word, {
-                    mastery: 1.0,
-                    definition: '',
-                    count: 1,
-                })
-            }
-        })
-        this.db.fetchWords((rows) => {
-            rows.forEach((row) => {
-                if (!this.words.has(row.original)) return
-                let wordData = this.words.get(row.original)
-                wordData.definition = row.definition
-                wordData.mastery = row.mastery
+        this.sentences.forEach((sentence) => {
+            const words = sentence.text.split(/\s+/)
+            words.forEach((word) => {
+                word = Utility.cleanWord(word)
+                if (word === '') return
+                if (this.words.has(word)) {
+                    this.words.get(word).count += 1
+                } else {
+                    this.words.set(word, {
+                        mastery: 1.0,
+                        definition: '',
+                        count: 1,
+                    })
+                }
             })
-            this.sidebar.updateStats()
-            this.sidebar.reader.highlight()
+            this.db.fetchWords((rows) => {
+                rows.forEach((row) => {
+                    if (!this.words.has(row.original)) return
+                    let wordData = this.words.get(row.original)
+                    wordData.definition = row.definition
+                    wordData.mastery = row.mastery
+                })
+                this.sidebar.updateStats()
+                this.sidebar.reader.highlight()
+            })
         })
     }
 
@@ -97,10 +99,10 @@ module.exports = class LanguageText {
         this.sentenceMap = new Map()
         while (true) {
             let endPos = Utility.nextEndPos(this.text, i);
-            if (endPos === false) break
-            let text = (this.text).substring(i, endPos + 1);
+            let text = (this.text).substring(i, endPos === false ? undefined : endPos + 1)
             this.sentences.push({text: text})
             this.sentenceMap.set(text, {text: text})
+            if (endPos === false) break
             i = endPos + 1
         }
         this.db.fetchSentences((rows) => {
