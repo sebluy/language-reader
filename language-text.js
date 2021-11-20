@@ -75,23 +75,36 @@ module.exports = class LanguageText {
         this.db.updateMastery(word, data.mastery)
     }
 
+    updateSentenceMastery(sentence) {
+        let data = this.sentenceMap.get(sentence)
+        if (data.mastery === 5) return
+        data.mastery += 1
+        this.db.updateSentenceMastery(sentence, data.mastery)
+    }
+
     updateStats() {
         let countTranslated = 0
-        let mastered = 0
+        let wMastered = 0
         let numberOfWords = 0
         this.words.forEach((data) => {
-            mastered += data.mastery
+            wMastered += data.mastery
             numberOfWords += data.count
             if (data.definition === '') return
             countTranslated += data.count
         })
+        let sMastered = 0
+        this.sentenceMap.forEach((data) => {
+            sMastered += data.mastery
+        })
         let percentTranslated = countTranslated === 0 ? 0 : countTranslated / numberOfWords
-        let percentMastered = mastered / (this.words.size * 5)
+        let percentWMastered = wMastered / (this.words.size * 5)
+        let percentSMastered = sMastered / (this.sentenceMap.size * 5)
         return {
             numberOfWords: numberOfWords,
             numberOfDistinctWords: this.words.size,
             percentTranslated: percentTranslated,
-            percentMastered: percentMastered,
+            percentWordsMastered: percentWMastered,
+            percentSentencesMastered: percentSMastered,
         }
     }
 
@@ -113,6 +126,7 @@ module.exports = class LanguageText {
                 let sentence = this.sentenceMap.get(row.sentence)
                 sentence.startTime = row.startTime
                 sentence.endTime = row.endTime
+                sentence.mastery = row.mastery
             })
         })
     }
@@ -142,6 +156,16 @@ module.exports = class LanguageText {
         if (startTime !== null) sentence.startTime = startTime
         if (endTime !== null) sentence.endTime = endTime
         this.db.updateSentenceTimes(sentence)
+    }
+
+    getNextSentenceByMastery() {
+        let values = Array.from(this.sentenceMap.values())
+        if (values.length === 0) return null
+        let mastery = values.map((v) => v.mastery)
+        let minimum = Math.min(...mastery)
+        return this.sentences.find((sentence) => {
+            return this.sentenceMap.get(sentence.text).mastery === minimum
+        })
     }
 
 }

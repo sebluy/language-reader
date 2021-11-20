@@ -20,6 +20,7 @@ const Unscramble = require('./unscramble')
 // TODO: Have someway to show the answer if you're wrong.
 // TODO: make this whole thing run in the browser instead of Electron
 // TODO: export/import database.
+// TODO: rename column "original" to "word"
 
 module.exports = class SideBar {
 
@@ -141,7 +142,8 @@ module.exports = class SideBar {
                 ['tr', ['td', 'Number of words'], ['td', stats.numberOfWords]],
                 ['tr', ['td', 'Number of distinct words'], ['td', stats.numberOfDistinctWords]],
                 ['tr', ['td', 'Percent translated'], ['td', fp(stats.percentTranslated)]],
-                ['tr', ['td', 'Percent mastered'], ['td', fp(stats.percentMastered)]],
+                ['tr', ['td', 'Words mastered'], ['td', fp(stats.percentWordsMastered)]],
+                ['tr', ['td', 'Sentences mastered'], ['td', fp(stats.percentSentencesMastered)]],
                 ['tr', ['td', 'Today\'s XP'], ['td', this.runtimeData.xp.today]],
                 ['tr', ['td', 'Yesterday\'s XP'], ['td', this.runtimeData.xp.yesterday]]
             ]

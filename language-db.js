@@ -28,6 +28,11 @@ module.exports = class LanguageDB {
         this.db.run(sql, {$original: word, $mastery: mastery})
     }
 
+    updateSentenceMastery(sentence, mastery) {
+        let sql = 'UPDATE sentences SET mastery = $mastery WHERE sentence = $sentence'
+        this.db.run(sql, {$sentence: sentence, $mastery: mastery})
+    }
+
     updateSentenceTimes(sentence) {
         let params = {
             $sentence: sentence.text,

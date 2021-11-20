@@ -11,9 +11,9 @@ module.exports = class Unscramble {
 
         this.titleE.textContent = 'Unscramble'
 
-        let sentence = this.languageText.getRandomSentenceBlock(1)[0]
-        let sentenceData = this.languageText.sentenceMap.get(sentence.text)
-        this.words = sentence.text.split(/\s+/).filter((word) => word !== '')
+        this.sentence = this.languageText.getNextSentenceByMastery()
+        let sentenceData = this.languageText.sentenceMap.get(this.sentence.text)
+        this.words = this.sentence.text.split(/\s+/).filter((word) => word !== '')
         let shuffled = [...this.words]
         Utility.shuffle(shuffled)
         this.build(shuffled)
@@ -27,6 +27,7 @@ module.exports = class Unscramble {
             if (this.words[i] !== current[i]) return
         }
         this.sidebar.addXP(this.words.length * 3)
+        this.languageText.updateSentenceMastery(this.sentence.text)
         this.sidebar.updateStats()
         new Unscramble(this.sidebar)
     }
