@@ -18,7 +18,7 @@ module.exports = class FillInTheBlanks {
     {
         let onDrop = () => {
             if (this.checkAnswer(words, blanks)) {
-                words.forEach((word) => this.languageText.updateMastery(word))
+                // words.forEach((word) => this.languageText.updateMastery(word))
                 this.sidebar.addXP(sentences.length * 2)
                 this.sidebar.updateStats()
                 new FillInTheBlanks(this.sidebar)
@@ -27,17 +27,17 @@ module.exports = class FillInTheBlanks {
         let blanks = []
         let words = []
         for (let i = 0; i < sentences.length; i++) {
-            let randomWord = Utility.weightedRandomWords(sentences[i].words, 1)
+            let randomWord = Utility.randomWordsByMastery(sentences[i].words, 1)
             if (randomWord.length === 0) continue
-            let [word] = randomWord[0]
-            let span = this.randomElement(this.reader.spansBySentenceAndWord[i].get(word))
+            let word = randomWord[0]
+            let span = this.randomElement(this.reader.spansBySentenceAndWord[i].get(word.word))
             let blank = Utility.createDraggableItem({
                 tag: 'span',
                 id: 'matching-blank-' + i,
                 text: '           ',
                 onDrop: onDrop
             })
-            words.push(word)
+            words.push(word.word)
             blanks.push(blank)
             span.parentNode.replaceChild(blank, span)
         }

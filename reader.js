@@ -17,7 +17,6 @@ module.exports = class Reader {
     load(title = null, sentences = null) {
         if (title === null) title = this.languageText.filename
         if (sentences === null) sentences = this.languageText.sentences
-        this.languageText.words.forEach((v, k) => v.spans = [])
         this.titleE.textContent = title
         this.element.innerHTML = ''
         this.spansByWord = new Map()
@@ -55,7 +54,7 @@ module.exports = class Reader {
         let spans = this.spansByWord.get(word)
         spans.forEach((span) => {
             if (this.sidebar.isHighlightChecked() && data.definition !== '') {
-                let hue = ((1 - data.mastery) * 120).toString(10)
+                let hue = ((data.mastery / 5) * 120).toString(10)
                 span.style.backgroundColor = 'hsl(' + hue + ',100%,75%)'
             } else {
                 span.style.backgroundColor = ''

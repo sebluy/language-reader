@@ -82,16 +82,8 @@ span.matching-item {
     text-align: center;
 }
 
-.correct-match {
-    border: 2px dotted green;
-}
-
-.incorrect-match {
-    border: 2px dotted red;
-}
-
 .drag-over {
-    border: 2px dotted blue;
+    border: 1px solid blue;
 }
 
 .highlight-sentence {

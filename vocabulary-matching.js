@@ -19,10 +19,10 @@ module.exports = class VocabularyMatching {
     {
         let words = [];
         let definitions = [];
-        let randomWords = Utility.weightedRandomWords(this.languageText.words, 8)
-        randomWords.forEach(([word, data]) => {
-            words.push(word)
-            definitions.push(data.definition)
+        let randomWords = Utility.randomWordsByMastery(this.languageText.words, 8)
+        randomWords.forEach((word) => {
+            words.push(word.word)
+            definitions.push(word.definition)
         })
         let shuffled = [...definitions]
         Utility.shuffle(shuffled)

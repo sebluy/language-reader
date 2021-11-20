@@ -39,22 +39,23 @@ module.exports = class LanguageText {
                     this.words.get(word).count += 1
                 } else {
                     this.words.set(word, {
-                        mastery: 1.0,
+                        word: word,
+                        mastery: 0,
                         definition: '',
                         count: 1,
                     })
                 }
             })
-            this.db.fetchWords((rows) => {
-                rows.forEach((row) => {
-                    if (!this.words.has(row.original)) return
-                    let wordData = this.words.get(row.original)
-                    wordData.definition = row.definition
-                    wordData.mastery = row.mastery
-                })
-                this.sidebar.updateStats()
-                this.sidebar.reader.highlight()
+        })
+        this.db.fetchWords((rows) => {
+            rows.forEach((row) => {
+                if (!this.words.has(row.original)) return
+                let wordData = this.words.get(row.original)
+                wordData.definition = row.definition
+                wordData.mastery = row.mastery
             })
+            this.sidebar.updateStats()
+            this.sidebar.reader.highlight()
         })
     }
 
@@ -69,7 +70,8 @@ module.exports = class LanguageText {
 
     updateMastery(word) {
         let data = this.words.get(word)
-        data.mastery = data.mastery / 2
+        if (data.mastery === 5) return
+        data.mastery += 1
         this.db.updateMastery(word, data.mastery)
     }
 
@@ -84,7 +86,7 @@ module.exports = class LanguageText {
             countTranslated += data.count
         })
         let percentTranslated = countTranslated === 0 ? 0 : countTranslated / numberOfWords
-        let percentMastered = 1 - (mastered / this.words.size)
+        let percentMastered = mastered / (this.words.size * 5)
         return {
             numberOfWords: numberOfWords,
             numberOfDistinctWords: this.words.size,

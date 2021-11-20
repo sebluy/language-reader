@@ -8,6 +8,19 @@ const LanguageText = require('./language-text')
 const Reader = require('./reader')
 const Unscramble = require('./unscramble')
 
+/* TODO: come up with a better way than just random. Some progression through the exercises or something.
+     Think a lesson, instead of just random exercises.
+     Maybe a 5 stage Leitner system.
+     Vocab - Each word goes through 5 levels until mastered. Random from lowest level.
+     Unscramble - Each sentence goes through 5 levels until mastered. In order.
+     Fill in the blanks - Each sentence goes through 5 levels until mastered. In order.
+     Mastery = 1/3 of each.
+*/
+// TODO: Page the reader
+// TODO: Have someway to show the answer if you're wrong.
+// TODO: make this whole thing run in the browser instead of Electron
+// TODO: export/import database.
+
 module.exports = class SideBar {
 
     constructor() {
@@ -53,7 +66,7 @@ module.exports = class SideBar {
     setAudio(startTime, endTime = null) {
         this.audioStart = startTime
         this.audioEnd = endTime
-        this.audioE.currentTime = startTime
+        if (this.audioStart) this.audioE.currentTime = startTime
     }
 
     playAudio() {
@@ -77,7 +90,7 @@ module.exports = class SideBar {
                 this.audioE.pause()
             }
         } else if (e.key === 'r') {
-            this.audioE.currentTime = this.audioStart
+            if (this.audioStart) this.audioE.currentTime = this.audioStart
             this.playAudio()
         } else if (e.key === 'm') {
             this.markAudio()

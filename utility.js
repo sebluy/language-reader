@@ -1,21 +1,17 @@
 module.exports = class Utility {
 
-    static weightedRandomWords(words, n) {
-        let defined = []
-        let cumWeight = 0
-        words.forEach((value, key) => {
-            if (value.definition === '') return
-            defined.push([key, value, cumWeight, cumWeight + value.mastery])
-            cumWeight += value.mastery
-        })
-        if (defined.length < n) return []
+    static randomWordsByMastery(words, n) {
+        let values = Array.from(words.values()).filter((v) => v.definition !== '')
+        if (values.length < n) return []
+        let mastery = values.map((v) => v.mastery)
+        let minimum = Math.min(...mastery)
 
         let random = []
         while (random.length < n) {
-            let index = Math.random() * cumWeight
-            let word = defined.find(([k, v, start, end]) => start <= index && index < end)
-            if (random.find(chosen => chosen[0] === word[0])) continue
-            random.push(word)
+            let pool = values.filter((v) => v.mastery === minimum)
+            Utility.shuffle(pool)
+            random = random.concat(pool.slice(0, n))
+            minimum += 1
         }
         return random
     }
