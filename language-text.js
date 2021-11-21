@@ -15,18 +15,9 @@ module.exports = class LanguageText {
         this.words = new Map()
         this.filename = filename
         this.text = text
-        this.audio = this.extractAudio()
         this.cleanText()
         this.extractSentences()
         this.extractWords()
-    }
-
-    extractAudio() {
-        let match = this.text.match(/<audio>([\d:]+)<\/audio>\n/)
-        if (match === null) return null
-        this.text = this.text.replace(match[0], '')
-        let [minutes, seconds] = match[1].split(':')
-        return parseInt(minutes) * 60 + parseInt(seconds)
     }
 
     cleanText() {
@@ -37,7 +28,7 @@ module.exports = class LanguageText {
 
     extractWords() {
         this.sentences.forEach((sentence) => {
-            const words = sentence.text.split(/\s+/)
+            const words = sentence.sentence.split(/\s+/)
             words.forEach((word) => {
                 word = Utility.cleanWord(word)
                 if (word === '') return
@@ -62,6 +53,7 @@ module.exports = class LanguageText {
             })
             this.sidebar.updateStats()
             this.sidebar.reader.highlight()
+            this.sidebar.reader.setAudio()
         })
     }
 
@@ -71,7 +63,7 @@ module.exports = class LanguageText {
         if (wordData.definition === '') this.sidebar.addXP(5)
         wordData.definition = definition
         console.log('Updating definition... for ' + word + ' to ' + definition)
-        this.db.updateDefinition(word, definition)
+        this.db.updateWords([wordData])
     }
 
     updateMastery(words) {
@@ -88,7 +80,7 @@ module.exports = class LanguageText {
         let data = this.sentenceMap.get(sentence)
         if (data.mastery === 5) return
         data.mastery += 1
-        this.db.updateSentenceMastery(sentence, data.mastery)
+        this.db.updateSentence(data)
     }
 
     updateStats() {
@@ -125,7 +117,7 @@ module.exports = class LanguageText {
             let endPos = Utility.nextEndPos(this.text, i);
             let text = (this.text).substring(i, endPos === false ? undefined : endPos + 1)
             if (text === '') break
-            let sentence = {text: text, mastery: 0}
+            let sentence = {sentence: text, mastery: 0}
             this.sentences.push(sentence)
             this.sentenceMap.set(text, sentence)
             if (endPos === false) break
@@ -138,7 +130,6 @@ module.exports = class LanguageText {
                 sentence.startTime = row.startTime
                 sentence.endTime = row.endTime
                 // TODO: write mastery as 0 to begin with
-                console.log(row.mastery)
                 if (row.mastery !== null) sentence.mastery = row.mastery
             })
         })
@@ -151,7 +142,7 @@ module.exports = class LanguageText {
         for (let i = 0; i < n; i++) {
             let sentenceData = this.sentences[sentenceIndex + i]
             sentenceData.words = new Map()
-            let words = sentenceData.text.split(/\s+/)
+            let words = sentenceData.sentence.split(/\s+/)
             words.forEach((word) => {
                 word = Utility.cleanWord(word)
                 if (word === '') return
@@ -168,7 +159,7 @@ module.exports = class LanguageText {
     {
         if (startTime !== null) sentence.startTime = startTime
         if (endTime !== null) sentence.endTime = endTime
-        this.db.updateSentenceTimes(sentence)
+        this.db.updateSentence(sentence)
     }
 
     getNextSentenceByMastery() {
@@ -176,9 +167,8 @@ module.exports = class LanguageText {
         if (values.length === 0) return null
         let mastery = values.map((v) => v.mastery)
         let minimum = Math.min(...mastery)
-        console.log(this.sentences)
         return this.sentences.find((sentence) => {
-            return this.sentenceMap.get(sentence.text).mastery === minimum
+            return this.sentenceMap.get(sentence.sentence).mastery === minimum
         })
     }
 

@@ -9,50 +9,46 @@ module.exports = class LanguageDBLocalStorage {
     fetchWords(cb) {
         let json = this.db.getItem('words')
         this.words = JSON.parse(json)
-        this.wordsIndex = new Map()
+        this.wordIndex = new Map()
         this.words.forEach((word, i) => {
-            this.wordsIndex.set(word.word, i)
+            if (word.mastery === undefined) word.mastery = 0
+            this.wordIndex.set(word.word, i)
         })
         setTimeout(() => cb(this.words), 0)
     }
 
     fetchSentences(cb) {
         this.sentences = JSON.parse(this.db.getItem('sentences'))
+        this.sentenceIndex = new Map()
+        this.sentences.forEach((sentence, i) => {
+            if (sentence.mastery === undefined) sentence.mastery = 0
+            this.sentenceIndex.set(sentence.sentence, i)
+        })
         setTimeout(() => cb(this.sentences), 0)
-    }
-
-    updateDefinition(word, definition) {
-        let row = this.words.find((row) => row.word === word)
-        if (row === undefined) {
-            row = {word: word}
-            this.words.push({word: word})
-        }
-        row.definition = definition
-        this.db.setItem('words', JSON.stringify(this.words))
     }
 
     updateWords(words) {
         words.forEach((word) => {
-            let index = this.wordsIndex.get(word.word)
-            this.words[index] = word
+            if (this.wordIndex.has(word.word)) {
+                let index = this.wordIndex.get(word.word)
+                this.words[index] = word
+            } else {
+                this.words.push(word)
+                this.wordIndex.set(word.word, this.words.length - 1)
+            }
         })
         this.db.setItem('words', JSON.stringify(this.words))
     }
 
-    updateSentenceMastery(sentence, mastery) {
-        let row = this.sentences.find((row) => row.sentence === sentence)
-        row.mastery = mastery
-        this.db.setItem('sentences', JSON.stringify(this.sentences))
-    }
-
-    updateSentenceTimes(sentence) {
-        let row = this.sentences.find((row) => row.sentence === sentence.text)
-        if (row === undefined) {
-            row = {sentence: sentence.text}
-            this.sentences.push(row)
+    updateSentence(sentence) {
+        if (this.sentenceIndex.has(sentence.sentence)) {
+            let index = this.sentenceIndex.get(sentence.sentence)
+            this.sentences[index] = sentence
+            console.log(index, sentence)
+        } else {
+            this.sentences.push(sentence)
+            this.sentenceIndex.set(sentence.sentence, this.sentences.length - 1)
         }
-        row.startTime = sentence.startTime
-        row.endTime = sentence.endTime
         this.db.setItem('sentences', JSON.stringify(this.sentences))
     }
 

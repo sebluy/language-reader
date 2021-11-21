@@ -227,7 +227,7 @@ module.exports = class SideBar {
         }
         if (this.marker > 0) {
             let lastSentence = sentences[this.marker - 1]
-            let lastData = this.languageText.sentenceMap.get(lastSentence.text)
+            let lastData = this.languageText.sentenceMap.get(lastSentence.sentence)
             this.languageText.updateSentenceTimes(lastData, null, this.audioE.currentTime)
             this.reader.removeSentenceHighlighting(this.marker - 1)
         }
@@ -237,7 +237,7 @@ module.exports = class SideBar {
             return
         }
         let sentence = sentences[this.marker]
-        let sentenceData = this.languageText.sentenceMap.get(sentence.text)
+        let sentenceData = this.languageText.sentenceMap.get(sentence.sentence)
         this.reader.highlightSentence(this.marker)
         this.languageText.updateSentenceTimes(sentenceData, this.audioE.currentTime, null)
         this.marker += 1

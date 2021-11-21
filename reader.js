@@ -16,13 +16,20 @@ module.exports = class Reader {
 
     load(title = null, sentences = null) {
         if (title === null) title = this.languageText.filename
-        if (sentences === null) sentences = this.languageText.sentences
+        if (sentences === null) this.sentences = this.languageText.sentences
         this.titleE.textContent = title
         this.element.innerHTML = ''
         this.spansByWord = new Map()
         this.spansBySentence = []
         this.spansBySentenceAndWord = []
-        this.addSentences(sentences)
+        this.addSentences()
+        this.setAudio()
+    }
+
+    setAudio() {
+        let first = this.sentences[0]
+        let last = this.sentences[this.sentences.length - 1]
+        this.sidebar.setAudio(first.startTime, last.endTime)
     }
 
     clickWord(e) {
@@ -66,9 +73,9 @@ module.exports = class Reader {
         this.languageText.words.forEach((data, word) => this.updateHighlighting(word))
     }
 
-    addSentences(sentences) {
-        sentences.forEach((sentence, i) => {
-            let wordsAndSpaces = sentence.text.split(/(\s+)/)
+    addSentences() {
+        this.sentences.forEach((sentence, i) => {
+            let wordsAndSpaces = sentence.sentence.split(/(\s+)/)
             let sentenceSpan = document.createElement('span')
             this.spansBySentence.push(sentenceSpan)
             this.spansBySentenceAndWord[i] = new Map()
