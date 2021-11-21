@@ -53,7 +53,7 @@ module.exports = class Reader {
         const data = this.languageText.words.get(word)
         let spans = this.spansByWord.get(word)
         spans.forEach((span) => {
-            if (this.sidebar.isHighlightChecked() && data.definition !== '') {
+            if (this.sidebar.highlightingOn && data.definition !== '') {
                 let hue = ((data.mastery / 5) * 120).toString(10)
                 span.style.backgroundColor = 'hsl(' + hue + ',100%,75%)'
             } else {

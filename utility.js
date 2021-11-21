@@ -10,7 +10,7 @@ module.exports = class Utility {
         while (random.length < n) {
             let pool = values.filter((v) => v.mastery === minimum)
             Utility.shuffle(pool)
-            random = random.concat(pool.slice(0, n))
+            random = random.concat(pool.slice(0, n - random.length))
             minimum += 1
         }
         return random
@@ -112,6 +112,13 @@ module.exports = class Utility {
             // e.target.classList.remove('incorrect-match')
         })
         return el
+    }
+
+    static benchmark(f) {
+        let t1 = (new Date()).getTime()
+        f()
+        let t2 = (new Date()).getTime()
+        console.log((t2 - t1)/1000)
     }
 
 }

@@ -1,20 +1,28 @@
 const sqlite3 = require('sqlite3')
 
-module.exports = class LanguageDB {
+module.exports = class LanguageDBSQL {
 
     constructor() {
         this.db = new sqlite3.Database('./words.db')
     }
 
     fetchWords(cb) {
-        this.db.all("SELECT * FROM words", (err, rows) => cb(rows))
+        this.db.all("SELECT * FROM words", (err, rows) => {
+            cb(rows.map((row) => {
+                return {
+                    word: row.original,
+                    definition: row.definition,
+                    mastery: row.mastery
+                }
+            }))
+        })
     }
 
     fetchSentences(cb) {
         this.db.all("SELECT * FROM sentences", (err, rows) => cb(rows))
     }
 
-    updateWord(word, definition) {
+    updateDefinition(word, definition) {
         let sql = 'INSERT OR IGNORE INTO words (original, definition)' +
             ' VALUES ($original, $definition)'
         const params =  {$definition: definition, $original: word}
@@ -44,6 +52,12 @@ module.exports = class LanguageDB {
         this.db.run(sql, params)
         sql = 'UPDATE sentences SET startTime = $startTime, endTime = $endTime WHERE sentence = $sentence'
         this.db.run(sql, params)
+    }
+
+    export(cb) {
+        let words = new Promise((resolve) => this.fetchWords(resolve))
+        let sentences = new Promise((resolve) => this.fetchSentences(resolve))
+        Promise.all([words, sentences]).then(([words, sentences]) => { return {words, sentences} })
     }
 
 }

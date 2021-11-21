@@ -16,15 +16,21 @@ const Unscramble = require('./unscramble')
      Fill in the blanks - Each sentence goes through 5 levels until mastered. In order.
      Mastery = 1/3 of each.
 */
+// TODO: change highlighting checkbox to button
 // TODO: Page the reader
 // TODO: Have someway to show the answer if you're wrong.
-// TODO: make this whole thing run in the browser instead of Electron
+/* TODO: make this whole thing run in the browser instead of Electron
+    prelim step: use local storage instead of SQL
+    use IndexedDB and File System API for storage
+ */
 // TODO: export/import database.
 // TODO: rename column "original" to "word"
+// TODO: use an actual dictionary instead of google translate
 
 module.exports = class SideBar {
 
     constructor() {
+        this.highlightingOn = false
         this.setElementsAndListeners()
         this.getRuntimeData((json) => {
             console.log(json)
@@ -44,13 +50,16 @@ module.exports = class SideBar {
         this.openAudioFileB = document.getElementById('open-audio-file')
         this.readerB = document.getElementById('reader')
         this.vocabMatchingB = document.getElementById('vocab-matching')
-        this.fillInTheBlanksB = document.getElementById('fill-in-the-blanks')
+        // this.fillInTheBlanksB = document.getElementById('fill-in-the-blanks')
         this.unscrambleB = document.getElementById('unscramble')
         this.audioE = document.getElementById('audio')
 
-        this.definitionE.addEventListener('focusout', () => this.updateWord())
+        this.definitionE.addEventListener('focusout', () => this.updateDefinition())
         this.definitionE.addEventListener('keydown', (e) => this.nextWord(e))
-        this.highlightCB.addEventListener('change', () => this.reader.highlight())
+        this.highlightCB.addEventListener('click', () => {
+            this.highlightingOn = !this.highlightingOn
+            this.reader.highlight()
+        })
         this.googleTranslateB.addEventListener('click', () => this.googleTranslate())
         this.updateStatsB.addEventListener('click', () => this.updateStats())
         this.openTextFileB.addEventListener('click', () => this.openTextFile())
@@ -60,7 +69,7 @@ module.exports = class SideBar {
             this.reader.highlight()
         })
         this.vocabMatchingB.addEventListener('click', () => new VocabularyMatching(this))
-        this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this))
+        // this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this))
         this.unscrambleB.addEventListener('click', () => new Unscramble(this))
     }
 
@@ -98,10 +107,10 @@ module.exports = class SideBar {
         }
     }
 
-    updateWord() {
+    updateDefinition() {
         const original = this.originalE.innerHTML
         const definition = this.definitionE.value
-        this.languageText.updateWord(original, definition)
+        this.languageText.updateDefinition(original, definition)
         this.reader.updateHighlighting(original)
     }
 
@@ -110,10 +119,6 @@ module.exports = class SideBar {
         this.originalE.innerText = word
         this.definitionE.value = definition
         this.definitionE.focus()
-    }
-
-    isHighlightChecked() {
-        return this.highlightCB.checked
     }
 
     nextWord(e) {
@@ -153,6 +158,7 @@ module.exports = class SideBar {
 
     openTextFile() {
         ipcRenderer.invoke('open-file').then((result) => {
+            // TODO: fix exception
             this.loadTextFile(result[0])
         })
     }

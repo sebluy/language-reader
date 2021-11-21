@@ -1,11 +1,17 @@
 const Utility = require('./utility')
-const LanguageDB = require('./language-db')
+const LanguageDB = require('./language-db-sql')
+const LanguageDBLocalStorage = require('./language-db-local-storage')
 
 module.exports = class LanguageText {
 
     constructor(sidebar, filename, text) {
         this.sidebar = sidebar
-        this.db = new LanguageDB()
+        // this.db = new LanguageDB()
+        this.db = new LanguageDBLocalStorage()
+        // this.db.export((db) => {
+        //     this.db2.import(db)
+        //     this.db2.export(console.log)
+        // })
         this.words = new Map()
         this.filename = filename
         this.text = text
@@ -49,8 +55,8 @@ module.exports = class LanguageText {
         })
         this.db.fetchWords((rows) => {
             rows.forEach((row) => {
-                if (!this.words.has(row.original)) return
-                let wordData = this.words.get(row.original)
+                if (!this.words.has(row.word)) return
+                let wordData = this.words.get(row.word)
                 wordData.definition = row.definition
                 wordData.mastery = row.mastery
             })
@@ -59,20 +65,23 @@ module.exports = class LanguageText {
         })
     }
 
-    updateWord(word, definition) {
+    updateDefinition(word, definition) {
         const wordData = this.words.get(word)
         if (wordData.definition === definition) return
         if (wordData.definition === '') this.sidebar.addXP(5)
         wordData.definition = definition
         console.log('Updating definition... for ' + word + ' to ' + definition)
-        this.db.updateWord(word, definition)
+        this.db.updateDefinition(word, definition)
     }
 
-    updateMastery(word) {
-        let data = this.words.get(word)
-        if (data.mastery === 5) return
-        data.mastery += 1
-        this.db.updateMastery(word, data.mastery)
+    updateMastery(words) {
+        words = words.map((word) => {
+            let data = this.words.get(word)
+            if (data.mastery === 5) return
+            data.mastery += 1
+            return data
+        })
+        this.db.updateWords(words)
     }
 
     updateSentenceMastery(sentence) {
@@ -115,8 +124,10 @@ module.exports = class LanguageText {
         while (true) {
             let endPos = Utility.nextEndPos(this.text, i);
             let text = (this.text).substring(i, endPos === false ? undefined : endPos + 1)
-            this.sentences.push({text: text})
-            this.sentenceMap.set(text, {text: text})
+            if (text === '') break
+            let sentence = {text: text, mastery: 0}
+            this.sentences.push(sentence)
+            this.sentenceMap.set(text, sentence)
             if (endPos === false) break
             i = endPos + 1
         }
@@ -126,7 +137,9 @@ module.exports = class LanguageText {
                 let sentence = this.sentenceMap.get(row.sentence)
                 sentence.startTime = row.startTime
                 sentence.endTime = row.endTime
-                sentence.mastery = row.mastery
+                // TODO: write mastery as 0 to begin with
+                console.log(row.mastery)
+                if (row.mastery !== null) sentence.mastery = row.mastery
             })
         })
     }
@@ -163,6 +176,7 @@ module.exports = class LanguageText {
         if (values.length === 0) return null
         let mastery = values.map((v) => v.mastery)
         let minimum = Math.min(...mastery)
+        console.log(this.sentences)
         return this.sentences.find((sentence) => {
             return this.sentenceMap.get(sentence.text).mastery === minimum
         })
