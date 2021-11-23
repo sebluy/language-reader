@@ -1,13 +1,11 @@
 const Utility = require('./utility')
-const LanguageDB = require('./language-db-sql')
-const LanguageDBLocalStorage = require('./language-db-local-storage')
 
 module.exports = class LanguageText {
 
     constructor(sidebar, filename, text) {
         this.sidebar = sidebar
         // this.db = new LanguageDB()
-        this.db = new LanguageDBLocalStorage()
+        this.db = sidebar.db
         // this.db.export((db) => {
         //     this.db2.import(db)
         //     this.db2.export(console.log)
@@ -22,8 +20,6 @@ module.exports = class LanguageText {
 
     cleanText() {
         this.text = this.text.replaceAll('-\n', '')
-        this.text = this.text.replaceAll('\n', ' ')
-        this.text = this.text.replaceAll('\t', '\n\t')
     }
 
     extractWords() {
@@ -51,6 +47,7 @@ module.exports = class LanguageText {
                 wordData.definition = row.definition
                 wordData.mastery = row.mastery
             })
+            this.totalWordsTranslated = rows.length
             this.sidebar.updateStats()
             this.sidebar.reader.highlight()
             this.sidebar.reader.setAudio()
@@ -103,6 +100,7 @@ module.exports = class LanguageText {
         return {
             numberOfWords: numberOfWords,
             numberOfDistinctWords: this.words.size,
+            totalWordsTranslated: this.totalWordsTranslated,
             percentTranslated: percentTranslated,
             percentWordsMastered: percentWMastered,
             percentSentencesMastered: percentSMastered,

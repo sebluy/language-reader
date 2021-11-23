@@ -38,7 +38,9 @@ module.exports = class Reader {
             if (oldWordE) oldWordE.classList.remove('selected')
             e.target.classList.add('selected')
             const word = Utility.cleanWord(e.target.innerHTML)
-            this.sidebar.showWordAndDefinition(word, this.languageText.words.get(word).definition)
+            if (this.languageText.words.has(word)) {
+                this.sidebar.showWordAndDefinition(word, this.languageText.words.get(word).definition)
+            }
         }
     }
 

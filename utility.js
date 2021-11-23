@@ -121,4 +121,27 @@ module.exports = class Utility {
         console.log((t2 - t1)/1000)
     }
 
+    static download(filename, text) {
+        let element = document.createElement('a')
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text))
+        element.setAttribute('download', filename)
+        element.style.display = 'none'
+        document.body.appendChild(element)
+        element.click()
+        document.body.removeChild(element)
+    }
+
+    static upload(cb) {
+        console.log('creating upload input')
+        let element = document.createElement('input')
+        element.setAttribute('type', 'file')
+        element.style.display = 'none'
+        document.body.appendChild(element)
+        element.addEventListener('change', () => {
+            element.files[0].text().then(cb)
+            element.remove()
+        })
+        element.click()
+    }
+
 }

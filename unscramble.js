@@ -13,6 +13,7 @@ module.exports = class Unscramble {
 
         this.sentence = this.languageText.getNextSentenceByMastery()
         let sentenceData = this.languageText.sentenceMap.get(this.sentence.sentence)
+        console.log(sentenceData)
         this.words = this.sentence.sentence.split(/\s+/).filter((word) => word !== '')
         let shuffled = [...this.words]
         Utility.shuffle(shuffled)

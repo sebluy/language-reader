@@ -57,10 +57,40 @@ module.exports = class LanguageDBLocalStorage {
         this.sentences = db.sentences
         this.db.setItem('words', JSON.stringify(this.words))
         this.db.setItem('sentences', JSON.stringify(this.sentences))
+        this.db.setItem('runtimeData', JSON.stringify(db.runtimeData))
     }
 
     export(cb) {
-        cb({words: this.words, sentences: this.sentences})
+        this.fetchRuntimeData(runtimeData => {
+            cb({
+                words: this.words,
+                sentences: this.sentences,
+                runtimeData: runtimeData
+            })
+        })
     }
+
+    fetchRuntimeData(cb) {
+        let runtimeData = JSON.parse(this.db.getItem('runtimeData'))
+        if (runtimeData === null) runtimeData = {}
+        if (runtimeData.xp === undefined) {
+            runtimeData.xp = {
+                today: 0,
+                yesterday: 0,
+                date: (new Date()).toLocaleDateString()
+            }
+        } else if (runtimeData.xp.date !== (new Date()).toLocaleDateString()) {
+            runtimeData.xp.yesterday = runtimeData.xp.today
+            runtimeData.xp.today = 0
+            runtimeData.xp.date = (new Date()).toLocaleDateString()
+            this.updateRuntimeData(runtimeData)
+        }
+        cb(runtimeData)
+    }
+
+    updateRuntimeData(runtimeData) {
+        localStorage.setItem('runtimeData', JSON.stringify(runtimeData))
+    }
+
 
 }

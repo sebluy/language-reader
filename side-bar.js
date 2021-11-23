@@ -7,6 +7,7 @@ const Utility = require('./utility')
 const LanguageText = require('./language-text')
 const Reader = require('./reader')
 const Unscramble = require('./unscramble')
+const LanguageDBLocalStorage = require('./language-db-local-storage')
 
 /* TODO: come up with a better way than just random. Some progression through the exercises or something.
      Think a lesson, instead of just random exercises.
@@ -16,14 +17,15 @@ const Unscramble = require('./unscramble')
      Fill in the blanks - Each sentence goes through 5 levels until mastered. In order.
      Mastery = 1/3 of each.
 */
-// TODO: change highlighting checkbox to button
 // TODO: Page the reader
 // TODO: Have someway to show the answer if you're wrong.
+// TODO: store the runtime data in localstorage
 /* TODO: make this whole thing run in the browser instead of Electron
     prelim step: use local storage instead of SQL
     use IndexedDB and File System API for storage
  */
 // TODO: export/import database.
+// TODO: reload everything on database import
 // TODO: rename column "original" to "word"
 // TODO: use an actual dictionary instead of google translate
 
@@ -31,9 +33,11 @@ module.exports = class SideBar {
 
     constructor() {
         this.highlightingOn = false
+        this.db = new LanguageDBLocalStorage()
         this.setElementsAndListeners()
-        this.getRuntimeData((json) => {
+        this.db.fetchRuntimeData((json) => {
             console.log(json)
+            this.runtimeData = json
             if (json.openTextFile) this.loadTextFile(json.openTextFile)
             if (json.openAudioFile) this.loadAudioFile(json.openAudioFile)
         })
@@ -52,6 +56,8 @@ module.exports = class SideBar {
         this.vocabMatchingB = document.getElementById('vocab-matching')
         // this.fillInTheBlanksB = document.getElementById('fill-in-the-blanks')
         this.unscrambleB = document.getElementById('unscramble')
+        this.exportB = document.getElementById('export')
+        this.importB = document.getElementById('import')
         this.audioE = document.getElementById('audio')
 
         this.definitionE.addEventListener('focusout', () => this.updateDefinition())
@@ -71,15 +77,18 @@ module.exports = class SideBar {
         this.vocabMatchingB.addEventListener('click', () => new VocabularyMatching(this))
         // this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this))
         this.unscrambleB.addEventListener('click', () => new Unscramble(this))
+        this.exportB.addEventListener('click', () => this.exportDatabase())
+        this.importB.addEventListener('click', () => this.importDatabase())
     }
 
     setAudio(startTime, endTime = null) {
         this.audioStart = startTime
         this.audioEnd = endTime
-        if (this.audioStart) this.audioE.currentTime = startTime
+        if (this.audioStart !== undefined) this.audioE.currentTime = startTime
     }
 
     playAudio() {
+        // TODO: Fix playback for 0
         clearTimeout(this.timeout)
         this.audioE.play()
         if (this.audioEnd) {
@@ -147,6 +156,7 @@ module.exports = class SideBar {
                 ['tr', ['td', 'Number of words'], ['td', stats.numberOfWords]],
                 ['tr', ['td', 'Number of distinct words'], ['td', stats.numberOfDistinctWords]],
                 ['tr', ['td', 'Percent translated'], ['td', fp(stats.percentTranslated)]],
+                ['tr', ['td', 'Total Words Translated'], ['td', stats.totalWordsTranslated]],
                 ['tr', ['td', 'Words mastered'], ['td', fp(stats.percentWordsMastered)]],
                 ['tr', ['td', 'Sentences mastered'], ['td', fp(stats.percentSentencesMastered)]],
                 ['tr', ['td', 'Today\'s XP'], ['td', this.runtimeData.xp.today]],
@@ -172,7 +182,7 @@ module.exports = class SideBar {
     loadAudioFile(filename) {
         this.audioE.src = filename
         this.runtimeData.openAudioFile = filename
-        this.writeRuntimeData()
+        this.db.updateRuntimeData(this.runtimeData)
     }
 
     loadTextFile(filename) {
@@ -183,40 +193,13 @@ module.exports = class SideBar {
             this.reader.languageText = this.languageText
             this.reader.load()
             this.runtimeData.openTextFile = filename
-            this.writeRuntimeData()
-        })
-    }
-
-    getRuntimeData(f) {
-        fs.readFile('runtime-data.json', (err, contents) => {
-            if (contents === undefined) {
-                this.runtimeData = {}
-            } else {
-                this.runtimeData = JSON.parse(contents.toString())
-            }
-            if (this.runtimeData.xp === undefined) {
-                this.runtimeData.xp = {
-                    today: 0,
-                    yesterday: 0,
-                    date: (new Date()).toLocaleDateString()
-                }
-            } else if (this.runtimeData.xp.date !== (new Date()).toLocaleDateString()) {
-                this.runtimeData.xp.yesterday = this.runtimeData.xp.today
-                this.runtimeData.xp.today = 0
-                this.runtimeData.xp.date = (new Date()).toLocaleDateString()
-                this.writeRuntimeData()
-            }
-            f(this.runtimeData)
+            this.db.updateRuntimeData(this.runtimeData)
         })
     }
 
     addXP(n) {
         this.runtimeData.xp.today += n
-        this.writeRuntimeData()
-    }
-
-    writeRuntimeData() {
-        fs.writeFile('runtime-data.json', JSON.stringify(this.runtimeData), err => {})
+        this.db.updateRuntimeData(this.runtimeData)
     }
 
     markAudio() {
@@ -241,6 +224,18 @@ module.exports = class SideBar {
         this.reader.highlightSentence(this.marker)
         this.languageText.updateSentenceTimes(sentenceData, this.audioE.currentTime, null)
         this.marker += 1
+    }
+
+    exportDatabase() {
+        this.db.export((db) => {
+            Utility.download('language-db.json', JSON.stringify(db))
+        })
+    }
+
+    importDatabase() {
+        Utility.upload((db) => {
+            this.db.import(JSON.parse(db))
+        })
     }
 
 }
