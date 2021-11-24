@@ -132,16 +132,21 @@ module.exports = class Utility {
     }
 
     static upload(cb) {
-        console.log('creating upload input')
         let element = document.createElement('input')
         element.setAttribute('type', 'file')
         element.style.display = 'none'
         document.body.appendChild(element)
         element.addEventListener('change', () => {
-            element.files[0].text().then(cb)
+            cb(element.files[0])
             element.remove()
         })
         element.click()
+    }
+
+    static uploadText(cb) {
+        Utility.upload((file) => {
+            file.text().then(text => cb(file.name, text))
+        })
     }
 
 }

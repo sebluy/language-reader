@@ -1,6 +1,4 @@
 const fetch = require('node-fetch')
-const { ipcRenderer } = require('electron')
-const fs = require('fs')
 const FillInTheBlanks = require('./fill-in-the-blanks')
 const VocabularyMatching = require('./vocabulary-matching')
 const Utility = require('./utility')
@@ -35,10 +33,14 @@ module.exports = class SideBar {
         this.highlightingOn = false
         this.db = new LanguageDBLocalStorage()
         this.setElementsAndListeners()
+        this.load()
+    }
+
+    load() {
         this.db.fetchRuntimeData((json) => {
             console.log(json)
             this.runtimeData = json
-            if (json.openTextFile) this.loadTextFile(json.openTextFile)
+            if (json.openTextFile) this.db.fetchTextFile((text) => this.loadTextFile(text))
             if (json.openAudioFile) this.loadAudioFile(json.openAudioFile)
         })
     }
@@ -167,34 +169,31 @@ module.exports = class SideBar {
     }
 
     openTextFile() {
-        ipcRenderer.invoke('open-file').then((result) => {
-            // TODO: fix exception
-            this.loadTextFile(result[0])
+        Utility.upload((file) => {
+            file.text().then((text) => {
+                this.runtimeData.openTextFile = file.name
+                this.db.updateRuntimeData(this.runtimeData)
+                this.db.updateTextFile(text)
+                this.loadTextFile(text)
+            })
         })
+    }
+
+    loadTextFile(text) {
+        this.languageText = new LanguageText(this, this.runtimeData.openTextFile, text)
+        if (!this.reader) this.reader = new Reader(this)
+        this.reader.languageText = this.languageText
+        this.reader.load()
     }
 
     openAudioFile() {
-        ipcRenderer.invoke('open-file').then((result) => {
-            this.loadAudioFile(result[0])
-        })
+        Utility.upload((file) => this.loadAudioFile(file.path))
     }
 
-    loadAudioFile(filename) {
-        this.audioE.src = filename
-        this.runtimeData.openAudioFile = filename
+    loadAudioFile(path) {
+        this.audioE.src = path
+        this.runtimeData.openAudioFile = path
         this.db.updateRuntimeData(this.runtimeData)
-    }
-
-    loadTextFile(filename) {
-        fs.readFile(filename, (err, contents) => {
-            if (err != null) return
-            this.languageText = new LanguageText(this, filename, contents.toString())
-            if (!this.reader) this.reader = new Reader(this)
-            this.reader.languageText = this.languageText
-            this.reader.load()
-            this.runtimeData.openTextFile = filename
-            this.db.updateRuntimeData(this.runtimeData)
-        })
     }
 
     addXP(n) {
@@ -233,8 +232,9 @@ module.exports = class SideBar {
     }
 
     importDatabase() {
-        Utility.upload((db) => {
+        Utility.uploadText((name, db) => {
             this.db.import(JSON.parse(db))
+            this.load()
         })
     }
 

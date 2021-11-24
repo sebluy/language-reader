@@ -58,14 +58,18 @@ module.exports = class LanguageDBLocalStorage {
         this.db.setItem('words', JSON.stringify(this.words))
         this.db.setItem('sentences', JSON.stringify(this.sentences))
         this.db.setItem('runtimeData', JSON.stringify(db.runtimeData))
+        this.db.setItem('textFile', db.textFile)
     }
 
     export(cb) {
-        this.fetchRuntimeData(runtimeData => {
-            cb({
-                words: this.words,
-                sentences: this.sentences,
-                runtimeData: runtimeData
+        this.fetchTextFile((textFile) => {
+            this.fetchRuntimeData(runtimeData => {
+                cb({
+                    words: this.words,
+                    sentences: this.sentences,
+                    runtimeData: runtimeData,
+                    textFile: textFile,
+                })
             })
         })
     }
@@ -90,6 +94,14 @@ module.exports = class LanguageDBLocalStorage {
 
     updateRuntimeData(runtimeData) {
         localStorage.setItem('runtimeData', JSON.stringify(runtimeData))
+    }
+
+    fetchTextFile(cb) {
+        cb(localStorage.getItem('textFile'))
+    }
+
+    updateTextFile(text) {
+        localStorage.setItem('textFile', text)
     }
 
 
