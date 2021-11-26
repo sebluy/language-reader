@@ -1,6 +1,6 @@
-const Utility = require('./utility')
+import { Utility } from './utility.js'
 
-module.exports = class FillInTheBlanks {
+export class FillInTheBlanks {
     constructor(sidebar) {
         this.sidebar = sidebar
         this.languageText = sidebar.languageText

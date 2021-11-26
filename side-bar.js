@@ -1,11 +1,10 @@
-const fetch = require('node-fetch')
-const FillInTheBlanks = require('./fill-in-the-blanks')
-const VocabularyMatching = require('./vocabulary-matching')
-const Utility = require('./utility')
-const LanguageText = require('./language-text')
-const Reader = require('./reader')
-const Unscramble = require('./unscramble')
-const LanguageDBLocalStorage = require('./language-db-local-storage')
+// const FillInTheBlanks = require('./fill-in-the-blanks')
+import { VocabularyMatching } from './vocabulary-matching.js'
+import { Utility } from './utility.js'
+import { LanguageText } from './language-text.js'
+import { Reader } from './reader.js'
+import { Unscramble } from './unscramble.js'
+import { LanguageDBLocalStorage } from  './language-db-local-storage.js'
 
 /* TODO: come up with a better way than just random. Some progression through the exercises or something.
      Think a lesson, instead of just random exercises.
@@ -15,19 +14,17 @@ const LanguageDBLocalStorage = require('./language-db-local-storage')
      Fill in the blanks - Each sentence goes through 5 levels until mastered. In order.
      Mastery = 1/3 of each.
 */
+// TODO: Update the styling to be more pretty/modern.
 // TODO: Page the reader
 // TODO: Have someway to show the answer if you're wrong.
-// TODO: store the runtime data in localstorage
 /* TODO: make this whole thing run in the browser instead of Electron
-    prelim step: use local storage instead of SQL
     use IndexedDB and File System API for storage
+    store audio blob in indexedDB
  */
-// TODO: export/import database.
-// TODO: reload everything on database import
 // TODO: rename column "original" to "word"
 // TODO: use an actual dictionary instead of google translate
 
-module.exports = class SideBar {
+class SideBar {
 
     constructor() {
         this.highlightingOn = false
@@ -187,12 +184,12 @@ module.exports = class SideBar {
     }
 
     openAudioFile() {
-        Utility.upload((file) => this.loadAudioFile(file.path))
+        Utility.upload((file) => this.loadAudioFile(URL.createObjectURL(file)))
     }
 
-    loadAudioFile(path) {
-        this.audioE.src = path
-        this.runtimeData.openAudioFile = path
+    loadAudioFile(url) {
+        this.audioE.src = url
+        this.runtimeData.openAudioFile = url
         this.db.updateRuntimeData(this.runtimeData)
     }
 
@@ -239,3 +236,5 @@ module.exports = class SideBar {
     }
 
 }
+
+new SideBar()

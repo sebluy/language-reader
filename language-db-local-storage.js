@@ -1,6 +1,5 @@
-const Utility = require('./utility')
 
-module.exports = class LanguageDBLocalStorage {
+export class LanguageDBLocalStorage {
 
     constructor() {
         this.db = localStorage
@@ -8,7 +7,7 @@ module.exports = class LanguageDBLocalStorage {
 
     fetchWords(cb) {
         let json = this.db.getItem('words')
-        this.words = JSON.parse(json)
+        this.words = json === null ? [] : JSON.parse(json)
         this.wordIndex = new Map()
         this.words.forEach((word, i) => {
             if (word.mastery === undefined) word.mastery = 0
@@ -18,7 +17,8 @@ module.exports = class LanguageDBLocalStorage {
     }
 
     fetchSentences(cb) {
-        this.sentences = JSON.parse(this.db.getItem('sentences'))
+        let json = this.db.getItem('sentences')
+        this.sentences = json === null ? [] : JSON.parse(json)
         this.sentenceIndex = new Map()
         this.sentences.forEach((sentence, i) => {
             if (sentence.mastery === undefined) sentence.mastery = 0

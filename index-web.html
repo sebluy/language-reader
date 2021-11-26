@@ -1,0 +1,53 @@
+<!--index-web.html-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Language Reader!</title>
+    <link rel="stylesheet" type="text/css" href="./index.css">
+</head>
+<body>
+    <div class="side-bar">
+        <div class="sidebar-group">
+            <span id="original">...</span>
+            <input id="definition"/>
+            <button id="google-translate">Google Translate</button>
+        </div>
+        <div class="sidebar-group">
+            <audio id="audio" controls>
+            </audio>
+        </div>
+    </div>
+    <div id="text">
+        <h2></h2>
+        <p></p>
+    </div>
+    <div class="side-bar right">
+        <div class="sidebar-group">
+            <button id="open-text-file">Open Text File</button>
+            <button id="open-audio-file">Open Audio File</button>
+        </div>
+        <div class="sidebar-group">
+            <button id="reader">Reader</button>
+            <button id="vocab-matching">Vocabulary Matching</button>
+<!--            <button id="fill-in-the-blanks">Fill in the Blanks</button>-->
+            <button id="unscramble">Unscramble</button>
+        </div>
+        <div class="sidebar-group">
+            <table id="stats"><tbody></tbody></table>
+            <button id="update-stats">Update Stats</button>
+        </div>
+        <div class="sidebar-group">
+            <button id="highlight">Toggle Highlighting</button>
+        </div>
+        <div class="sidebar-group">
+            <button id="export">Export Database</button>
+            <button id="import">Import Database</button>
+        </div>
+    </div>
+
+<script type="module" src="./side-bar.js"></script>
+
+</body>
+</html>

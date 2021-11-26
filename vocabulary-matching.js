@@ -1,6 +1,6 @@
-const Utility = require('./utility')
+import { Utility } from './utility.js'
 
-module.exports = class VocabularyMatching {
+export class VocabularyMatching {
 
     constructor(sidebar) {
         this.sidebar = sidebar

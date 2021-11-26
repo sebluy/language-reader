@@ -1,4 +1,4 @@
-module.exports = class Utility {
+export class Utility {
 
     static randomWordsByMastery(words, n) {
         let values = Array.from(words.values()).filter((v) => v.definition !== '')

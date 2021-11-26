@@ -1,6 +1,6 @@
-const Utility = require('./utility')
+import { Utility } from './utility.js'
 
-module.exports = class Unscramble {
+export class Unscramble {
 
     constructor(sidebar) {
         this.sidebar = sidebar

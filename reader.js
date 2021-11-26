@@ -1,6 +1,6 @@
-const Utility = require('./utility')
+import { Utility } from './utility.js'
 
-module.exports = class Reader {
+export class Reader {
 
     constructor(sidebar) {
         this.sidebar = sidebar

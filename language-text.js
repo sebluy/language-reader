@@ -1,6 +1,6 @@
-const Utility = require('./utility')
+import { Utility } from './utility.js'
 
-module.exports = class LanguageText {
+export class LanguageText {
 
     constructor(sidebar, filename, text) {
         this.sidebar = sidebar
