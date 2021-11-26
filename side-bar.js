@@ -14,15 +14,14 @@ import { LanguageDb } from './language-db.js'
      Fill in the blanks - Each sentence goes through 5 levels until mastered. In order.
      Mastery = 1/3 of each.
 */
+// TODO: Fix the span thing with clicking.
 // TODO: Update the styling to be more pretty/modern.
 // TODO: Page the reader
 // TODO: Have someway to show the answer if you're wrong.
 /* TODO: make this whole thing run in the browser instead of Electron
-    - use IndexedDB for storage
-    - store audio blob in indexedDB
     - host on github static pages
-    - fix google translate AJAX
  */
+// TODO: change fetch/update to get/set
 // TODO: use async/await more
 // TODO: rename column "original" to "word"
 // TODO: use an actual dictionary instead of google translate

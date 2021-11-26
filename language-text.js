@@ -122,6 +122,7 @@ export class LanguageText {
                 if (row === null) return
                 sentence.startTime = row.startTime
                 sentence.endTime = row.endTime
+                sentence.mastery = row.mastery
             })
         })
     }

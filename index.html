@@ -4,9 +4,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
     <title>Language Reader!</title>
     <link rel="stylesheet" type="text/css" href="./index.css">
 </head>
@@ -50,8 +47,8 @@
         </div>
     </div>
 
-<!-- You can also require other files to run in this process -->
-<!--<script src="./renderer.js"></script>-->
+<script type="module" src="./side-bar.js"></script>
+<script src="./dist/localforage.min.js"></script>
 
 </body>
 </html>
