@@ -4,12 +4,7 @@ export class LanguageText {
 
     constructor(sidebar, filename, text) {
         this.sidebar = sidebar
-        // this.db = new LanguageDB()
         this.db = sidebar.db
-        // this.db.export((db) => {
-        //     this.db2.import(db)
-        //     this.db2.export(console.log)
-        // })
         this.words = new Map()
         this.filename = filename
         this.text = text
@@ -19,7 +14,7 @@ export class LanguageText {
     }
 
     cleanText() {
-        this.text = this.text.replaceAll('-\n', '')
+        this.text = this.text.replace(/-\n/g, '')
     }
 
     extractWords() {
@@ -40,14 +35,15 @@ export class LanguageText {
                 }
             })
         })
-        this.db.fetchWords((rows) => {
-            rows.forEach((row) => {
-                if (!this.words.has(row.word)) return
-                let wordData = this.words.get(row.word)
+        let promises = Array.from(this.words).map(([word, wordData]) => {
+            return this.db.fetchWord(word).then(row => {
+                if (row === null) return
                 wordData.definition = row.definition
                 wordData.mastery = row.mastery
             })
-            this.totalWordsTranslated = rows.length
+        })
+        promises.push(this.db.fetchNumberOfWords().then(n => this.totalWordsTranslated = n))
+        Promise.all(promises).then(() => {
             this.sidebar.updateStats()
             this.sidebar.reader.highlight()
             this.sidebar.reader.setAudio()
@@ -121,14 +117,11 @@ export class LanguageText {
             if (endPos === false) break
             i = endPos + 1
         }
-        this.db.fetchSentences((rows) => {
-            rows.forEach((row) => {
-                if (!this.sentenceMap.has(row.sentence)) return
-                let sentence = this.sentenceMap.get(row.sentence)
+        this.sentences.forEach(sentence => {
+            this.db.fetchSentence(sentence.sentence).then(row => {
+                if (row === null) return
                 sentence.startTime = row.startTime
                 sentence.endTime = row.endTime
-                // TODO: write mastery as 0 to begin with
-                if (row.mastery !== null) sentence.mastery = row.mastery
             })
         })
     }

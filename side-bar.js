@@ -4,7 +4,7 @@ import { Utility } from './utility.js'
 import { LanguageText } from './language-text.js'
 import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
-import { LanguageDBLocalStorage } from  './language-db-local-storage.js'
+import { LanguageDb } from './language-db.js'
 
 /* TODO: come up with a better way than just random. Some progression through the exercises or something.
      Think a lesson, instead of just random exercises.
@@ -18,9 +18,12 @@ import { LanguageDBLocalStorage } from  './language-db-local-storage.js'
 // TODO: Page the reader
 // TODO: Have someway to show the answer if you're wrong.
 /* TODO: make this whole thing run in the browser instead of Electron
-    use IndexedDB and File System API for storage
-    store audio blob in indexedDB
+    - use IndexedDB for storage
+    - store audio blob in indexedDB
+    - host on github static pages
+    - fix google translate AJAX
  */
+// TODO: use async/await more
 // TODO: rename column "original" to "word"
 // TODO: use an actual dictionary instead of google translate
 
@@ -28,18 +31,23 @@ class SideBar {
 
     constructor() {
         this.highlightingOn = false
-        this.db = new LanguageDBLocalStorage()
+        this.db = new LanguageDb()
         this.setElementsAndListeners()
         this.load()
     }
 
-    load() {
-        this.db.fetchRuntimeData((json) => {
-            console.log(json)
-            this.runtimeData = json
-            if (json.openTextFile) this.db.fetchTextFile((text) => this.loadTextFile(text))
-            if (json.openAudioFile) this.loadAudioFile(json.openAudioFile)
-        })
+    async load() {
+        let runtimeData = await this.db.fetchRuntimeData()
+        console.log(runtimeData)
+        this.runtimeData = runtimeData
+        if (runtimeData.openTextFile) {
+            let text = await this.db.fetchTextFile()
+            this.loadTextFile(text)
+        }
+        if (runtimeData.openAudioFile) {
+            let audio = await this.db.fetchAudioFile()
+            this.loadAudioFile(audio)
+        }
     }
 
     setElementsAndListeners() {
@@ -177,6 +185,7 @@ class SideBar {
     }
 
     loadTextFile(text) {
+        if (text === null) return
         this.languageText = new LanguageText(this, this.runtimeData.openTextFile, text)
         if (!this.reader) this.reader = new Reader(this)
         this.reader.languageText = this.languageText
@@ -184,13 +193,24 @@ class SideBar {
     }
 
     openAudioFile() {
-        Utility.upload((file) => this.loadAudioFile(URL.createObjectURL(file)))
+        Utility.upload((file) => {
+            this.runtimeData.openAudioFile = file.name
+            this.db.updateRuntimeData(this.runtimeData)
+            this.db.updateAudioFile(file)
+            this.loadAudioFile(URL.createObjectURL(file))
+        })
     }
 
     loadAudioFile(url) {
-        this.audioE.src = url
-        this.runtimeData.openAudioFile = url
-        this.db.updateRuntimeData(this.runtimeData)
+        if (url instanceof File) {
+            let reader = new FileReader();
+            reader.readAsDataURL(url)
+            reader.onload = () => {
+                this.audioE.src = reader.result
+            }
+        } else {
+            this.audioE.src = url
+        }
     }
 
     addXP(n) {
@@ -223,15 +243,13 @@ class SideBar {
     }
 
     exportDatabase() {
-        this.db.export((db) => {
-            Utility.download('language-db.json', JSON.stringify(db))
-        })
+        this.db.export()
+            .then(db => Utility.download('language-db.json', JSON.stringify(db)))
     }
 
     importDatabase() {
         Utility.uploadText((name, db) => {
-            this.db.import(JSON.parse(db))
-            this.load()
+            this.db.import(JSON.parse(db)).then(() => this.load())
         })
     }
 
