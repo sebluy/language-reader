@@ -6,7 +6,7 @@ import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
 
-// TODO: use dexie instead because localforage perf sucks https://jsfiddle.net/dfahlander/xf2zrL4p
+// TODO: change export to CSV
 // TODO: add a README with a link to the github page
 // TODO: Page the reader
 // TODO: change fetch/update to get/set
@@ -36,15 +36,15 @@ class SideBar {
     }
 
     async load() {
-        let runtimeData = await this.db.fetchRuntimeData()
+        let runtimeData = await this.db.getRuntimeData()
         console.log(runtimeData)
         this.runtimeData = runtimeData
         if (runtimeData.openTextFile) {
-            let text = await this.db.fetchTextFile()
+            let text = await this.db.getTextFile()
             this.loadTextFile(text)
         }
         if (runtimeData.openAudioFile) {
-            let audio = await this.db.fetchAudioFile()
+            let audio = await this.db.getAudioFile()
             this.loadAudioFile(audio)
         }
     }
@@ -176,15 +176,15 @@ class SideBar {
         Utility.upload((file) => {
             file.text().then((text) => {
                 this.runtimeData.openTextFile = file.name
-                this.db.updateRuntimeData(this.runtimeData)
-                this.db.updateTextFile(text)
+                this.db.putRuntimeData(this.runtimeData)
+                this.db.putTextFile(text)
                 this.loadTextFile(text)
             })
         })
     }
 
     loadTextFile(text) {
-        if (text === null) return
+        if (text === undefined) return
         this.languageText = new LanguageText(this, this.runtimeData.openTextFile, text)
         if (!this.reader) this.reader = new Reader(this)
         this.reader.languageText = this.languageText
@@ -194,13 +194,14 @@ class SideBar {
     openAudioFile() {
         Utility.upload((file) => {
             this.runtimeData.openAudioFile = file.name
-            this.db.updateRuntimeData(this.runtimeData)
-            this.db.updateAudioFile(file)
+            this.db.putRuntimeData(this.runtimeData)
+            this.db.putAudioFile(file)
             this.loadAudioFile(URL.createObjectURL(file))
         })
     }
 
     loadAudioFile(url) {
+        if (url === undefined) return
         if (url instanceof File) {
             let reader = new FileReader();
             reader.readAsDataURL(url)
@@ -214,7 +215,7 @@ class SideBar {
 
     addXP(n) {
         this.runtimeData.xp.today += n
-        this.db.updateRuntimeData(this.runtimeData)
+        this.db.putRuntimeData(this.runtimeData)
     }
 
     markAudio() {

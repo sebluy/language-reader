@@ -36,13 +36,13 @@ export class LanguageText {
             })
         })
         let promises = Array.from(this.words).map(([word, wordData]) => {
-            return this.db.fetchWord(word).then(row => {
-                if (row === null) return
+            return this.db.getWord(word).then(row => {
+                if (row === undefined) return
                 wordData.definition = row.definition
                 wordData.mastery = row.mastery
             })
         })
-        promises.push(this.db.fetchNumberOfWords().then(n => this.totalWordsTranslated = n))
+        promises.push(this.db.getNumberOfWords().then(n => this.totalWordsTranslated = n))
         Promise.all(promises).then(() => {
             this.sidebar.updateStats()
             this.sidebar.reader.highlight()
@@ -56,7 +56,7 @@ export class LanguageText {
         if (wordData.definition === '') this.sidebar.addXP(5)
         wordData.definition = definition
         console.log('Updating definition... for ' + word + ' to ' + definition)
-        this.db.updateWords([wordData])
+        this.db.putWords([wordData])
     }
 
     updateMastery(words) {
@@ -66,14 +66,14 @@ export class LanguageText {
             data.mastery += 1
             return data
         })
-        this.db.updateWords(words)
+        this.db.putWords(words)
     }
 
     updateSentenceMastery(sentence) {
         let data = this.sentenceMap.get(sentence)
         if (data.mastery === 5) return
         data.mastery += 1
-        this.db.updateSentence(data)
+        this.db.putSentence(data)
     }
 
     updateStats() {
@@ -118,8 +118,8 @@ export class LanguageText {
             i = endPos + 1
         }
         this.sentences.forEach(sentence => {
-            this.db.fetchSentence(sentence.sentence).then(row => {
-                if (row === null) return
+            this.db.getSentence(sentence.sentence).then(row => {
+                if (row === undefined) return
                 sentence.startTime = row.startTime
                 sentence.endTime = row.endTime
                 sentence.mastery = row.mastery
@@ -151,7 +151,7 @@ export class LanguageText {
     {
         if (startTime !== null) sentence.startTime = startTime
         if (endTime !== null) sentence.endTime = endTime
-        this.db.updateSentence(sentence)
+        this.db.putSentence(sentence)
     }
 
     getNextSentenceByMastery() {

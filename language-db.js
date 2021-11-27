@@ -3,63 +3,62 @@ import {Benchmark} from "./benchmark.js";
 export class LanguageDb {
 
     constructor() {
-        this.words = localforage.createInstance({name: 'words'})
-        this.sentences = localforage.createInstance({name: 'sentences'})
-        this.other = localforage.createInstance({name: 'other'})
+        this.db = new Dexie('LanguageDB')
+        this.db.version(1).stores({
+            words: 'word',
+            sentences: 'sentence',
+            other: 'key',
+        })
     }
 
-    fetchWord(word, cb) {
-        return this.words.getItem(word, cb)
+    getWord(word) {
+        return this.db.words.get(word)
     }
 
-    fetchSentence(sentence, cb) {
-        return this.sentences.getItem(sentence, cb)
+    getSentence(sentence) {
+        return this.db.sentences.get(sentence)
     }
 
-    fetchNumberOfWords() {
-        return this.words.length()
+    getNumberOfWords() {
+        return this.db.words.count()
     }
 
-    updateWords(words) {
-        return Promise.all(words.map(word => {
-            return this.words.setItem(word.word, word)
-        }))
+    putWords(words) {
+        return this.db.words.bulkPut(words)
     }
 
-    updateSentence(sentence) {
-        this.sentences.setItem(sentence.sentence, sentence)
+    putSentence(sentence) {
+        return this.db.sentences.put(sentence)
     }
 
     async import(db) {
-        await this.words.clear()
-        await this.sentences.clear()
-        await this.other.removeItem('runtimeData')
+        await this.db.words.clear()
+        await this.db.sentences.clear()
+        await this.db.other.delete('runtimeData')
 
         console.log('importing words')
         let now = Benchmark.now()
-        await this.updateWords(db.words)
+        await this.putWords(db.words)
         console.log(Benchmark.diff(now), db.words.length)
         console.log('done importing words')
         console.log('importing sentences')
-        await Promise.all(db.sentences.map(sentence => this.updateSentence(sentence)))
+        await this.db.sentences.bulkPut(db.sentences)
         console.log('done importing sentences')
-        await this.other.setItem('runtimeData', db.runtimeData)
+        await this.db.other.put({key: 'runtimeData', value: db.runtimeData})
         console.log('done import')
         return 'done'
     }
 
     async export() {
-        let words = []
-        let sentences = []
-        await this.words.iterate((word) => { words.push(word) })
-        await this.sentences.iterate((sentence) => { sentences.push(sentence) })
-        let runtimeData = await this.fetchRuntimeData()
+        let words = await this.db.words.toArray()
+        let sentences = await this.db.sentences.toArray()
+        let runtimeData = await this.getRuntimeData()
         return {runtimeData, sentences, words}
     }
 
-    async fetchRuntimeData() {
-        let runtimeData = await this.other.getItem('runtimeData')
-        if (runtimeData === null) runtimeData = {}
+    async getRuntimeData() {
+        let row = await this.db.other.get('runtimeData')
+        let runtimeData = row === undefined ? {} : row.value
         if (runtimeData.xp === undefined) {
             runtimeData.xp = {
                 today: 0,
@@ -70,30 +69,29 @@ export class LanguageDb {
             runtimeData.xp.yesterday = runtimeData.xp.today
             runtimeData.xp.today = 0
             runtimeData.xp.date = (new Date()).toLocaleDateString()
-            this.updateRuntimeData(runtimeData)
+            this.putRuntimeData(runtimeData)
         }
         return runtimeData
     }
 
-    updateRuntimeData(runtimeData) {
-        this.other.setItem('runtimeData', runtimeData)
+    putRuntimeData(runtimeData) {
+        this.db.other.put({key: 'runtimeData', value: runtimeData})
     }
 
-    fetchTextFile() {
-        return this.other.getItem('textFile')
+    getTextFile() {
+        return this.db.other.get('textFile').then((row) => row === undefined ? undefined : row.value)
     }
 
-    updateTextFile(text) {
-        this.other.setItem('textFile', text)
+    putTextFile(text) {
+        this.db.other.put({key: 'textFile', value: text})
     }
 
-    fetchAudioFile() {
-        return this.other.getItem('audioFile')
+    getAudioFile() {
+        return this.db.other.get('audioFile').then((row) => row === undefined ? undefined : row.value)
     }
 
-    updateAudioFile(file) {
-        this.other.setItem('audioFile', file)
+    putAudioFile(file) {
+        this.db.other.put({key: 'audioFile', value: file})
     }
-
 
 }
