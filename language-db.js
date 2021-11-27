@@ -1,3 +1,4 @@
+import {Benchmark} from "./benchmark.js";
 
 export class LanguageDb {
 
@@ -21,7 +22,7 @@ export class LanguageDb {
 
     updateWords(words) {
         return Promise.all(words.map(word => {
-            this.words.setItem(word.word, word)
+            return this.words.setItem(word.word, word)
         }))
     }
 
@@ -35,7 +36,9 @@ export class LanguageDb {
         await this.other.removeItem('runtimeData')
 
         console.log('importing words')
+        let now = Benchmark.now()
         await this.updateWords(db.words)
+        console.log(Benchmark.diff(now), db.words.length)
         console.log('done importing words')
         console.log('importing sentences')
         await Promise.all(db.sentences.map(sentence => this.updateSentence(sentence)))
@@ -48,8 +51,8 @@ export class LanguageDb {
     async export() {
         let words = []
         let sentences = []
-        await this.words.iterate((key, word) => { words.push(word) })
-        await this.sentences.iterate((key, sentence) => { sentences.push(sentence) })
+        await this.words.iterate((word) => { words.push(word) })
+        await this.sentences.iterate((sentence) => { sentences.push(sentence) })
         let runtimeData = await this.fetchRuntimeData()
         return {runtimeData, sentences, words}
     }

@@ -6,6 +6,14 @@ import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
 
+// TODO: use dexie instead because localforage perf sucks https://jsfiddle.net/dfahlander/xf2zrL4p
+// TODO: add a README with a link to the github page
+// TODO: Page the reader
+// TODO: change fetch/update to get/set
+// TODO: use async/await more
+// TODO: rename column "original" to "word"
+// TODO: Fix the span thing with clicking.
+// TODO: Update the styling to be more pretty/modern.
 /* TODO: come up with a better way than just random. Some progression through the exercises or something.
      Think a lesson, instead of just random exercises.
      Maybe a 5 stage Leitner system.
@@ -14,17 +22,9 @@ import { LanguageDb } from './language-db.js'
      Fill in the blanks - Each sentence goes through 5 levels until mastered. In order.
      Mastery = 1/3 of each.
 */
-// TODO: Fix the span thing with clicking.
-// TODO: Update the styling to be more pretty/modern.
-// TODO: Page the reader
 // TODO: Have someway to show the answer if you're wrong.
-/* TODO: make this whole thing run in the browser instead of Electron
-    - host on github static pages
- */
-// TODO: change fetch/update to get/set
-// TODO: use async/await more
-// TODO: rename column "original" to "word"
 // TODO: use an actual dictionary instead of google translate
+// TODO: remove all the node/electron stuff from the project
 
 class SideBar {
 
