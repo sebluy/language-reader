@@ -6,14 +6,17 @@ import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
 
-// TODO: change export to CSV
 // TODO: add a README with a link to the github page
-// TODO: Page the reader
-// TODO: change fetch/update to get/set
-// TODO: use async/await more
+// TODO: allow timestamps for sentences to be edited in gui
 // TODO: rename column "original" to "word"
 // TODO: Fix the span thing with clicking.
+// TODO: Page the reader
+
+// TODO: change export to CSV
+// TODO: change fetch/update to get/set
 // TODO: Update the styling to be more pretty/modern.
+// TODO: use async/await more
+// TODO: fix favicon error
 /* TODO: come up with a better way than just random. Some progression through the exercises or something.
      Think a lesson, instead of just random exercises.
      Maybe a 5 stage Leitner system.
@@ -24,7 +27,6 @@ import { LanguageDb } from './language-db.js'
 */
 // TODO: Have someway to show the answer if you're wrong.
 // TODO: use an actual dictionary instead of google translate
-// TODO: remove all the node/electron stuff from the project
 
 class SideBar {
 
