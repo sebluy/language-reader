@@ -38,14 +38,14 @@
     padding: 5px;
 }
 
-#original {
+#word {
     display: block;
     margin: 10px;
     font-size: x-large;
     text-align: center;
 }
 
-#definition {
+.side-bar input {
     width: 242px;
     text-align: center;
     font-size: x-large;
@@ -57,12 +57,6 @@ audio {
 
 label {
     font-size: medium;
-}
-
-/* Everything else */
-.selected {
-    border: black solid 2px;
-    padding: 5px;
 }
 
 td.matching-item {
@@ -90,14 +84,14 @@ span.matching-item {
     background-color: yellow;
 }
 
-#text {
+#main {
     margin-left: 280px;
     width: 500px;
     padding: 5px;
     border: 1px solid black;
 }
 
-#text p {
+#main p {
     line-height: 30px;
     white-space: pre-wrap;
 }

@@ -6,20 +6,22 @@ export class Unscramble {
         this.sidebar = sidebar
         this.languageText = sidebar.languageText
 
-        this.element = document.querySelector('#text p')
-        this.titleE = document.querySelector('#text h2')
-
+        let es = Utility.resetMainView()
+        this.titleE = es[0]
         this.titleE.textContent = 'Unscramble'
+        this.textE = es[1]
+        this.textE.addEventListener('click', (e) => this.clickWord(e))
 
         this.sentence = this.languageText.getNextSentenceByMastery()
-        let sentenceData = this.languageText.sentenceMap.get(this.sentence.sentence)
-        console.log(sentenceData)
+        this.sentenceO = this.languageText.sentenceMap.get(this.sentence.sentence)
+        this.sidebar.showSentence(this.sentenceO)
+        console.log(this.sentenceO)
         this.words = this.sentence.sentence.split(/\s+/).filter((word) => word !== '')
         let shuffled = [...this.words]
         Utility.shuffle(shuffled)
         this.build(shuffled)
-        this.sidebar.setAudio(sentenceData.startTime, sentenceData.endTime)
-        this.sidebar.playAudio()
+        this.sidebar.setAudio(this.sentenceO.startTime, this.sentenceO.endTime)
+        if (this.sentenceO.startTime !== undefined) this.sidebar.playAudio()
     }
 
     checkAnswer() {
@@ -34,7 +36,7 @@ export class Unscramble {
     }
 
     getCurrentOrder() {
-        let els = this.element.getElementsByClassName('matching-item')
+        let els = this.textE.getElementsByClassName('matching-item')
         let current = []
         for (let i = 0; i < els.length; i++) {
             if (els[i].innerText !== ' ') current.push(els[i].innerText)
@@ -43,15 +45,15 @@ export class Unscramble {
     }
 
     build(current) {
-        this.element.innerHTML = ''
+        this.textE.innerHTML = ''
         current.forEach((word, i) => {
-            this.element.append(Utility.createDraggableItem({
+            this.textE.append(Utility.createDraggableItem({
                 tag: 'span',
                 id: 'matching-item-' + i,
                 text: word,
             }))
             if (i === current.length - 1) return
-            this.element.append(Utility.createDraggableItem({
+            this.textE.append(Utility.createDraggableItem({
                 tag: 'span',
                 id: 'matching-blank-' + i,
                 text: ' ',
@@ -63,7 +65,16 @@ export class Unscramble {
         button.innerText = 'Check Answer'
         button.onclick = () => this.checkAnswer()
         div.append(button)
-        this.element.append(div)
+        this.textE.append(div)
+    }
+
+    clickWord(e) {
+        if (e.target.matches('span')) {
+            const word = Utility.cleanWord(e.target.innerHTML)
+            let wordO = this.languageText.words.get(word)
+            if (wordO === undefined) return
+            this.sidebar.showWord(wordO)
+        }
     }
 
 }

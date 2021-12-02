@@ -46,7 +46,6 @@ export class LanguageText {
         Promise.all(promises).then(() => {
             this.sidebar.updateStats()
             this.sidebar.reader.highlight()
-            this.sidebar.reader.setAudio()
         })
     }
 
@@ -151,6 +150,12 @@ export class LanguageText {
     {
         if (startTime !== null) sentence.startTime = startTime
         if (endTime !== null) sentence.endTime = endTime
+        this.db.putSentence(sentence)
+    }
+
+    updateSentence(sentence)
+    {
+        this.sentenceMap.set(sentence.sentence, sentence)
         this.db.putSentence(sentence)
     }
 

@@ -6,10 +6,13 @@ export class VocabularyMatching {
         this.sidebar = sidebar
         this.languageText = sidebar.languageText
 
-        this.element = document.querySelector('#text p')
-        this.titleE = document.querySelector('#text h2')
-
+        let es = Utility.resetMainView()
+        this.titleE = es[0]
         this.titleE.textContent = 'Vocabulary Matching'
+        this.textE = es[1]
+
+        this.sidebar.setAudio()
+        this.sidebar.showSentence()
         this.sidebar.updateStats()
 
         this.buildGrid(this.getRandomWords())
@@ -64,8 +67,8 @@ export class VocabularyMatching {
                 })
             ])
         }
-        this.element.innerHTML = ''
-        this.element.append(Utility.createHTML(['table', ['tbody', ...rows]]))
+        this.textE.innerHTML = ''
+        this.textE.append(Utility.createHTML(['table', ['tbody', ...rows]]))
     }
 
 }

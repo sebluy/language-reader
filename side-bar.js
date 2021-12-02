@@ -6,12 +6,12 @@ import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
 
-// TODO: add a README with a link to the github page
-// TODO: allow timestamps for sentences to be edited in gui
 // TODO: rename column "original" to "word"
+// TODO: allow timestamps for sentences to be edited in gui
 // TODO: Fix the span thing with clicking.
 // TODO: Page the reader
 
+// TODO: Fix sentence parsing for songs
 // TODO: change export to CSV
 // TODO: change fetch/update to get/set
 // TODO: Update the styling to be more pretty/modern.
@@ -27,6 +27,8 @@ import { LanguageDb } from './language-db.js'
 */
 // TODO: Have someway to show the answer if you're wrong.
 // TODO: use an actual dictionary instead of google translate
+// TODO: make it mobile friendly
+// TODO: find a way to sync with multiple clients
 
 class SideBar {
 
@@ -52,7 +54,7 @@ class SideBar {
     }
 
     setElementsAndListeners() {
-        this.originalE = document.getElementById('original')
+        this.wordE = document.getElementById('word')
         this.definitionE = document.getElementById('definition')
         this.statsE = document.getElementById('stats')
         this.highlightCB = document.getElementById('highlight')
@@ -67,7 +69,10 @@ class SideBar {
         this.exportB = document.getElementById('export')
         this.importB = document.getElementById('import')
         this.audioE = document.getElementById('audio')
+        this.audioStartE = document.getElementById('audio-start')
+        this.audioEndE = document.getElementById('audio-end')
 
+        document.addEventListener('keydown', (e) => this.handleKey(e))
         this.definitionE.addEventListener('focusout', () => this.updateDefinition())
         this.definitionE.addEventListener('keydown', (e) => this.nextWord(e))
         this.highlightCB.addEventListener('click', () => {
@@ -79,7 +84,7 @@ class SideBar {
         this.openTextFileB.addEventListener('click', () => this.openTextFile())
         this.openAudioFileB.addEventListener('click', () => this.openAudioFile())
         this.readerB.addEventListener('click', () => {
-            this.reader.load()
+            this.reader = new Reader(this)
             this.reader.highlight()
         })
         this.vocabMatchingB.addEventListener('click', () => new VocabularyMatching(this))
@@ -87,12 +92,16 @@ class SideBar {
         this.unscrambleB.addEventListener('click', () => new Unscramble(this))
         this.exportB.addEventListener('click', () => this.exportDatabase())
         this.importB.addEventListener('click', () => this.importDatabase())
+        this.audioStartE.addEventListener('focusout', () => this.updateAudioTimes())
+        this.audioEndE.addEventListener('focusout', () => this.updateAudioTimes())
     }
 
     setAudio(startTime, endTime = null) {
         this.audioStart = startTime
         this.audioEnd = endTime
         if (this.audioStart !== undefined) this.audioE.currentTime = startTime
+        clearTimeout(this.timeout)
+        this.audioE.pause()
     }
 
     playAudio() {
@@ -125,17 +134,29 @@ class SideBar {
     }
 
     updateDefinition() {
-        const original = this.originalE.innerHTML
+        const word = this.wordE.innerHTML
         const definition = this.definitionE.value
-        this.languageText.updateDefinition(original, definition)
-        this.reader.updateHighlighting(original)
+        this.languageText.updateDefinition(word, definition)
+        this.reader.updateHighlighting(word)
     }
 
-    showWordAndDefinition(word, definition)
+    showWord(word)
     {
-        this.originalE.innerText = word
-        this.definitionE.value = definition
+        this.wordE.innerText = word.word
+        this.definitionE.value = word.definition
         this.definitionE.focus()
+    }
+
+    showSentence(sentence)
+    {
+        if (sentence === undefined) {
+            this.currentSentence = undefined
+            this.audioStartE.value = this.audioEndE.value = ''
+            return
+        }
+        this.currentSentence = sentence
+        this.audioStartE.value = sentence.startTime === undefined ? '' : sentence.startTime.toFixed(1)
+        this.audioEndE.value = sentence.endTime === undefined ? '' : sentence.endTime.toFixed(1)
     }
 
     nextWord(e) {
@@ -148,8 +169,8 @@ class SideBar {
     }
 
     googleTranslate() {
-        const original = this.originalE.innerText
-        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + original
+        const word = this.wordE.innerText
+        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + word
         fetch(url).then(res => res.json()).then(res => {
             this.definitionE.value = res[0][0][0]
             this.definitionE.focus()
@@ -188,7 +209,7 @@ class SideBar {
     loadTextFile(text) {
         if (text === undefined) return
         this.languageText = new LanguageText(this, this.runtimeData.openTextFile, text)
-        if (!this.reader) this.reader = new Reader(this)
+        this.reader = new Reader(this)
         this.reader.languageText = this.languageText
         this.reader.load()
     }
@@ -253,6 +274,24 @@ class SideBar {
         Utility.uploadText((name, db) => {
             this.db.import(JSON.parse(db)).then(() => this.load())
         })
+    }
+
+    parseTime(str) {
+        if (str === '') return undefined
+        return Number.parseFloat(str)
+    }
+
+    updateAudioTimes() {
+        if (this.currentSentence === undefined) return
+
+        let start = this.parseTime(this.audioStartE.value)
+        let end = this.parseTime(this.audioEndE.value)
+
+        if (!Number.isNaN(start)) this.currentSentence.startTime = start
+        if (!Number.isNaN(end)) this.currentSentence.endTime = end
+
+        this.setAudio(this.currentSentence.startTime, this.currentSentence.endTime)
+        this.languageText.updateSentence(this.currentSentence)
     }
 
 }

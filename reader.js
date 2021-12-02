@@ -5,31 +5,24 @@ export class Reader {
     constructor(sidebar) {
         this.sidebar = sidebar
         this.languageText = sidebar.languageText
-
-        this.element = document.querySelector('#text p')
-        this.titleE = document.querySelector('#text h2')
-
-        this.element.addEventListener('click', (e) => this.clickWord(e))
-        // How to remove this for new instances
-        document.addEventListener('keydown', (e) => this.sidebar.handleKey(e))
+        let es = Utility.resetMainView()
+        this.titleE = es[0]
+        this.textE = es[1]
+        this.textE.addEventListener('click', (e) => this.clickWord(e))
+        this.load()
     }
 
     load(title = null, sentences = null) {
         if (title === null) title = this.languageText.filename
         if (sentences === null) this.sentences = this.languageText.sentences
         this.titleE.textContent = title
-        this.element.innerHTML = ''
+        this.textE.innerHTML = ''
         this.spansByWord = new Map()
         this.spansBySentence = []
         this.spansBySentenceAndWord = []
         this.addSentences()
-        this.setAudio()
-    }
-
-    setAudio() {
-        let first = this.sentences[0]
-        let last = this.sentences[this.sentences.length - 1]
-        this.sidebar.setAudio(first.startTime, last.endTime)
+        this.sidebar.setAudio()
+        this.sidebar.showSentence()
     }
 
     clickWord(e) {
@@ -38,9 +31,9 @@ export class Reader {
             if (oldWordE) oldWordE.classList.remove('selected')
             e.target.classList.add('selected')
             const word = Utility.cleanWord(e.target.innerHTML)
-            if (this.languageText.words.has(word)) {
-                this.sidebar.showWordAndDefinition(word, this.languageText.words.get(word).definition)
-            }
+            let wordO = this.languageText.words.get(word)
+            if (wordO === undefined) return
+            this.sidebar.showWord(wordO)
         }
     }
 
@@ -81,7 +74,7 @@ export class Reader {
             let sentenceSpan = document.createElement('span')
             this.spansBySentence.push(sentenceSpan)
             this.spansBySentenceAndWord[i] = new Map()
-            this.element.appendChild(sentenceSpan)
+            this.textE.appendChild(sentenceSpan)
             wordsAndSpaces.forEach((word) => {
                 if (word.trim() === '') {
                     sentenceSpan.appendChild(document.createTextNode(word))
