@@ -6,10 +6,8 @@ import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
 
-// TODO: rename column "original" to "word"
-// TODO: allow timestamps for sentences to be edited in gui
-// TODO: Fix the span thing with clicking.
 // TODO: Page the reader
+// TODO: Fix the span thing with clicking.
 
 // TODO: Fix sentence parsing for songs
 // TODO: change export to CSV
@@ -34,6 +32,7 @@ class SideBar {
 
     constructor() {
         this.highlightingOn = false
+        this.currentPage = 0
         this.db = new LanguageDb()
         this.setElementsAndListeners()
         this.load()
@@ -208,10 +207,8 @@ class SideBar {
 
     loadTextFile(text) {
         if (text === undefined) return
-        this.languageText = new LanguageText(this, this.runtimeData.openTextFile, text)
+        this.languageText = new LanguageText(this, this.runtimeData.openTextFile, text, this.currentPage)
         this.reader = new Reader(this)
-        this.reader.languageText = this.languageText
-        this.reader.load()
     }
 
     openAudioFile() {
@@ -292,6 +289,12 @@ class SideBar {
 
         this.setAudio(this.currentSentence.startTime, this.currentSentence.endTime)
         this.languageText.updateSentence(this.currentSentence)
+    }
+
+    async changePageBy(n) {
+        this.currentPage += n
+        let text = await this.db.getTextFile()
+        this.loadTextFile(text)
     }
 
 }

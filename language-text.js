@@ -2,19 +2,41 @@ import { Utility } from './utility.js'
 
 export class LanguageText {
 
-    constructor(sidebar, filename, text) {
+    constructor(sidebar, filename, text, pageNumber) {
         this.sidebar = sidebar
         this.db = sidebar.db
         this.words = new Map()
         this.filename = filename
-        this.text = text
-        this.cleanText()
+        this.text = this.extractPages(text)[pageNumber]
         this.extractSentences()
         this.extractWords()
     }
 
-    cleanText() {
-        this.text = this.text.replace(/-\n/g, '')
+    extractPages(text) {
+        let idealLength = 1000
+        let pages = []
+        let pageStart = 0
+        let lastTab = 0
+        let nextTab = 0
+        let i = 0
+        while (true) {
+            i++
+            if (i === 1000) break
+            nextTab = text.indexOf("\t", lastTab + 1)
+            if (nextTab === -1) {
+                pages.push(text.substring(pageStart))
+                break
+            }
+            if (nextTab - pageStart > idealLength) {
+                let diffA = Math.abs(lastTab - pageStart - idealLength)
+                let diffB = Math.abs(nextTab - pageStart - idealLength)
+                let pageEnd = diffA < diffB ? lastTab : nextTab
+                pages.push(text.substring(pageStart, pageEnd))
+                pageStart = pageEnd
+            }
+            lastTab = nextTab
+        }
+        return pages
     }
 
     extractWords() {

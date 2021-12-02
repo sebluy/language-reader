@@ -23,11 +23,6 @@
     margin-bottom: 5px;
 }
 
-.side-bar input[type=checkbox] {
-    transform: scale(1.5);
-    margin: 10px;
-}
-
 #stats {
     font-size: medium;
     text-align: left;
@@ -49,6 +44,8 @@
     width: 242px;
     text-align: center;
     font-size: x-large;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 audio {
