@@ -13,15 +13,14 @@ export class Unscramble {
         this.textE.addEventListener('click', (e) => this.clickWord(e))
 
         this.sentence = this.languageText.getNextSentenceByMastery()
-        this.sentenceO = this.languageText.sentenceMap.get(this.sentence.sentence)
-        this.sidebar.showSentence(this.sentenceO)
-        console.log(this.sentenceO)
+        this.sidebar.showSentence(this.sentence)
+        console.log(this.sentence)
         this.words = this.sentence.sentence.split(/\s+/).filter((word) => word !== '')
         let shuffled = [...this.words]
         Utility.shuffle(shuffled)
         this.build(shuffled)
-        this.sidebar.setAudio(this.sentenceO.startTime, this.sentenceO.endTime)
-        if (this.sentenceO.startTime !== undefined) this.sidebar.playAudio()
+        this.sidebar.setAudio(this.sentence.startTime, this.sentence.endTime)
+        if (this.sentence.startTime !== undefined) this.sidebar.playAudio()
     }
 
     checkAnswer() {
@@ -32,7 +31,7 @@ export class Unscramble {
         this.sidebar.addXP(this.words.length * 3)
         this.languageText.updateSentenceMastery(this.sentence.sentence)
         this.sidebar.updateStats()
-        new Unscramble(this.sidebar)
+        this.sidebar.unscramble = new Unscramble(this.sidebar)
     }
 
     getCurrentOrder() {

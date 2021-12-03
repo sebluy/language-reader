@@ -28,6 +28,7 @@ export class LanguageDb {
     }
 
     putSentence(sentence) {
+        console.log('Updating sentence', sentence)
         return this.db.sentences.put(sentence)
     }
 

@@ -81,7 +81,10 @@ export class LanguageText {
     updateDefinition(word, definition) {
         const wordData = this.words.get(word)
         if (wordData.definition === definition) return
-        if (wordData.definition === '') this.sidebar.addXP(5)
+        if (wordData.definition === '') {
+            this.totalWordsTranslated += 1
+            this.sidebar.addXP(5)
+        }
         wordData.definition = definition
         console.log('Updating definition... for ' + word + ' to ' + definition)
         this.db.putWords([wordData])

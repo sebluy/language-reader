@@ -6,8 +6,11 @@ import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
 
+// TODO: handle nested quotes
 // TODO: create new widgets or reuse
 // TODO: Fix the span thing with clicking.
+// TODO: Store trimmed sentences
+// TODO: play audio at first sentence in reader
 
 // TODO: Fix sentence parsing for songs
 // TODO: change export to CSV
