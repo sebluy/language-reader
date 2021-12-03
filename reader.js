@@ -21,16 +21,6 @@ export class Reader {
         this.spansBySentence = []
         this.spansBySentenceAndWord = []
         this.addSentences()
-
-        let previousPage = document.createElement('button')
-        previousPage.innerText = 'Previous Page'
-        previousPage.addEventListener('click', (e) => this.sidebar.changePageBy(-1))
-        let nextPage = document.createElement('button')
-        nextPage.innerText = 'Next Page'
-        nextPage.addEventListener('click', (e) => this.sidebar.changePageBy(1))
-        this.textE.append(previousPage)
-        this.textE.append(nextPage)
-
         this.sidebar.setAudio()
         this.sidebar.showSentence()
     }

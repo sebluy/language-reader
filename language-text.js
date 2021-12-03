@@ -2,12 +2,18 @@ import { Utility } from './utility.js'
 
 export class LanguageText {
 
-    constructor(sidebar, filename, text, pageNumber) {
+    constructor(sidebar, filename, text, currentPage) {
         this.sidebar = sidebar
         this.db = sidebar.db
-        this.words = new Map()
         this.filename = filename
-        this.text = this.extractPages(text)[pageNumber]
+        this.pages = this.extractPages(text)
+        this.text = this.pages[currentPage]
+        this.extractSentences()
+        this.extractWords()
+    }
+
+    setPage(n) {
+        this.text = this.pages[n]
         this.extractSentences()
         this.extractWords()
     }
@@ -40,6 +46,7 @@ export class LanguageText {
     }
 
     extractWords() {
+        this.words = new Map()
         this.sentences.forEach((sentence) => {
             const words = sentence.sentence.split(/\s+/)
             words.forEach((word) => {
@@ -126,6 +133,7 @@ export class LanguageText {
 
     extractSentences() {
         let i = 0;
+        if (this.text === undefined) this.text = ''
         this.sentences = []
         this.sentenceMap = new Map()
         while (true) {

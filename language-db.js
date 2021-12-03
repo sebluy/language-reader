@@ -59,6 +59,7 @@ export class LanguageDb {
     async getRuntimeData() {
         let row = await this.db.other.get('runtimeData')
         let runtimeData = row === undefined ? {} : row.value
+        if (runtimeData.currentPage === undefined) runtimeData.currentPage = 0
         if (runtimeData.xp === undefined) {
             runtimeData.xp = {
                 today: 0,

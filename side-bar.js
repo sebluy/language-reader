@@ -6,7 +6,7 @@ import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
 
-// TODO: Page the reader
+// TODO: create new widgets or reuse
 // TODO: Fix the span thing with clicking.
 
 // TODO: Fix sentence parsing for songs
@@ -32,7 +32,6 @@ class SideBar {
 
     constructor() {
         this.highlightingOn = false
-        this.currentPage = 0
         this.db = new LanguageDb()
         this.setElementsAndListeners()
         this.load()
@@ -70,6 +69,9 @@ class SideBar {
         this.audioE = document.getElementById('audio')
         this.audioStartE = document.getElementById('audio-start')
         this.audioEndE = document.getElementById('audio-end')
+        this.previousPageE = document.getElementById('previous-page')
+        this.nextPageE = document.getElementById('next-page')
+        this.checkAnswerE = document.getElementById('check-answer')
 
         document.addEventListener('keydown', (e) => this.handleKey(e))
         this.definitionE.addEventListener('focusout', () => this.updateDefinition())
@@ -83,16 +85,19 @@ class SideBar {
         this.openTextFileB.addEventListener('click', () => this.openTextFile())
         this.openAudioFileB.addEventListener('click', () => this.openAudioFile())
         this.readerB.addEventListener('click', () => {
-            this.reader = new Reader(this)
+            this.showReader()
             this.reader.highlight()
         })
-        this.vocabMatchingB.addEventListener('click', () => new VocabularyMatching(this))
+        this.vocabMatchingB.addEventListener('click', () => this.showVocabularyMatching())
         // this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this))
-        this.unscrambleB.addEventListener('click', () => new Unscramble(this))
+        this.unscrambleB.addEventListener('click', () => this.showUnscramble())
         this.exportB.addEventListener('click', () => this.exportDatabase())
         this.importB.addEventListener('click', () => this.importDatabase())
         this.audioStartE.addEventListener('focusout', () => this.updateAudioTimes())
         this.audioEndE.addEventListener('focusout', () => this.updateAudioTimes())
+        this.previousPageE.addEventListener('click', (e) => this.changePageBy(-1))
+        this.nextPageE.addEventListener('click', (e) => this.changePageBy(1))
+        this.checkAnswerE.addEventListener('click', (e) => this.unscramble.checkAnswer())
     }
 
     setAudio(startTime, endTime = null) {
@@ -198,6 +203,7 @@ class SideBar {
         Utility.upload((file) => {
             file.text().then((text) => {
                 this.runtimeData.openTextFile = file.name
+                this.runtimeData.currentPage = 0
                 this.db.putRuntimeData(this.runtimeData)
                 this.db.putTextFile(text)
                 this.loadTextFile(text)
@@ -207,8 +213,13 @@ class SideBar {
 
     loadTextFile(text) {
         if (text === undefined) return
-        this.languageText = new LanguageText(this, this.runtimeData.openTextFile, text, this.currentPage)
-        this.reader = new Reader(this)
+        this.languageText = new LanguageText(
+            this,
+            this.runtimeData.openTextFile,
+            text,
+            this.runtimeData.currentPage
+        )
+        this.showReader()
     }
 
     openAudioFile() {
@@ -291,10 +302,45 @@ class SideBar {
         this.languageText.updateSentence(this.currentSentence)
     }
 
-    async changePageBy(n) {
-        this.currentPage += n
-        let text = await this.db.getTextFile()
-        this.loadTextFile(text)
+    showReader() {
+        this.reader = new Reader(this)
+        this.updateSidebar(this.reader)
+    }
+
+    showUnscramble() {
+        this.unscramble = new Unscramble(this)
+        this.updateSidebar(this.unscramble)
+    }
+
+    showVocabularyMatching() {
+        let activity = new VocabularyMatching(this)
+        this.updateSidebar(activity)
+    }
+
+    showElement(element, show) {
+        element.style.display = show ? '' : 'none'
+    }
+
+    updateSidebar(activity) {
+        let r = activity instanceof Reader
+        let us = activity instanceof Unscramble
+        this.showElement(this.wordE, r || us)
+        this.showElement(this.definitionE, r || us)
+        this.showElement(this.googleTranslateB, r || us)
+        this.showElement(this.audioE, r || us)
+        this.showElement(this.highlightCB, r)
+        this.showElement(this.previousPageE, r)
+        this.showElement(this.nextPageE, r)
+        this.showElement(this.audioStartE, us)
+        this.showElement(this.audioEndE, us)
+        this.showElement(this.checkAnswerE, us)
+    }
+
+    changePageBy(n) {
+        this.runtimeData.currentPage += n
+        this.db.putRuntimeData(this.runtimeData)
+        this.languageText.setPage(this.runtimeData.currentPage)
+        this.reader = new Reader(this)
     }
 
 }

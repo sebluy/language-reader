@@ -60,12 +60,6 @@ export class Unscramble {
                 onDrop: () => this.build(this.getCurrentOrder())
             }))
         })
-        let div = document.createElement('div')
-        let button = document.createElement('button')
-        button.innerText = 'Check Answer'
-        button.onclick = () => this.checkAnswer()
-        div.append(button)
-        this.textE.append(div)
     }
 
     clickWord(e) {
