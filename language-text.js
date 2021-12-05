@@ -48,7 +48,7 @@ export class LanguageText {
     extractWords() {
         this.words = new Map()
         this.sentences.forEach((sentence) => {
-            const words = sentence.sentence.split(/\s+/)
+            const words = sentence.raw.split(/\s+/)
             words.forEach((word) => {
                 word = Utility.cleanWord(word)
                 if (word === '') return
@@ -143,13 +143,13 @@ export class LanguageText {
             let endPos = Utility.nextEndPos(this.text, i);
             let text = (this.text).substring(i, endPos === false ? undefined : endPos + 1)
             if (text === '') break
-            let sentence = {sentence: text, mastery: 0}
-            this.sentences.push(sentence)
-            this.sentenceMap.set(text, sentence)
+            let clean = text.trim()
+            this.sentences.push({raw: text, clean: clean})
+            this.sentenceMap.set(clean, {sentence: clean, mastery: 0})
             if (endPos === false) break
             i = endPos + 1
         }
-        this.sentences.forEach(sentence => {
+        this.sentenceMap.forEach(sentence => {
             this.db.getSentence(sentence.sentence).then(row => {
                 if (row === undefined) return
                 sentence.startTime = row.startTime
@@ -159,25 +159,25 @@ export class LanguageText {
         })
     }
 
-    getRandomSentenceBlock(n)
-    {
-        let sentenceIndex = Math.floor(Math.random() * (this.sentences.length - n))
-        let block = []
-        for (let i = 0; i < n; i++) {
-            let sentenceData = this.sentences[sentenceIndex + i]
-            sentenceData.words = new Map()
-            let words = sentenceData.sentence.split(/\s+/)
-            words.forEach((word) => {
-                word = Utility.cleanWord(word)
-                if (word === '') return
-                if (!sentenceData.words.has(word)) {
-                    sentenceData.words.set(word, this.words.get(word))
-                }
-            })
-            block.push(sentenceData)
-        }
-        return block
-    }
+    // getRandomSentenceBlock(n)
+    // {
+    //     let sentenceIndex = Math.floor(Math.random() * (this.sentences.length - n))
+    //     let block = []
+    //     for (let i = 0; i < n; i++) {
+    //         let sentenceData = this.sentences[sentenceIndex + i]
+    //         sentenceData.words = new Map()
+    //         let words = sentenceData.sentence.split(/\s+/)
+    //         words.forEach((word) => {
+    //             word = Utility.cleanWord(word)
+    //             if (word === '') return
+    //             if (!sentenceData.words.has(word)) {
+    //                 sentenceData.words.set(word, this.words.get(word))
+    //             }
+    //         })
+    //         block.push(sentenceData)
+    //     }
+    //     return block
+    // }
 
     updateSentenceTimes(sentence, startTime, endTime)
     {
@@ -197,9 +197,10 @@ export class LanguageText {
         if (values.length === 0) return null
         let mastery = values.map((v) => v.mastery)
         let minimum = Math.min(...mastery)
-        return this.sentences.find((sentence) => {
-            return this.sentenceMap.get(sentence.sentence).mastery === minimum
-        })
+        for (let i in this.sentences) {
+            let sentenceO = this.sentenceMap.get(this.sentences[i].clean)
+            if (sentenceO.mastery === minimum) return sentenceO
+        }
     }
 
 }

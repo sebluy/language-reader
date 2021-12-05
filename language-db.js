@@ -9,6 +9,21 @@ export class LanguageDb {
             sentences: 'sentence',
             other: 'key',
         })
+        // TODO: this can be deleted after running this in prod
+        let sentences = []
+        this.db.sentences.each((sentence) => {
+            let clean = sentence.sentence.trim()
+            if (clean === sentence.sentence) return
+            sentences.push(sentence)
+        }).then(() => {
+            sentences.forEach((sentence) => {
+                console.log('DELETE: ' + sentence.sentence)
+                this.db.sentences.delete(sentence.sentence)
+                sentence.sentence = sentence.sentence.trim()
+                console.log('PUT: ' + sentence.sentence)
+                this.db.sentences.put(sentence)
+            })
+        })
     }
 
     getWord(word) {

@@ -6,12 +6,14 @@ import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
 
-// TODO: handle nested quotes
+// TODO: Store trimmed sentences
+// TODO: show how many new words learned each day
 // TODO: create new widgets or reuse
 // TODO: Fix the span thing with clicking.
-// TODO: Store trimmed sentences
 // TODO: play audio at first sentence in reader
 
+// TODO: write a desktop version (Java?)
+// TODO: upgrade to TypeSript?
 // TODO: Fix sentence parsing for songs
 // TODO: change export to CSV
 // TODO: change fetch/update to get/set

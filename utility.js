@@ -17,7 +17,7 @@ export class Utility {
     }
 
     static cleanWord(word) {
-        const punctuation = /[,.!?"“„:\-–;…()]+/
+        const punctuation = /[,.!?"“„‘‚:\-–;…()]+/
         const regex = new RegExp('^' + punctuation.source + '|' + punctuation.source + '$', 'g')
         return word.replaceAll(regex, '').toLowerCase()
     }
