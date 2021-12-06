@@ -6,7 +6,6 @@ import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
 
-// TODO: Store trimmed sentences
 // TODO: show how many new words learned each day
 // TODO: create new widgets or reuse
 // TODO: Fix the span thing with clicking.
@@ -195,6 +194,7 @@ class SideBar {
                 ['tr', ['td', 'Number of distinct words'], ['td', stats.numberOfDistinctWords]],
                 ['tr', ['td', 'Percent translated'], ['td', fp(stats.percentTranslated)]],
                 ['tr', ['td', 'Total Words Translated'], ['td', stats.totalWordsTranslated]],
+                ['tr', ['td', 'Words Learned Today'], ['td', stats.wordsLearnedToday]],
                 ['tr', ['td', 'Words mastered'], ['td', fp(stats.percentWordsMastered)]],
                 ['tr', ['td', 'Sentences mastered'], ['td', fp(stats.percentSentencesMastered)]],
                 ['tr', ['td', 'Today\'s XP'], ['td', this.runtimeData.xp.today]],

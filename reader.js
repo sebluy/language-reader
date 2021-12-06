@@ -70,7 +70,7 @@ export class Reader {
 
     addSentences() {
         this.sentences.forEach((sentence, i) => {
-            let wordsAndSpaces = sentence.raw.split(/(\s+)/)
+            let wordsAndSpaces = sentence.getWordsAndSpaces()
             let sentenceSpan = document.createElement('span')
             this.spansBySentence.push(sentenceSpan)
             this.spansBySentenceAndWord[i] = new Map()

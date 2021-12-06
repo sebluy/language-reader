@@ -1,9 +1,13 @@
 import { Utility } from './utility.js'
+import {Word} from "./word.js"
+import {Sentence} from "./sentence.js"
+import {RawSentence} from "./raw-sentence";
 
 export class LanguageText {
 
     constructor(sidebar, filename, text, currentPage) {
         this.sidebar = sidebar
+        this.wordsLearnedToday = 0
         this.db = sidebar.db
         this.filename = filename
         this.pages = this.extractPages(text)
@@ -48,19 +52,12 @@ export class LanguageText {
     extractWords() {
         this.words = new Map()
         this.sentences.forEach((sentence) => {
-            const words = sentence.raw.split(/\s+/)
+            const words = sentence.getWords()
             words.forEach((word) => {
-                word = Utility.cleanWord(word)
-                if (word === '') return
                 if (this.words.has(word)) {
                     this.words.get(word).count += 1
                 } else {
-                    this.words.set(word, {
-                        word: word,
-                        mastery: 0,
-                        definition: '',
-                        count: 1,
-                    })
+                    this.words.set(word, new Word(word))
                 }
             })
         })
@@ -83,6 +80,7 @@ export class LanguageText {
         if (wordData.definition === definition) return
         if (wordData.definition === '') {
             this.totalWordsTranslated += 1
+            this.wordsLearnedToday += 1
             this.sidebar.addXP(5)
         }
         wordData.definition = definition
@@ -91,20 +89,8 @@ export class LanguageText {
     }
 
     updateMastery(words) {
-        words = words.map((word) => {
-            let data = this.words.get(word)
-            if (data.mastery === 5) return
-            data.mastery += 1
-            return data
-        })
+        words.forEach((word) => this.words.get(word).nextMastery())
         this.db.putWords(words)
-    }
-
-    updateSentenceMastery(sentence) {
-        let data = this.sentenceMap.get(sentence)
-        if (data.mastery === 5) return
-        data.mastery += 1
-        this.db.putSentence(data)
     }
 
     updateStats() {
@@ -114,8 +100,7 @@ export class LanguageText {
         this.words.forEach((data) => {
             wMastered += data.mastery
             numberOfWords += data.count
-            if (data.definition === '') return
-            countTranslated += data.count
+            countTranslated += data.getTranslatedCount()
         })
         let sMastered = 0
         this.sentenceMap.forEach((data) => {
@@ -128,6 +113,7 @@ export class LanguageText {
             numberOfWords: numberOfWords,
             numberOfDistinctWords: this.words.size,
             totalWordsTranslated: this.totalWordsTranslated,
+            wordsLearnedToday: this.wordsLearnedToday,
             percentTranslated: percentTranslated,
             percentWordsMastered: percentWMastered,
             percentSentencesMastered: percentSMastered,
@@ -144,8 +130,8 @@ export class LanguageText {
             let text = (this.text).substring(i, endPos === false ? undefined : endPos + 1)
             if (text === '') break
             let clean = text.trim()
-            this.sentences.push({raw: text, clean: clean})
-            this.sentenceMap.set(clean, {sentence: clean, mastery: 0})
+            this.sentences.push(new RawSentence(text, clean))
+            this.sentenceMap.set(clean, new Sentence(clean))
             if (endPos === false) break
             i = endPos + 1
         }

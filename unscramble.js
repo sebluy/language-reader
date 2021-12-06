@@ -15,7 +15,7 @@ export class Unscramble {
         this.sentence = this.languageText.getNextSentenceByMastery()
         this.sidebar.showSentence(this.sentence)
         console.log(this.sentence)
-        this.words = this.sentence.sentence.split(/\s+/).filter((word) => word !== '')
+        this.words = this.sentence.getWords()
         let shuffled = [...this.words]
         Utility.shuffle(shuffled)
         this.build(shuffled)
@@ -29,7 +29,8 @@ export class Unscramble {
             if (this.words[i] !== current[i]) return
         }
         this.sidebar.addXP(this.words.length * 3)
-        this.languageText.updateSentenceMastery(this.sentence.sentence)
+        this.sentence.nextMastery()
+        this.languageText.updateSentence(this.sentence)
         this.sidebar.updateStats()
         this.sidebar.unscramble = new Unscramble(this.sidebar)
     }
