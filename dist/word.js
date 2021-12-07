@@ -9,6 +9,7 @@ export class Word {
         if (this.mastery === 5)
             return;
         this.mastery += 1;
+        return this;
     }
     getTranslatedCount() {
         if (this.definition === '')

@@ -11,7 +11,7 @@ export class Unscramble {
         this.sentence = this.languageText.getNextSentenceByMastery();
         this.sidebar.showSentence(this.sentence);
         console.log(this.sentence);
-        this.words = this.sentence.getWords();
+        this.words = this.sentence.getRawWords();
         let shuffled = [...this.words];
         Utility.shuffle(shuffled);
         this.build(shuffled);

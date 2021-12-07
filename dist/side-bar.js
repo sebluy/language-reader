@@ -15,6 +15,7 @@ import { Reader } from './reader.js';
 import { Unscramble } from './unscramble.js';
 import { LanguageDb } from './language-db.js';
 import { RuntimeData } from './runtime-data.js';
+// TODO: fix bug with matching
 // TODO: fix bug with marking audio
 // TODO: show how many new words learned each day
 // TODO: create new widgets or reuse

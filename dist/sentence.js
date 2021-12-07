@@ -1,4 +1,3 @@
-import { Utility } from "./utility.js";
 export class Sentence {
     constructor(sentence, mastery = 0) {
         this.sentence = sentence;
@@ -9,7 +8,7 @@ export class Sentence {
             return;
         this.mastery += 1;
     }
-    getWords() {
-        return this.sentence.split(/\s+/).map(Utility.cleanWord).filter(v => v !== '');
+    getRawWords() {
+        return this.sentence.split(/\s+/).filter(v => v !== '');
     }
 }

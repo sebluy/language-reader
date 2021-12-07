@@ -1,4 +1,5 @@
-import { Utility } from './utility.js';
+import { Utility } from './utility.js'
+
 export class VocabularyMatching {
     constructor(sidebar) {
         this.sidebar = sidebar;
@@ -7,45 +8,45 @@ export class VocabularyMatching {
         this.titleE = es[0];
         this.titleE.textContent = 'Vocabulary Matching';
         this.textE = es[1];
-        this.sidebar.setAudio();
-        this.sidebar.showSentence();
+        this.sidebar.setAudio(undefined, undefined);
+        this.sidebar.showSentence(undefined);
         this.sidebar.updateStats();
-        this.buildGrid(this.getRandomWords());
+        this.getRandomWords();
+        this.buildGrid();
     }
     getRandomWords() {
-        let words = [];
-        let definitions = [];
+        this.words = [];
+        this.definitions = [];
         let randomWords = Utility.randomWordsByMastery(this.languageText.words, 8);
         randomWords.forEach((word) => {
-            words.push(word.word);
-            definitions.push(word.definition);
+            this.words.push(word.word);
+            this.definitions.push(word.definition);
         });
-        let shuffled = [...definitions];
-        Utility.shuffle(shuffled);
-        return [words, definitions, shuffled];
+        this.shuffled = [...this.definitions];
+        Utility.shuffle(this.shuffled);
     }
-    checkAnswer(rows, definitions) {
+    checkAnswer(rows) {
         for (let i = 0; i < rows.length; i++) {
             let el = rows[i][2];
-            if (el.innerHTML !== definitions[i])
+            if (el.innerHTML !== this.definitions[i])
                 return false;
         }
         return true;
     }
-    buildGrid([words, definitions, shuffled]) {
+    buildGrid() {
         let onDrop = () => {
-            if (this.checkAnswer(rows, definitions)) {
+            if (this.checkAnswer(rows)) {
                 Utility.benchmark(() => {
-                    this.languageText.updateMastery(words);
+                    this.languageText.updateMastery(this.words);
                 });
-                this.sidebar.addXP(definitions.length);
+                this.sidebar.addXP(this.definitions.length);
                 new VocabularyMatching(this.sidebar);
             }
         };
         let rows = [];
-        for (let i in words) {
+        for (let i in this.words) {
             rows.push(['tr',
-                ['td', { className: 'matching-item' }, words[i]],
+                ['td', { className: 'matching-item' }, this.words[i]],
                 Utility.createDraggableItem({
                     tag: 'td',
                     id: 'matching-blank-' + i,
@@ -55,7 +56,7 @@ export class VocabularyMatching {
                 Utility.createDraggableItem({
                     tag: 'td',
                     id: 'matching-definition-' + i,
-                    text: shuffled[i],
+                    text: this.shuffled[i],
                 })
             ]);
         }

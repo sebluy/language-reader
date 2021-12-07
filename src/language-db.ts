@@ -48,6 +48,7 @@ export class LanguageDb {
     }
 
     putWords(words: Array<Word>) {
+        console.log(words)
         return this.db.words.bulkPut(words)
     }
 

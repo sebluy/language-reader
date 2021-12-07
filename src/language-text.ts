@@ -103,7 +103,7 @@ export class LanguageText {
     }
 
     updateMastery(words) {
-        words.forEach((word) => this.words.get(word).nextMastery())
+        words = words.map((word) => this.words.get(word).nextMastery())
         this.db.putWords(words)
     }
 

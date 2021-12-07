@@ -8,8 +8,6 @@ import { LanguageDb } from './language-db.js'
 import { RuntimeData } from './runtime-data.js'
 import { Sentence } from './sentence.js'
 
-// TODO: fix bug with marking audio
-// TODO: show how many new words learned each day
 // TODO: create new widgets or reuse
 // TODO: Fix the span thing with clicking.
 // TODO: play audio at first sentence in reader
