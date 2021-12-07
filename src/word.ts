@@ -1,4 +1,8 @@
 export class Word {
+    word: string
+    definition: string
+    mastery: number
+    count: number
 
     constructor(word, definition = '', mastery = 0, count = 1) {
         this.word = word

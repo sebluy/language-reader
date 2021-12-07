@@ -5,7 +5,10 @@ import { LanguageText } from './language-text.js'
 import { Reader } from './reader.js'
 import { Unscramble } from './unscramble.js'
 import { LanguageDb } from './language-db.js'
+import { RuntimeData } from './runtime-data.js'
+import { Sentence } from './sentence.js'
 
+// TODO: fix bug with marking audio
 // TODO: show how many new words learned each day
 // TODO: create new widgets or reuse
 // TODO: Fix the span thing with clicking.
@@ -32,7 +35,31 @@ import { LanguageDb } from './language-db.js'
 // TODO: make it mobile friendly
 // TODO: find a way to sync with multiple clients
 
-class SideBar {
+export class SideBar {
+
+    highlightingOn: boolean
+    db: LanguageDb
+    runtimeData: RuntimeData
+    reader: Reader
+    unscramble: Unscramble
+    timeout: number
+    audioStart: number
+    audioEnd: number
+    languageText: LanguageText
+    currentSentence: Sentence
+    marker: number
+
+    wordE: HTMLElement
+    definitionE: HTMLInputElement
+    statsE: HTMLElement
+    highlightCB: HTMLElement
+    googleTranslateB: HTMLElement
+    audioE: HTMLAudioElement
+    audioStartE: HTMLInputElement
+    audioEndE: HTMLInputElement
+    previousPageE: HTMLElement
+    nextPageE: HTMLElement
+    checkAnswerE: HTMLElement
 
     constructor() {
         this.highlightingOn = false
@@ -43,7 +70,9 @@ class SideBar {
 
     async load() {
         let runtimeData = await this.db.getRuntimeData()
+        if (runtimeData === undefined) runtimeData = RuntimeData.empty()
         console.log(runtimeData)
+        runtimeData.updateXP()
         this.runtimeData = runtimeData
         if (runtimeData.openTextFile) {
             let text = await this.db.getTextFile()
@@ -57,27 +86,17 @@ class SideBar {
 
     setElementsAndListeners() {
         this.wordE = document.getElementById('word')
-        this.definitionE = document.getElementById('definition')
+        this.definitionE = <HTMLInputElement>document.getElementById('definition')
         this.statsE = document.getElementById('stats')
         this.highlightCB = document.getElementById('highlight')
         this.googleTranslateB = document.getElementById('google-translate')
-        this.updateStatsB = document.getElementById('update-stats')
-        this.openTextFileB = document.getElementById('open-text-file')
-        this.openAudioFileB = document.getElementById('open-audio-file')
-        this.readerB = document.getElementById('reader')
-        this.vocabMatchingB = document.getElementById('vocab-matching')
-        // this.fillInTheBlanksB = document.getElementById('fill-in-the-blanks')
-        this.unscrambleB = document.getElementById('unscramble')
-        this.exportB = document.getElementById('export')
-        this.importB = document.getElementById('import')
-        this.audioE = document.getElementById('audio')
-        this.audioStartE = document.getElementById('audio-start')
-        this.audioEndE = document.getElementById('audio-end')
+        this.audioE = <HTMLAudioElement>document.getElementById('audio')
+        this.audioStartE = <HTMLInputElement>document.getElementById('audio-start')
+        this.audioEndE = <HTMLInputElement>document.getElementById('audio-end')
         this.previousPageE = document.getElementById('previous-page')
         this.nextPageE = document.getElementById('next-page')
         this.checkAnswerE = document.getElementById('check-answer')
 
-        document.addEventListener('keydown', (e) => this.handleKey(e))
         this.definitionE.addEventListener('focusout', () => this.updateDefinition())
         this.definitionE.addEventListener('keydown', (e) => this.nextWord(e))
         this.highlightCB.addEventListener('click', () => {
@@ -85,23 +104,25 @@ class SideBar {
             this.reader.highlight()
         })
         this.googleTranslateB.addEventListener('click', () => this.googleTranslate())
-        this.updateStatsB.addEventListener('click', () => this.updateStats())
-        this.openTextFileB.addEventListener('click', () => this.openTextFile())
-        this.openAudioFileB.addEventListener('click', () => this.openAudioFile())
-        this.readerB.addEventListener('click', () => {
-            this.showReader()
-            this.reader.highlight()
-        })
-        this.vocabMatchingB.addEventListener('click', () => this.showVocabularyMatching())
-        // this.fillInTheBlanksB.addEventListener('click', () => new FillInTheBlanks(this))
-        this.unscrambleB.addEventListener('click', () => this.showUnscramble())
-        this.exportB.addEventListener('click', () => this.exportDatabase())
-        this.importB.addEventListener('click', () => this.importDatabase())
         this.audioStartE.addEventListener('focusout', () => this.updateAudioTimes())
         this.audioEndE.addEventListener('focusout', () => this.updateAudioTimes())
         this.previousPageE.addEventListener('click', (e) => this.changePageBy(-1))
         this.nextPageE.addEventListener('click', (e) => this.changePageBy(1))
         this.checkAnswerE.addEventListener('click', (e) => this.unscramble.checkAnswer())
+
+        document.getElementById('update-stats').addEventListener('click', () => this.updateStats())
+        document.getElementById('open-text-file').addEventListener('click', () => this.openTextFile())
+        document.getElementById('open-audio-file').addEventListener('click', () => this.openAudioFile())
+        document.getElementById('reader').addEventListener('click', () => {
+            this.showReader()
+            this.reader.highlight()
+        })
+        document.getElementById('vocab-matching')
+            .addEventListener('click', () => this.showVocabularyMatching())
+        document.getElementById('unscramble').addEventListener('click', () => this.showUnscramble())
+        document.getElementById('export').addEventListener('click', () => this.exportDatabase())
+        document.getElementById('import').addEventListener('click', () => this.importDatabase())
+        document.addEventListener('keydown', (e) => this.handleKey(e))
     }
 
     setAudio(startTime, endTime = null) {
@@ -118,7 +139,7 @@ class SideBar {
         this.audioE.play()
         if (this.audioEnd) {
             let remaining = this.audioEnd - this.audioE.currentTime
-            this.timeout = setTimeout(() => {
+            this.timeout = window.setTimeout(() => {
                 this.audioE.currentTime = this.audioStart
                 this.audioE.pause()
             }, remaining * 1000)
@@ -197,8 +218,8 @@ class SideBar {
                 ['tr', ['td', 'Words Learned Today'], ['td', stats.wordsLearnedToday]],
                 ['tr', ['td', 'Words mastered'], ['td', fp(stats.percentWordsMastered)]],
                 ['tr', ['td', 'Sentences mastered'], ['td', fp(stats.percentSentencesMastered)]],
-                ['tr', ['td', 'Today\'s XP'], ['td', this.runtimeData.xp.today]],
-                ['tr', ['td', 'Yesterday\'s XP'], ['td', this.runtimeData.xp.yesterday]]
+                ['tr', ['td', 'Today\'s XP'], ['td', this.runtimeData.xpToday]],
+                ['tr', ['td', 'Yesterday\'s XP'], ['td', this.runtimeData.xpYesterday]]
             ]
         )
         this.statsE.replaceChild(newTable, this.statsE.childNodes[0])
@@ -242,7 +263,7 @@ class SideBar {
             let reader = new FileReader();
             reader.readAsDataURL(url)
             reader.onload = () => {
-                this.audioE.src = reader.result
+                if (typeof reader.result === 'string') this.audioE.src = reader.result
             }
         } else {
             this.audioE.src = url
@@ -250,7 +271,7 @@ class SideBar {
     }
 
     addXP(n) {
-        this.runtimeData.xp.today += n
+        this.runtimeData.xpToday += n
         this.db.putRuntimeData(this.runtimeData)
     }
 
@@ -262,7 +283,7 @@ class SideBar {
         }
         if (this.marker > 0) {
             let lastSentence = sentences[this.marker - 1]
-            let lastData = this.languageText.sentenceMap.get(lastSentence.sentence)
+            let lastData = this.languageText.sentenceMap.get(lastSentence.clean)
             this.languageText.updateSentenceTimes(lastData, null, this.audioE.currentTime)
             this.reader.removeSentenceHighlighting(this.marker - 1)
         }
@@ -272,7 +293,7 @@ class SideBar {
             return
         }
         let sentence = sentences[this.marker]
-        let sentenceData = this.languageText.sentenceMap.get(sentence.sentence)
+        let sentenceData = this.languageText.sentenceMap.get(sentence.clean)
         this.reader.highlightSentence(this.marker)
         this.languageText.updateSentenceTimes(sentenceData, this.audioE.currentTime, null)
         this.marker += 1

@@ -1,6 +1,8 @@
-import {Utility} from "./utility";
+import { Utility } from "./utility.js"
 
 export class RawSentence {
+    raw: string
+    clean: string
 
     constructor(raw, clean) {
         this.raw = raw

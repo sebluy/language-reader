@@ -1,14 +1,23 @@
-import {Benchmark} from "./benchmark.js";
+import { Benchmark } from './benchmark.js'
+import {RuntimeData} from './runtime-data.js'
+import {Sentence} from './sentence.js'
+import {Word} from './word.js'
 
 export class LanguageDb {
 
+    db: any
+
     constructor() {
+        // @ts-ignore
         this.db = new Dexie('LanguageDB')
         this.db.version(1).stores({
             words: 'word',
             sentences: 'sentence',
             other: 'key',
         })
+        this.db.words.mapToClass(Word)
+        this.db.sentences.mapToClass(Sentence)
+
         // TODO: this can be deleted after running this in prod
         let sentences = []
         this.db.sentences.each((sentence) => {
@@ -26,23 +35,23 @@ export class LanguageDb {
         })
     }
 
-    getWord(word) {
+    getWord(word: string): Promise<Word> {
         return this.db.words.get(word)
     }
 
-    getSentence(sentence) {
+    getSentence(sentence: string): Promise<Sentence> {
         return this.db.sentences.get(sentence)
     }
 
-    getNumberOfWords() {
+    getNumberOfWords(): Promise<number> {
         return this.db.words.count()
     }
 
-    putWords(words) {
+    putWords(words: Array<Word>) {
         return this.db.words.bulkPut(words)
     }
 
-    putSentence(sentence) {
+    putSentence(sentence: Sentence) {
         console.log('Updating sentence', sentence)
         return this.db.sentences.put(sentence)
     }
@@ -72,26 +81,14 @@ export class LanguageDb {
         return {runtimeData, sentences, words}
     }
 
-    async getRuntimeData() {
-        let row = await this.db.other.get('runtimeData')
-        let runtimeData = row === undefined ? {} : row.value
-        if (runtimeData.currentPage === undefined) runtimeData.currentPage = 0
-        if (runtimeData.xp === undefined) {
-            runtimeData.xp = {
-                today: 0,
-                yesterday: 0,
-                date: (new Date()).toLocaleDateString()
-            }
-        } else if (runtimeData.xp.date !== (new Date()).toLocaleDateString()) {
-            runtimeData.xp.yesterday = runtimeData.xp.today
-            runtimeData.xp.today = 0
-            runtimeData.xp.date = (new Date()).toLocaleDateString()
-            this.putRuntimeData(runtimeData)
-        }
-        return runtimeData
+    getRuntimeData(): Promise<RuntimeData> {
+        return this.db.other.get('runtimeData').then((data) => {
+            if (data === undefined) return undefined
+            return RuntimeData.fromObject(data.value)
+        })
     }
 
-    putRuntimeData(runtimeData) {
+    putRuntimeData(runtimeData: RuntimeData) {
         this.db.other.put({key: 'runtimeData', value: runtimeData})
     }
 

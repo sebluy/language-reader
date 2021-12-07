@@ -1,6 +1,10 @@
-import {Utility} from "./utility";
+import { Utility } from "./utility.js"
 
 export class Sentence {
+    sentence: string
+    mastery: number
+    startTime: number
+    endTime: number
 
     constructor(sentence, mastery = 0) {
         this.sentence = sentence

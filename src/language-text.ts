@@ -1,9 +1,21 @@
 import { Utility } from './utility.js'
-import {Word} from "./word.js"
-import {Sentence} from "./sentence.js"
-import {RawSentence} from "./raw-sentence";
+import { Word } from './word.js'
+import { Sentence } from './sentence.js'
+import { RawSentence } from './raw-sentence.js'
+import { LanguageDb } from './language-db.js'
+import { SideBar } from './side-bar.js'
 
 export class LanguageText {
+    sidebar: SideBar
+    filename: string
+    wordsLearnedToday: number
+    totalWordsTranslated: number
+    db: LanguageDb
+    pages: Array<string>
+    text: string
+    sentences: Array<RawSentence>
+    sentenceMap: Map<string, Sentence>
+    words: Map<string, Word>
 
     constructor(sidebar, filename, text, currentPage) {
         this.sidebar = sidebar
@@ -68,7 +80,9 @@ export class LanguageText {
                 wordData.mastery = row.mastery
             })
         })
-        promises.push(this.db.getNumberOfWords().then(n => this.totalWordsTranslated = n))
+        promises.push(this.db.getNumberOfWords().then(n => {
+            this.totalWordsTranslated = n
+        }))
         Promise.all(promises).then(() => {
             this.sidebar.updateStats()
             this.sidebar.reader.highlight()
