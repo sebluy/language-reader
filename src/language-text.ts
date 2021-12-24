@@ -86,6 +86,7 @@ export class LanguageText {
         Promise.all(promises).then(() => {
             this.sidebar.updateStats()
             this.sidebar.reader.highlight()
+            this.sidebar.reader.setSentence();
         })
     }
 

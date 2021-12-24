@@ -98,3 +98,6 @@ span.matching-item {
     white-space: pre-wrap;
 }
 
+.selected {
+    box-shadow: inset 0 0 0 5px yellow;
+}

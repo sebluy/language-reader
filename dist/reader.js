@@ -20,8 +20,12 @@ export class Reader {
         this.spansBySentence = [];
         this.spansBySentenceAndWord = [];
         this.addSentences();
-        this.sidebar.setAudio();
-        this.sidebar.showSentence();
+    }
+    setSentence() {
+        let sentenceO = this.languageText.sentenceMap.get(this.sentences[0].clean);
+        console.log(sentenceO);
+        this.sidebar.setAudio(sentenceO.startTime, undefined);
+        this.sidebar.showSentence(sentenceO);
     }
     clickWord(e) {
         if (e.target.matches('span')) {

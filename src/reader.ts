@@ -1,6 +1,18 @@
 import { Utility } from './utility.js'
+import { SideBar } from './side-bar.js'
+import { LanguageText } from './language-text.js'
+import { RawSentence } from './raw-sentence.js'
 
 export class Reader {
+
+    sidebar: SideBar
+    languageText: LanguageText
+    titleE: HTMLElement
+    textE: HTMLElement
+    sentences: Array<RawSentence>
+    spansByWord: Map<string, Array<HTMLSpanElement>>
+    spansBySentence: Array<HTMLSpanElement>
+    spansBySentenceAndWord: Array<Map<string, Array<HTMLSpanElement>>>
 
     constructor(sidebar) {
         this.sidebar = sidebar
@@ -21,8 +33,13 @@ export class Reader {
         this.spansBySentence = []
         this.spansBySentenceAndWord = []
         this.addSentences()
-        this.sidebar.setAudio()
-        this.sidebar.showSentence()
+    }
+
+    setSentence() {
+        let sentenceO = this.languageText.sentenceMap.get(this.sentences[0].clean)
+        console.log(sentenceO)
+        this.sidebar.setAudio(sentenceO.startTime, undefined)
+        this.sidebar.showSentence(sentenceO)
     }
 
     clickWord(e) {
@@ -42,12 +59,12 @@ export class Reader {
         if (!current) return
         let sibling = current.nextElementSibling
         if (sibling) {
-            sibling.click()
+            (<HTMLSpanElement>sibling).click()
             return
         }
         let parentSibling = current.parentNode.nextSibling
         if (parentSibling && parentSibling.firstChild) {
-            parentSibling.firstChild.click()
+            (<HTMLSpanElement>parentSibling.firstChild).click()
         }
     }
 

@@ -8,9 +8,13 @@ import { LanguageDb } from './language-db.js'
 import { RuntimeData } from './runtime-data.js'
 import { Sentence } from './sentence.js'
 
+// TODO: finish upgrading everything to Typescript
+// TODO: cleanup drag and drop for vocabulary matching
+// TODO: use only one activity field instead of having a separate field for each activity
+
 // TODO: create new widgets or reuse
 // TODO: Fix the span thing with clicking.
-// TODO: play audio at first sentence in reader
+// TODO: new activity: show a sentence (with audio). Give user some options for next sentence (with audio)
 
 // TODO: write a desktop version (Java?)
 // TODO: upgrade to TypeSript?
@@ -40,6 +44,7 @@ export class SideBar {
     runtimeData: RuntimeData
     reader: Reader
     unscramble: Unscramble
+    vocabularyMatching: VocabularyMatching
     timeout: number
     audioStart: number
     audioEnd: number
@@ -338,6 +343,7 @@ export class SideBar {
 
     showVocabularyMatching() {
         let activity = new VocabularyMatching(this)
+        this.vocabularyMatching = activity
         this.updateSidebar(activity)
     }
 
@@ -348,6 +354,11 @@ export class SideBar {
     updateSidebar(activity) {
         let r = activity instanceof Reader
         let us = activity instanceof Unscramble
+        let v = activity instanceof VocabularyMatching
+        if (!v && this.vocabularyMatching) {
+            this.vocabularyMatching.cleanup();
+            this.vocabularyMatching = undefined;
+        }
         this.showElement(this.wordE, r || us)
         this.showElement(this.definitionE, r || us)
         this.showElement(this.googleTranslateB, r || us)
