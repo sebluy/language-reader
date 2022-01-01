@@ -1,11 +1,12 @@
 import { Utility } from './utility.js'
-import { SideBar } from './side-bar.js'
 import { LanguageText } from './language-text.js'
 import { RawSentence } from './raw-sentence.js'
+import { Word } from './word.js'
+import { ControllerInterface } from './controller-interface.js'
 
 export class Reader {
 
-    sidebar: SideBar
+    controller: ControllerInterface
     languageText: LanguageText
     titleE: HTMLElement
     textE: HTMLElement
@@ -14,9 +15,9 @@ export class Reader {
     spansBySentence: Array<HTMLSpanElement>
     spansBySentenceAndWord: Array<Map<string, Array<HTMLSpanElement>>>
 
-    constructor(sidebar) {
-        this.sidebar = sidebar
-        this.languageText = sidebar.languageText
+    constructor(controller) {
+        this.controller = controller
+        this.languageText = controller.languageText
         let es = Utility.resetMainView()
         this.titleE = es[0]
         this.textE = es[1]
@@ -35,11 +36,8 @@ export class Reader {
         this.addSentences()
     }
 
-    setSentence() {
-        let sentenceO = this.languageText.sentenceMap.get(this.sentences[0].clean)
-        console.log(sentenceO)
-        this.sidebar.setAudio(sentenceO.startTime, undefined)
-        this.sidebar.showSentence(sentenceO)
+    getFirstSentence() {
+        return this.languageText.sentenceMap.get(this.sentences[0].clean)
     }
 
     clickWord(e) {
@@ -50,9 +48,11 @@ export class Reader {
             const word = Utility.cleanWord(e.target.innerHTML)
             let wordO = this.languageText.words.get(word)
             if (wordO === undefined) return
-            this.sidebar.showWord(wordO)
+            this.onClickWord(word)
         }
     }
+
+    onClickWord(word: Word) {}
 
     nextWord() {
         const current = document.querySelector('span.selected')
@@ -68,11 +68,11 @@ export class Reader {
         }
     }
 
-    updateHighlighting(word) {
+    updateHighlightingWord(highlightingOn, word) {
         const data = this.languageText.words.get(word)
         let spans = this.spansByWord.get(word)
         spans.forEach((span) => {
-            if (this.sidebar.highlightingOn && data.definition !== '') {
+            if (highlightingOn && data.definition !== '') {
                 let hue = ((data.mastery / 5) * 120).toString(10)
                 span.style.backgroundColor = 'hsl(' + hue + ',100%,75%)'
             } else {
@@ -81,8 +81,12 @@ export class Reader {
         })
     }
 
-    highlight() {
-        this.languageText.words.forEach((data, word) => this.updateHighlighting(word))
+    updateHighlighting(highlightingOn, word?) {
+        if (word === undefined) {
+            this.languageText.words.forEach((data, word) => this.updateHighlighting(highlightingOn, word))
+        } else {
+            this.updateHighlightingWord(highlightingOn, word)
+        }
     }
 
     addSentences() {

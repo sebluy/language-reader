@@ -1,8 +1,8 @@
 import { Utility } from './utility.js';
 export class VocabularyMatching {
-    constructor(sidebar) {
-        this.sidebar = sidebar;
-        this.languageText = sidebar.languageText;
+    constructor(controller) {
+        this.controller = controller;
+        this.languageText = controller.languageText;
         this.elementGrid = [];
         this.shuffledElements = [];
         this.selectedIndex = 0;
@@ -10,9 +10,6 @@ export class VocabularyMatching {
         this.titleE = es[0];
         this.titleE.textContent = 'Vocabulary Matching';
         this.textE = es[1];
-        this.sidebar.setAudio(undefined, undefined);
-        this.sidebar.showSentence(undefined);
-        this.sidebar.updateStats();
         this.getRandomWords();
         this.buildGrid();
         this.selectElement(this.nextDefinition());
@@ -43,9 +40,8 @@ export class VocabularyMatching {
         Utility.benchmark(() => {
             this.languageText.updateMastery(this.words);
         });
-        this.sidebar.addXP(this.definitions.length);
-        this.cleanup();
-        this.sidebar.vocabularyMatching = new VocabularyMatching(this.sidebar);
+        this.controller.addXP(this.definitions.length);
+        this.controller.showVocabularyMatching();
     }
     buildGrid() {
         // let onDrop = () => {

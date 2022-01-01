@@ -1,4 +1,3 @@
-import { Utility } from "./utility.js"
 
 export class Sentence {
     sentence: string

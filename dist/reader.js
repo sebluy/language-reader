@@ -1,8 +1,8 @@
 import { Utility } from './utility.js';
 export class Reader {
-    constructor(sidebar) {
-        this.sidebar = sidebar;
-        this.languageText = sidebar.languageText;
+    constructor(controller) {
+        this.controller = controller;
+        this.languageText = controller.languageText;
         let es = Utility.resetMainView();
         this.titleE = es[0];
         this.textE = es[1];
@@ -21,11 +21,8 @@ export class Reader {
         this.spansBySentenceAndWord = [];
         this.addSentences();
     }
-    setSentence() {
-        let sentenceO = this.languageText.sentenceMap.get(this.sentences[0].clean);
-        console.log(sentenceO);
-        this.sidebar.setAudio(sentenceO.startTime, undefined);
-        this.sidebar.showSentence(sentenceO);
+    getFirstSentence() {
+        return this.languageText.sentenceMap.get(this.sentences[0].clean);
     }
     clickWord(e) {
         if (e.target.matches('span')) {
@@ -37,9 +34,10 @@ export class Reader {
             let wordO = this.languageText.words.get(word);
             if (wordO === undefined)
                 return;
-            this.sidebar.showWord(wordO);
+            this.onClickWord(word);
         }
     }
+    onClickWord(word) { }
     nextWord() {
         const current = document.querySelector('span.selected');
         if (!current)
@@ -54,11 +52,11 @@ export class Reader {
             parentSibling.firstChild.click();
         }
     }
-    updateHighlighting(word) {
+    updateHighlightingWord(highlightingOn, word) {
         const data = this.languageText.words.get(word);
         let spans = this.spansByWord.get(word);
         spans.forEach((span) => {
-            if (this.sidebar.highlightingOn && data.definition !== '') {
+            if (highlightingOn && data.definition !== '') {
                 let hue = ((data.mastery / 5) * 120).toString(10);
                 span.style.backgroundColor = 'hsl(' + hue + ',100%,75%)';
             }
@@ -67,8 +65,13 @@ export class Reader {
             }
         });
     }
-    highlight() {
-        this.languageText.words.forEach((data, word) => this.updateHighlighting(word));
+    updateHighlighting(highlightingOn, word) {
+        if (word === undefined) {
+            this.languageText.words.forEach((data, word) => this.updateHighlighting(highlightingOn, word));
+        }
+        else {
+            this.updateHighlightingWord(highlightingOn, word);
+        }
     }
     addSentences() {
         this.sentences.forEach((sentence, i) => {

@@ -1,23 +1,19 @@
 import { Utility } from './utility.js';
 export class Unscramble {
-    constructor(sidebar) {
-        this.sidebar = sidebar;
-        this.languageText = sidebar.languageText;
+    constructor(controller, sentence) {
+        this.controller = controller;
+        this.languageText = controller.languageText;
+        this.sentence = sentence;
         let es = Utility.resetMainView();
         this.titleE = es[0];
         this.titleE.textContent = 'Unscramble';
         this.textE = es[1];
         this.textE.addEventListener('click', (e) => this.clickWord(e));
-        this.sentence = this.languageText.getNextSentenceByMastery();
-        this.sidebar.showSentence(this.sentence);
         console.log(this.sentence);
         this.words = this.sentence.getRawWords();
         let shuffled = [...this.words];
         Utility.shuffle(shuffled);
         this.build(shuffled);
-        this.sidebar.setAudio(this.sentence.startTime, this.sentence.endTime);
-        if (this.sentence.startTime !== undefined)
-            this.sidebar.playAudio();
     }
     checkAnswer() {
         let current = this.getCurrentOrder();
@@ -25,18 +21,18 @@ export class Unscramble {
             if (this.words[i] !== current[i])
                 return;
         }
-        this.sidebar.addXP(this.words.length * 3);
         this.sentence.nextMastery();
         this.languageText.updateSentence(this.sentence);
-        this.sidebar.updateStats();
-        this.sidebar.unscramble = new Unscramble(this.sidebar);
+        this.controller.addXP(this.words.length * 3);
+        this.controller.showUnscramble();
     }
     getCurrentOrder() {
         let els = this.textE.getElementsByClassName('matching-item');
         let current = [];
         for (let i = 0; i < els.length; i++) {
-            if (els[i].innerText !== ' ')
-                current.push(els[i].innerText);
+            let input = els[i];
+            if (input.innerText !== ' ')
+                current.push(input.innerText);
         }
         return current;
     }
@@ -64,7 +60,8 @@ export class Unscramble {
             let wordO = this.languageText.words.get(word);
             if (wordO === undefined)
                 return;
-            this.sidebar.showWord(wordO);
+            this.onClickWord(word);
         }
     }
+    onClickWord(word) { }
 }

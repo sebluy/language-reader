@@ -3,18 +3,18 @@ import { Word } from './word.js';
 import { Sentence } from './sentence.js';
 import { RawSentence } from './raw-sentence.js';
 export class LanguageText {
-    constructor(sidebar, filename, text, currentPage) {
-        this.sidebar = sidebar;
+    constructor(controller, filename, text, currentPage) {
+        this.controller = controller;
         this.wordsLearnedToday = 0;
-        this.db = sidebar.db;
+        this.db = controller.db;
         this.filename = filename;
         this.pages = this.extractPages(text);
-        this.text = this.pages[currentPage];
-        this.extractSentences();
-        this.extractWords();
+        this.setPage(currentPage);
     }
     setPage(n) {
         this.text = this.pages[n];
+        this.expected = 0;
+        this.loaded = 0;
         this.extractSentences();
         this.extractWords();
     }
@@ -58,23 +58,23 @@ export class LanguageText {
                 }
             });
         });
-        let promises = Array.from(this.words).map(([word, wordData]) => {
-            return this.db.getWord(word).then(row => {
-                if (row === undefined)
-                    return;
-                wordData.definition = row.definition;
-                wordData.mastery = row.mastery;
+        this.expected += this.words.size;
+        this.words.forEach((word) => {
+            return this.db.getWord(word.word).then(row => {
+                if (row !== undefined) {
+                    word.definition = row.definition;
+                    word.mastery = row.mastery;
+                }
+                this.markLoaded();
             });
         });
-        promises.push(this.db.getNumberOfWords().then(n => {
+        this.expected += 1;
+        this.db.getNumberOfWords().then(n => {
             this.totalWordsTranslated = n;
-        }));
-        Promise.all(promises).then(() => {
-            this.sidebar.updateStats();
-            this.sidebar.reader.highlight();
-            this.sidebar.reader.setSentence();
+            this.markLoaded();
         });
     }
+    onLoad() { }
     updateDefinition(word, definition) {
         const wordData = this.words.get(word);
         if (wordData.definition === definition)
@@ -82,12 +82,14 @@ export class LanguageText {
         if (wordData.definition === '') {
             this.totalWordsTranslated += 1;
             this.wordsLearnedToday += 1;
-            this.sidebar.addXP(5);
+            this.controller.addXP(5);
         }
         wordData.definition = definition;
         console.log('Updating definition... for ' + word + ' to ' + definition);
         this.db.putWords([wordData]);
+        this.onUpdateDefinition(word);
     }
+    onUpdateDefinition(word) { }
     updateMastery(words) {
         words = words.map((word) => this.words.get(word).nextMastery());
         this.db.putWords(words);
@@ -136,15 +138,22 @@ export class LanguageText {
                 break;
             i = endPos + 1;
         }
+        this.expected += this.sentenceMap.size;
         this.sentenceMap.forEach(sentence => {
             this.db.getSentence(sentence.sentence).then(row => {
-                if (row === undefined)
-                    return;
-                sentence.startTime = row.startTime;
-                sentence.endTime = row.endTime;
-                sentence.mastery = row.mastery;
+                if (row !== undefined) {
+                    sentence.startTime = row.startTime;
+                    sentence.endTime = row.endTime;
+                    sentence.mastery = row.mastery;
+                }
+                this.markLoaded();
             });
         });
+    }
+    markLoaded() {
+        this.loaded += 1;
+        if (this.loaded === this.expected)
+            this.onLoad();
     }
     // getRandomSentenceBlock(n)
     // {
