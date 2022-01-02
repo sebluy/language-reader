@@ -7,8 +7,10 @@ import { LanguageDb } from './language-db.js'
 import { RuntimeData } from './runtime-data.js'
 import { SideBar } from './side-bar.js'
 import { ControllerInterface } from './controller-interface.js'
+import { Listening } from './listening.js'
 
-// TODO: add a controller class
+// TODO: add a cloze multiple choice activity
+// TODO: add a definition in context multiple choice activity
 // TODO: finish upgrading everything to Typescript
 // TODO: cleanup drag and drop for vocabulary matching
 // TODO: use only one activity field instead of having a separate field for each activity
@@ -38,15 +40,17 @@ import { ControllerInterface } from './controller-interface.js'
 // TODO: make it mobile friendly
 // TODO: find a way to sync with multiple clients
 
+export interface Activity {
+    cleanup()
+}
+
 export class Controller implements ControllerInterface {
 
     db: LanguageDb
     runtimeData: RuntimeData
-    reader: Reader
-    unscramble: Unscramble
-    vocabularyMatching: VocabularyMatching
     sidebar: SideBar
     languageText: LanguageText
+    activity: Activity
 
     constructor() {
         this.db = new LanguageDb()
@@ -121,51 +125,58 @@ export class Controller implements ControllerInterface {
     }
 
     showReader() {
-        // TODO: add generic cleanup method to activity
-        this.cleanupVocabularyMatching();
-        this.reader = new Reader(this)
-        this.reader.onClickWord = (word) => this.sidebar.showWord(word)
-        let sentence = this.reader.getFirstSentence();
-        this.sidebar.setAudio(sentence.startTime)
-        this.sidebar.loadActivity(this.reader)
-        this.sidebar.onNextWord = () => this.reader.nextWord()
+        this.cleanupActivity();
+        let reader = new Reader(this)
+        reader.onClickWord = (word) => this.sidebar.showWord(word)
+        this.sidebar.showSentence(undefined)
+        this.sidebar.setAudio(reader.getFirstSentence().startTime)
+        this.sidebar.loadActivity(reader)
+        this.sidebar.onNextWord = () => reader.nextWord()
         this.sidebar.updateHighlighting = () => this.updateHighlighting()
-        this.sidebar.highlightSentence = (i) => this.reader.highlightSentence(i)
-        this.sidebar.unhighlightSentence = (i) => this.reader.removeSentenceHighlighting(i)
-        if (this.sidebar.highlightingOn) this.reader.updateHighlighting(true)
+        this.sidebar.highlightSentence = (i) => reader.highlightSentence(i)
+        this.sidebar.unhighlightSentence = (i) => reader.removeSentenceHighlighting(i)
+        if (this.sidebar.highlightingOn) reader.updateHighlighting(true)
+        this.activity = reader
     }
 
     showUnscramble() {
-        this.cleanupVocabularyMatching();
-        let sentence = this.languageText.getNextSentenceByMastery()
-        this.unscramble = new Unscramble(this, sentence)
-        this.unscramble.onClickWord = (word) => this.sidebar.showWord(word)
-        this.sidebar.showSentence(sentence)
-        this.sidebar.updateStats()
-        this.sidebar.loadActivity(this.unscramble)
-        this.sidebar.setAudio(sentence.startTime, sentence.endTime)
-        this.sidebar.checkAnswer = () => this.unscramble.checkAnswer()
-        if (sentence.startTime !== undefined) this.sidebar.playAudio()
+        this.cleanupActivity();
+        let unscramble = new Unscramble(this)
+        unscramble.onClickWord = (word) => this.sidebar.showWord(word)
+        this.sidebar.showSentence(unscramble.sentence)
+        this.sidebar.loadActivity(unscramble)
+        this.sidebar.checkAnswer = () => unscramble.checkAnswer()
+        this.activity = unscramble
     }
 
     showVocabularyMatching() {
-        this.cleanupVocabularyMatching();
-        this.vocabularyMatching = new VocabularyMatching(this)
-        this.sidebar.setAudio(undefined, undefined)
+        this.cleanupActivity();
+        let vocabularyMatching = new VocabularyMatching(this)
         this.sidebar.showSentence(undefined)
-        this.sidebar.updateStats()
-        this.sidebar.loadActivity(this.vocabularyMatching)
+        this.sidebar.loadActivity(vocabularyMatching)
+        this.activity = vocabularyMatching
     }
 
-    cleanupVocabularyMatching() {
-        if (this.vocabularyMatching) {
-            this.vocabularyMatching.cleanup()
-            this.vocabularyMatching = undefined
+    showListening(index = 0) {
+        this.cleanupActivity();
+        let listening = new Listening(this, index)
+        listening.onClickWord = (word) => this.sidebar.showWord(word)
+        this.sidebar.showSentence(listening.sentence)
+        this.sidebar.loadActivity(listening)
+        this.activity = listening
+    }
+
+    cleanupActivity() {
+        if (this.activity) {
+            this.activity.cleanup()
+            this.activity = undefined
         }
     }
 
     updateHighlighting(word?) {
-        this.reader.updateHighlighting(this.sidebar.highlightingOn, word)
+        if (this.activity instanceof Reader) {
+            this.activity.updateHighlighting(this.sidebar.highlightingOn, word)
+        }
     }
 
     importDatabase() {

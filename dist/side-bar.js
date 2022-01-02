@@ -1,6 +1,7 @@
 import { Utility } from './utility.js';
 import { Reader } from './reader.js';
 import { Unscramble } from './unscramble.js';
+import { Listening } from './listening.js';
 export class SideBar {
     constructor(controller) {
         this.controller = controller;
@@ -37,26 +38,28 @@ export class SideBar {
             .addEventListener('click', () => this.controller.openTextFile());
         document.getElementById('open-audio-file')
             .addEventListener('click', () => this.controller.openAudioFile());
-        document.getElementById('reader').addEventListener('click', () => {
-            this.controller.showReader();
-        });
+        document.getElementById('reader')
+            .addEventListener('click', () => this.controller.showReader());
         document.getElementById('vocab-matching')
             .addEventListener('click', () => this.controller.showVocabularyMatching());
         document.getElementById('unscramble')
             .addEventListener('click', () => this.controller.showUnscramble());
+        document.getElementById('listening')
+            .addEventListener('click', () => this.controller.showListening());
         document.getElementById('export')
             .addEventListener('click', () => this.controller.exportDatabase());
         document.getElementById('import')
             .addEventListener('click', () => this.controller.importDatabase());
         document.addEventListener('keydown', (e) => this.handleKey(e));
     }
-    setAudio(startTime, endTime = null) {
+    setAudio(startTime, endTime = undefined) {
         this.audioStart = startTime;
         this.audioEnd = endTime;
         if (this.audioStart !== undefined)
             this.audioE.currentTime = startTime;
         clearTimeout(this.timeout);
-        this.audioE.pause();
+        if (!this.audioE.paused)
+            this.audioE.pause();
     }
     playAudio() {
         // TODO: Fix playback for 0
@@ -103,11 +106,15 @@ export class SideBar {
         if (sentence === undefined) {
             this.currentSentence = undefined;
             this.audioStartE.value = this.audioEndE.value = '';
+            this.setAudio(undefined);
             return;
         }
         this.currentSentence = sentence;
         this.audioStartE.value = sentence.startTime === undefined ? '' : sentence.startTime.toFixed(1);
         this.audioEndE.value = sentence.endTime === undefined ? '' : sentence.endTime.toFixed(1);
+        this.setAudio(sentence.startTime, sentence.endTime);
+        if (sentence.startTime !== undefined)
+            this.playAudio();
     }
     nextWord(e) {
         if (e.key === 'Tab') {
@@ -189,17 +196,19 @@ export class SideBar {
         this.audioE.src = source;
     }
     loadActivity(activity) {
+        this.updateStats();
         let r = activity instanceof Reader;
         let us = activity instanceof Unscramble;
-        this.showElement(this.wordE, r || us);
-        this.showElement(this.definitionE, r || us);
-        this.showElement(this.googleTranslateB, r || us);
-        this.showElement(this.audioE, r || us);
+        let l = activity instanceof Listening;
+        this.showElement(this.wordE, r || us || l);
+        this.showElement(this.definitionE, r || us || l);
+        this.showElement(this.googleTranslateB, r || us || l);
+        this.showElement(this.audioE, r || us || l);
         this.showElement(this.highlightCB, r);
         this.showElement(this.previousPageE, r);
         this.showElement(this.nextPageE, r);
-        this.showElement(this.audioStartE, us);
-        this.showElement(this.audioEndE, us);
+        this.showElement(this.audioStartE, us || l);
+        this.showElement(this.audioEndE, us || l);
         this.showElement(this.checkAnswerE, us);
     }
     highlightSentence(i) { }

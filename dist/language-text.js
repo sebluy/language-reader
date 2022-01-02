@@ -197,4 +197,11 @@ export class LanguageText {
                 return sentenceO;
         }
     }
+    getWordMap(words) {
+        let map = new Map();
+        words.forEach((word) => {
+            map.set(word, this.words.get(word));
+        });
+        return map;
+    }
 }

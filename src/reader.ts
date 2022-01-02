@@ -3,8 +3,9 @@ import { LanguageText } from './language-text.js'
 import { RawSentence } from './raw-sentence.js'
 import { Word } from './word.js'
 import { ControllerInterface } from './controller-interface.js'
+import { Activity } from './controller.js'
 
-export class Reader {
+export class Reader implements Activity {
 
     controller: ControllerInterface
     languageText: LanguageText
@@ -24,6 +25,8 @@ export class Reader {
         this.textE.addEventListener('click', (e) => this.clickWord(e))
         this.load()
     }
+
+    cleanup() {}
 
     load(title = null, sentences = null) {
         if (title === null) title = this.languageText.filename

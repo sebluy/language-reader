@@ -15,6 +15,8 @@ export interface ControllerInterface {
     showReader()
     showUnscramble()
     showVocabularyMatching()
+    showListening(index?: number)
 
     addXP(n: number)
+
 }

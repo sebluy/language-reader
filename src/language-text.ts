@@ -219,4 +219,12 @@ export class LanguageText {
         }
     }
 
+    getWordMap(words: Array<string>) {
+        let map = new Map()
+        words.forEach((word) => {
+            map.set(word, this.words.get(word))
+        })
+        return map
+    }
+
 }

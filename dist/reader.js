@@ -9,6 +9,7 @@ export class Reader {
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         this.load();
     }
+    cleanup() { }
     load(title = null, sentences = null) {
         if (title === null)
             title = this.languageText.filename;

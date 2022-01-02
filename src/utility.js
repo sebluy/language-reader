@@ -29,6 +29,11 @@ export class Utility {
         }
     }
 
+    static randomItem(a) {
+        let index = Math.floor(Math.random() * a.length);
+        return a[index]
+    }
+
     static createHTML(a) {
         let [tag, ...rest] = a
         let element = document.createElement(tag)

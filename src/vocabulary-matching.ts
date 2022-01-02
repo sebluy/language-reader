@@ -1,8 +1,9 @@
 import { Utility } from './utility.js'
 import { LanguageText } from './language-text.js'
 import { ControllerInterface } from './controller-interface.js'
+import { Activity } from './controller.js'
 
-export class VocabularyMatching {
+export class VocabularyMatching implements Activity {
 
     controller: ControllerInterface
     languageText: LanguageText

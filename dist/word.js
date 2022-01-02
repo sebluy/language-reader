@@ -7,7 +7,7 @@ export class Word {
     }
     nextMastery() {
         if (this.mastery === 5)
-            return;
+            return this;
         this.mastery += 1;
         return this;
     }

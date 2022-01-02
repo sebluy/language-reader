@@ -15,33 +15,7 @@ import { Unscramble } from './unscramble.js';
 import { LanguageDb } from './language-db.js';
 import { RuntimeData } from './runtime-data.js';
 import { SideBar } from './side-bar.js';
-// TODO: add a controller class
-// TODO: finish upgrading everything to Typescript
-// TODO: cleanup drag and drop for vocabulary matching
-// TODO: use only one activity field instead of having a separate field for each activity
-// TODO: create new widgets or reuse
-// TODO: Fix the span thing with clicking.
-// TODO: new activity: show a sentence (with audio). Give user some options for next sentence (with audio)
-// TODO: write a desktop version (Java?)
-// TODO: upgrade to TypeSript?
-// TODO: Fix sentence parsing for songs
-// TODO: change export to CSV
-// TODO: change fetch/update to get/set
-// TODO: Update the styling to be more pretty/modern.
-// TODO: use async/await more
-// TODO: fix favicon error
-/* TODO: come up with a better way than just random. Some progression through the exercises or something.
-     Think a lesson, instead of just random exercises.
-     Maybe a 5 stage Leitner system.
-     Vocab - Each word goes through 5 levels until mastered. Random from lowest level.
-     Unscramble - Each sentence goes through 5 levels until mastered. In order.
-     Fill in the blanks - Each sentence goes through 5 levels until mastered. In order.
-     Mastery = 1/3 of each.
-*/
-// TODO: Have someway to show the answer if you're wrong.
-// TODO: use an actual dictionary instead of google translate
-// TODO: make it mobile friendly
-// TODO: find a way to sync with multiple clients
+import { Listening } from './listening.js';
 export class Controller {
     constructor() {
         this.db = new LanguageDb();
@@ -112,49 +86,54 @@ export class Controller {
         }
     }
     showReader() {
-        // TODO: add generic cleanup method to activity
-        this.cleanupVocabularyMatching();
-        this.reader = new Reader(this);
-        this.reader.onClickWord = (word) => this.sidebar.showWord(word);
-        let sentence = this.reader.getFirstSentence();
-        this.sidebar.setAudio(sentence.startTime);
-        this.sidebar.loadActivity(this.reader);
-        this.sidebar.onNextWord = () => this.reader.nextWord();
+        this.cleanupActivity();
+        let reader = new Reader(this);
+        reader.onClickWord = (word) => this.sidebar.showWord(word);
+        this.sidebar.showSentence(undefined);
+        this.sidebar.setAudio(reader.getFirstSentence().startTime);
+        this.sidebar.loadActivity(reader);
+        this.sidebar.onNextWord = () => reader.nextWord();
         this.sidebar.updateHighlighting = () => this.updateHighlighting();
-        this.sidebar.highlightSentence = (i) => this.reader.highlightSentence(i);
-        this.sidebar.unhighlightSentence = (i) => this.reader.removeSentenceHighlighting(i);
+        this.sidebar.highlightSentence = (i) => reader.highlightSentence(i);
+        this.sidebar.unhighlightSentence = (i) => reader.removeSentenceHighlighting(i);
         if (this.sidebar.highlightingOn)
-            this.reader.updateHighlighting(true);
+            reader.updateHighlighting(true);
+        this.activity = reader;
     }
     showUnscramble() {
-        this.cleanupVocabularyMatching();
-        let sentence = this.languageText.getNextSentenceByMastery();
-        this.unscramble = new Unscramble(this, sentence);
-        this.unscramble.onClickWord = (word) => this.sidebar.showWord(word);
-        this.sidebar.showSentence(sentence);
-        this.sidebar.updateStats();
-        this.sidebar.loadActivity(this.unscramble);
-        this.sidebar.setAudio(sentence.startTime, sentence.endTime);
-        this.sidebar.checkAnswer = () => this.unscramble.checkAnswer();
-        if (sentence.startTime !== undefined)
-            this.sidebar.playAudio();
+        this.cleanupActivity();
+        let unscramble = new Unscramble(this);
+        unscramble.onClickWord = (word) => this.sidebar.showWord(word);
+        this.sidebar.showSentence(unscramble.sentence);
+        this.sidebar.loadActivity(unscramble);
+        this.sidebar.checkAnswer = () => unscramble.checkAnswer();
+        this.activity = unscramble;
     }
     showVocabularyMatching() {
-        this.cleanupVocabularyMatching();
-        this.vocabularyMatching = new VocabularyMatching(this);
-        this.sidebar.setAudio(undefined, undefined);
+        this.cleanupActivity();
+        let vocabularyMatching = new VocabularyMatching(this);
         this.sidebar.showSentence(undefined);
-        this.sidebar.updateStats();
-        this.sidebar.loadActivity(this.vocabularyMatching);
+        this.sidebar.loadActivity(vocabularyMatching);
+        this.activity = vocabularyMatching;
     }
-    cleanupVocabularyMatching() {
-        if (this.vocabularyMatching) {
-            this.vocabularyMatching.cleanup();
-            this.vocabularyMatching = undefined;
+    showListening(index = 0) {
+        this.cleanupActivity();
+        let listening = new Listening(this, index);
+        listening.onClickWord = (word) => this.sidebar.showWord(word);
+        this.sidebar.showSentence(listening.sentence);
+        this.sidebar.loadActivity(listening);
+        this.activity = listening;
+    }
+    cleanupActivity() {
+        if (this.activity) {
+            this.activity.cleanup();
+            this.activity = undefined;
         }
     }
     updateHighlighting(word) {
-        this.reader.updateHighlighting(this.sidebar.highlightingOn, word);
+        if (this.activity instanceof Reader) {
+            this.activity.updateHighlighting(this.sidebar.highlightingOn, word);
+        }
     }
     importDatabase() {
         Utility.uploadText((name, db) => {

@@ -1,9 +1,9 @@
 import { Utility } from './utility.js';
 export class Unscramble {
-    constructor(controller, sentence) {
+    constructor(controller) {
         this.controller = controller;
         this.languageText = controller.languageText;
-        this.sentence = sentence;
+        this.sentence = this.languageText.getNextSentenceByMastery();
         let es = Utility.resetMainView();
         this.titleE = es[0];
         this.titleE.textContent = 'Unscramble';
@@ -64,4 +64,5 @@ export class Unscramble {
         }
     }
     onClickWord(word) { }
+    cleanup() { }
 }

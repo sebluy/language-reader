@@ -3,8 +3,9 @@ import { LanguageText } from './language-text.js'
 import { Sentence } from './sentence.js';
 import { Word } from './word.js';
 import { ControllerInterface } from './controller-interface.js'
+import { Activity } from './controller.js'
 
-export class Unscramble {
+export class Unscramble implements Activity {
 
     controller: ControllerInterface
     languageText: LanguageText
@@ -13,10 +14,10 @@ export class Unscramble {
     sentence: Sentence
     words: Array<string>
 
-    constructor(controller, sentence) {
+    constructor(controller) {
         this.controller = controller
         this.languageText = controller.languageText
-        this.sentence = sentence
+        this.sentence = this.languageText.getNextSentenceByMastery()
 
         let es = Utility.resetMainView()
         this.titleE = es[0]
@@ -80,5 +81,7 @@ export class Unscramble {
     }
 
     onClickWord(word: Word) {}
+
+    cleanup() {}
 
 }
