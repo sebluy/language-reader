@@ -82,6 +82,8 @@ export class SideBar {
             .addEventListener('click', () => this.controller.showListening())
         document.getElementById('vocab-in-context')
             .addEventListener('click', () => this.controller.showVocabInContext())
+        document.getElementById('cloze')
+            .addEventListener('click', () => this.controller.showCloze())
 
         document.getElementById('export')
             .addEventListener('click', () => this.controller.exportDatabase())

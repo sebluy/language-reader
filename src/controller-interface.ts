@@ -17,6 +17,7 @@ export interface ControllerInterface {
     showVocabularyMatching()
     showListening(index?: number)
     showVocabInContext(index?: number)
+    showCloze(index?: number)
 
     addXP(n: number)
 

@@ -7,7 +7,11 @@ import { RawSentence } from './raw-sentence.js'
 import { Activity } from './controller.js'
 import { MultipleChoice } from './multiple-choice.js'
 
-export class Listening implements Activity {
+export class Cloze implements Activity {
+
+    // TODO: dedupe with listening and vocab in context
+    // TODO: dedupe using text area object?
+    // TODO: add full sentence translation
 
     controller: ControllerInterface
     languageText: LanguageText
@@ -16,9 +20,7 @@ export class Listening implements Activity {
     sentence: Sentence
     rawSentence: RawSentence
     index: number
-    solution: string
-    options: Array<string>
-    keyListener: (Event) => void
+    solution: Word
     multipleChoice: MultipleChoice
 
     constructor(controller, index = 0) {
@@ -28,7 +30,7 @@ export class Listening implements Activity {
 
         let es = Utility.resetMainView()
         this.titleE = es[0]
-        this.titleE.textContent = 'Listening'
+        this.titleE.textContent = 'Vocabulary In Context'
         this.textE = es[1]
         this.textE.addEventListener('click', (e) => this.clickWord(e))
 
@@ -36,13 +38,13 @@ export class Listening implements Activity {
         this.sentence = this.languageText.sentenceMap.get(this.rawSentence.clean)
         this.solution = this.leastMastery().word
         this.buildSentence()
-        this.createOptions()
+        let options = this.createOptions()
 
-        this.multipleChoice = new MultipleChoice(this.options, this.solution)
+        this.multipleChoice = new MultipleChoice(options, this.solution)
         this.multipleChoice.onCorrectAnswer = () => {
             this.languageText.updateMastery([this.solution])
             this.controller.addXP(1)
-            this.controller.showListening(this.index + 1)
+            this.controller.showCloze(this.index + 1)
         }
         this.multipleChoice.render(this.textE)
     }
@@ -53,12 +55,13 @@ export class Listening implements Activity {
 
     createOptions() {
         let words = Array.from(this.languageText.words)
-        this.options = [this.solution]
-        while (this.options.length < 4) {
+        let options = [this.solution]
+        while (options.length < 4) {
             let option = Utility.randomItem(words)[1].word
-            if (this.options.indexOf(option) === -1) this.options.push(option)
+            if (options.indexOf(option) === -1) options.push(option)
         }
-        Utility.shuffle(this.options)
+        Utility.shuffle(options)
+        return options
     }
 
     leastMastery() {

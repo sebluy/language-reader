@@ -17,6 +17,7 @@ import { RuntimeData } from './runtime-data.js';
 import { SideBar } from './side-bar.js';
 import { Listening } from './listening.js';
 import { VocabInContext } from './vocab-in-context.js';
+import { Cloze } from './cloze.js';
 export class Controller {
     constructor() {
         this.db = new LanguageDb();
@@ -130,6 +131,15 @@ export class Controller {
         let vocab = new VocabInContext(this, index);
         vocab.onClickWord = (word) => this.sidebar.showWord(word);
         this.sidebar.showSentence(vocab.sentence);
+        this.sidebar.loadActivity(vocab);
+        this.activity = vocab;
+    }
+    showCloze(index = 0) {
+        this.cleanupActivity();
+        let vocab = new Cloze(this, index);
+        vocab.onClickWord = (word) => this.sidebar.showWord(word);
+        // TODO: what to do with audio here?
+        // this.sidebar.showSentence(vocab.sentence)
         this.sidebar.loadActivity(vocab);
         this.activity = vocab;
     }

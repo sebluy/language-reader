@@ -1,6 +1,6 @@
 import { Utility } from './utility.js';
 import { MultipleChoice } from './multiple-choice.js';
-export class VocabInContext {
+export class Cloze {
     constructor(controller, index = 0) {
         this.controller = controller;
         this.languageText = controller.languageText;
@@ -12,14 +12,14 @@ export class VocabInContext {
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         this.rawSentence = this.languageText.sentences[this.index];
         this.sentence = this.languageText.sentenceMap.get(this.rawSentence.clean);
-        this.word = this.leastMastery();
+        this.solution = this.leastMastery().word;
         this.buildSentence();
-        this.createOptions();
-        this.multipleChoice = new MultipleChoice(this.options, this.word.definition);
+        let options = this.createOptions();
+        this.multipleChoice = new MultipleChoice(options, this.solution);
         this.multipleChoice.onCorrectAnswer = () => {
-            this.languageText.updateMastery([this.word.word]);
+            this.languageText.updateMastery([this.solution]);
             this.controller.addXP(1);
-            this.controller.showVocabInContext(this.index + 1);
+            this.controller.showCloze(this.index + 1);
         };
         this.multipleChoice.render(this.textE);
     }
@@ -28,13 +28,14 @@ export class VocabInContext {
     }
     createOptions() {
         let words = Array.from(this.languageText.words);
-        this.options = [this.word.definition];
-        while (this.options.length < 4) {
-            let option = Utility.randomItem(words)[1].definition;
-            if (this.options.indexOf(option) === -1)
-                this.options.push(option);
+        let options = [this.solution];
+        while (options.length < 4) {
+            let option = Utility.randomItem(words)[1].word;
+            if (options.indexOf(option) === -1)
+                options.push(option);
         }
-        Utility.shuffle(this.options);
+        Utility.shuffle(options);
+        return options;
     }
     leastMastery() {
         let wordMap = this.languageText.getWordMap(this.rawSentence.getWords());
@@ -53,10 +54,12 @@ export class VocabInContext {
                 this.textE.appendChild(document.createTextNode(word));
                 return;
             }
+            if (cWord === this.solution) {
+                this.textE.appendChild(document.createTextNode('________'));
+                return;
+            }
             const span = document.createElement('span');
             span.innerText = word;
-            if (cWord === this.word.word)
-                span.classList.add('bold');
             this.textE.appendChild(span);
         });
     }

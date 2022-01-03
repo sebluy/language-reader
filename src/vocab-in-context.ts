@@ -5,6 +5,7 @@ import { Word } from './word.js';
 import { ControllerInterface } from './controller-interface.js'
 import { RawSentence } from './raw-sentence.js'
 import { Activity } from './controller.js'
+import { MultipleChoice } from './multiple-choice.js'
 
 export class VocabInContext implements Activity {
 
@@ -17,9 +18,9 @@ export class VocabInContext implements Activity {
     sentence: Sentence
     rawSentence: RawSentence
     index: number
-    solution: Word
+    word: Word
     options: Array<string>
-    keyListener: (Event) => void;
+    multipleChoice: MultipleChoice
 
     constructor(controller, index = 0) {
         this.controller = controller
@@ -34,21 +35,26 @@ export class VocabInContext implements Activity {
 
         this.rawSentence = this.languageText.sentences[this.index]
         this.sentence = this.languageText.sentenceMap.get(this.rawSentence.clean)
-        this.solution = this.leastMastery()
+        this.word = this.leastMastery()
         this.buildSentence()
         this.createOptions()
-        this.buildOptions()
-        this.keyListener = (e) => this.handleKey(e)
-        document.addEventListener('keydown', this.keyListener);
+
+        this.multipleChoice = new MultipleChoice(this.options, this.word.definition)
+        this.multipleChoice.onCorrectAnswer = () => {
+            this.languageText.updateMastery([this.word.word])
+            this.controller.addXP(1)
+            this.controller.showVocabInContext(this.index + 1)
+        }
+        this.multipleChoice.render(this.textE)
     }
 
     cleanup() {
-        document.removeEventListener('keydown', this.keyListener);
+        this.multipleChoice.cleanup()
     }
 
     createOptions() {
         let words = Array.from(this.languageText.words)
-        this.options = [this.solution.definition]
+        this.options = [this.word.definition]
         while (this.options.length < 4) {
             let option = Utility.randomItem(words)[1].definition
             if (this.options.indexOf(option) === -1) this.options.push(option)
@@ -76,29 +82,9 @@ export class VocabInContext implements Activity {
             }
             const span = document.createElement('span')
             span.innerText = word
-            if (cWord === this.solution.word) span.classList.add('bold')
+            if (cWord === this.word.word) span.classList.add('bold')
             this.textE.appendChild(span)
         })
-    }
-
-    buildOptions() {
-        let div = document.createElement('div')
-        this.options.forEach((option, index) => {
-            let button = document.createElement('button')
-            button.innerText = (index + 1) + '. ' + option
-            button.classList.add('multiple-choice')
-            button.addEventListener('click', () => this.checkAnswer(option))
-            div.appendChild(button)
-        })
-        this.textE.append(div)
-    }
-
-    checkAnswer(option) {
-        if (option === this.solution.definition) {
-            this.languageText.updateMastery([this.solution.word])
-            this.controller.addXP(1)
-            this.controller.showVocabInContext(this.index + 1)
-        }
     }
 
     clickWord(e) {
@@ -112,12 +98,4 @@ export class VocabInContext implements Activity {
 
     onClickWord(word: Word) {}
 
-    handleKey(e) {
-        if (['1', '2', '3', '4'].indexOf(e.key) !== -1) {
-            e.preventDefault()
-            let index = Number.parseInt(e.key) - 1
-            this.checkAnswer(this.options[index])
-        }
-        e.stopPropagation()
-    }
 }

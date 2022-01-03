@@ -1,4 +1,5 @@
 import { Utility } from './utility.js';
+import { MultipleChoice } from './multiple-choice.js';
 export class Listening {
     constructor(controller, index = 0) {
         this.controller = controller;
@@ -11,21 +12,25 @@ export class Listening {
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         this.rawSentence = this.languageText.sentences[this.index];
         this.sentence = this.languageText.sentenceMap.get(this.rawSentence.clean);
-        this.solution = this.leastMastery();
+        this.solution = this.leastMastery().word;
         this.buildSentence();
         this.createOptions();
-        this.buildOptions();
-        this.keyListener = (e) => this.handleKey(e);
-        document.addEventListener('keydown', this.keyListener);
+        this.multipleChoice = new MultipleChoice(this.options, this.solution);
+        this.multipleChoice.onCorrectAnswer = () => {
+            this.languageText.updateMastery([this.solution]);
+            this.controller.addXP(1);
+            this.controller.showListening(this.index + 1);
+        };
+        this.multipleChoice.render(this.textE);
     }
     cleanup() {
-        document.removeEventListener('keydown', this.keyListener);
+        this.multipleChoice.cleanup();
     }
     createOptions() {
         let words = Array.from(this.languageText.words);
-        this.options = [this.solution.word];
+        this.options = [this.solution];
         while (this.options.length < 4) {
-            let option = Utility.randomItem(words)[0];
+            let option = Utility.randomItem(words)[1].word;
             if (this.options.indexOf(option) === -1)
                 this.options.push(option);
         }
@@ -48,7 +53,7 @@ export class Listening {
                 this.textE.appendChild(document.createTextNode(word));
                 return;
             }
-            if (cWord === this.solution.word) {
+            if (cWord === this.solution) {
                 this.textE.appendChild(document.createTextNode('________'));
                 return;
             }
@@ -56,24 +61,6 @@ export class Listening {
             span.innerText = word;
             this.textE.appendChild(span);
         });
-    }
-    buildOptions() {
-        let div = document.createElement('div');
-        this.options.forEach((option, index) => {
-            let button = document.createElement('button');
-            button.innerText = (index + 1) + '. ' + option;
-            button.classList.add('multiple-choice');
-            button.addEventListener('click', () => this.checkAnswer(option));
-            div.appendChild(button);
-        });
-        this.textE.append(div);
-    }
-    checkAnswer(option) {
-        if (option === this.solution.word) {
-            this.languageText.updateMastery([this.solution.word]);
-            this.controller.addXP(1);
-            this.controller.showListening(this.index + 1);
-        }
     }
     clickWord(e) {
         if (e.target.matches('span')) {
@@ -85,12 +72,4 @@ export class Listening {
         }
     }
     onClickWord(word) { }
-    handleKey(e) {
-        if (['1', '2', '3', '4'].indexOf(e.key) !== -1) {
-            e.preventDefault();
-            let index = Number.parseInt(e.key) - 1;
-            this.checkAnswer(this.options[index]);
-        }
-        e.stopPropagation();
-    }
 }
