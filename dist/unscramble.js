@@ -4,10 +4,7 @@ export class Unscramble {
         this.controller = controller;
         this.languageText = controller.languageText;
         this.sentence = this.languageText.getNextSentenceByMastery();
-        let es = Utility.resetMainView();
-        this.titleE = es[0];
-        this.titleE.textContent = 'Unscramble';
-        this.textE = es[1];
+        this.textE = Utility.resetMainView('Unscramble');
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         console.log(this.sentence);
         this.words = this.sentence.getRawWords();

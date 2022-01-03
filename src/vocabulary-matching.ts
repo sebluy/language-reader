@@ -7,7 +7,6 @@ export class VocabularyMatching implements Activity {
 
     controller: ControllerInterface
     languageText: LanguageText
-    titleE: HTMLElement
     textE: HTMLElement
     words: Array<string>
     definitions: Array<string>
@@ -26,10 +25,7 @@ export class VocabularyMatching implements Activity {
         this.shuffledElements = []
         this.selectedIndex = 0
 
-        let es = Utility.resetMainView()
-        this.titleE = es[0]
-        this.titleE.textContent = 'Vocabulary Matching'
-        this.textE = es[1]
+        this.textE = Utility.resetMainView('Vocabulary Matching')
 
         this.getRandomWords()
         this.buildGrid()

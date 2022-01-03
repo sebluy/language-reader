@@ -204,4 +204,14 @@ export class LanguageText {
         });
         return map;
     }
+    getWordStrArray() {
+        return Array.from(this.words).map((v) => v[1].word);
+    }
+    getDefinitionArray() {
+        return Array.from(this.words).map((v) => v[1].definition);
+    }
+    leastMasteredWord(rawSentence) {
+        let wordMap = this.getWordMap(rawSentence.getWords());
+        return Utility.randomWordsByMastery(wordMap, 1)[0];
+    }
 }

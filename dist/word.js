@@ -6,7 +6,7 @@ export class Word {
         this.count = count;
     }
     nextMastery() {
-        if (this.mastery === 5)
+        if (this.mastery === Word.MAX_MASTERY)
             return this;
         this.mastery += 1;
         return this;
@@ -17,3 +17,4 @@ export class Word {
         return this.count;
     }
 }
+Word.MAX_MASTERY = 5;

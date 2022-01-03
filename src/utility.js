@@ -154,13 +154,14 @@ export class Utility {
         })
     }
 
-    static resetMainView() {
+    static resetMainView(title) {
         let mainE = document.getElementById('main')
         mainE.innerHTML = ''
         let titleE = document.createElement('h2')
+        titleE.textContent = title
         let textE = document.createElement('p')
         mainE.append(titleE, textE)
-        return [titleE, textE]
+        return textE
     }
 
 }

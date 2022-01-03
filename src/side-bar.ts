@@ -138,6 +138,8 @@ export class SideBar {
 
     showWord(word)
     {
+        word = this.languageText.words.get(word)
+        if (word === undefined) return
         this.wordE.innerText = word.word
         this.definitionE.value = word.definition
         this.definitionE.focus()

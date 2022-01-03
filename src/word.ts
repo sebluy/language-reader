@@ -3,6 +3,7 @@ export class Word {
     definition: string
     mastery: number
     count: number
+    static MAX_MASTERY = 5
 
     constructor(word, definition = '', mastery = 0, count = 1) {
         this.word = word
@@ -12,7 +13,7 @@ export class Word {
     }
 
     nextMastery() {
-        if (this.mastery === 5) return this
+        if (this.mastery === Word.MAX_MASTERY) return this
         this.mastery += 1
         return this
     }

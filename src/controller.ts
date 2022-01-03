@@ -11,7 +11,9 @@ import { Listening } from './listening.js'
 import { VocabInContext } from './vocab-in-context.js'
 import { Cloze } from './cloze.js'
 
-// TODO: add a Cloze multiple choice activity
+// TODO: continue textview refactor
+// TODO: keep working on Cloze
+// TODO: change audio time edit to mm:ss
 // TODO: how to handle new chapters (new audio file) in page. Split text files into chapters?
 // TODO: finish upgrading everything to Typescript
 // TODO: cleanup drag and drop for vocabulary matching

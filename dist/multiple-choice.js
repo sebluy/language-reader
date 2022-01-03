@@ -1,9 +1,19 @@
+import { Utility } from './utility.js';
 export class MultipleChoice {
-    constructor(options, solution) {
-        this.options = options;
+    constructor(pool, solution) {
         this.solution = solution;
+        this.createOptions(pool);
         this.keyListener = (e) => this.handleKey(e);
         document.addEventListener('keydown', this.keyListener);
+    }
+    createOptions(pool) {
+        this.options = [this.solution];
+        while (this.options.length < 4) {
+            let option = Utility.randomItem(pool);
+            if (this.options.indexOf(option) === -1)
+                this.options.push(option);
+        }
+        Utility.shuffle(this.options);
     }
     cleanup() {
         document.removeEventListener('keydown', this.keyListener);

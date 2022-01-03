@@ -6,10 +6,7 @@ export class VocabularyMatching {
         this.elementGrid = [];
         this.shuffledElements = [];
         this.selectedIndex = 0;
-        let es = Utility.resetMainView();
-        this.titleE = es[0];
-        this.titleE.textContent = 'Vocabulary Matching';
-        this.textE = es[1];
+        this.textE = Utility.resetMainView('Vocabulary Matching');
         this.getRandomWords();
         this.buildGrid();
         this.selectElement(this.nextDefinition());

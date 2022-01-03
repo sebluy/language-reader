@@ -3,19 +3,14 @@ export class Reader {
     constructor(controller) {
         this.controller = controller;
         this.languageText = controller.languageText;
-        let es = Utility.resetMainView();
-        this.titleE = es[0];
-        this.textE = es[1];
+        this.textE = Utility.resetMainView('Reader');
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         this.load();
     }
     cleanup() { }
-    load(title = null, sentences = null) {
-        if (title === null)
-            title = this.languageText.filename;
+    load(sentences = null) {
         if (sentences === null)
             this.sentences = this.languageText.sentences;
-        this.titleE.textContent = title;
         this.textE.innerHTML = '';
         this.spansByWord = new Map();
         this.spansBySentence = [];
