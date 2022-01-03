@@ -16,6 +16,7 @@ import { LanguageDb } from './language-db.js';
 import { RuntimeData } from './runtime-data.js';
 import { SideBar } from './side-bar.js';
 import { Listening } from './listening.js';
+import { VocabInContext } from './vocab-in-context.js';
 export class Controller {
     constructor() {
         this.db = new LanguageDb();
@@ -123,6 +124,14 @@ export class Controller {
         this.sidebar.showSentence(listening.sentence);
         this.sidebar.loadActivity(listening);
         this.activity = listening;
+    }
+    showVocabInContext(index = 0) {
+        this.cleanupActivity();
+        let vocab = new VocabInContext(this, index);
+        vocab.onClickWord = (word) => this.sidebar.showWord(word);
+        this.sidebar.showSentence(vocab.sentence);
+        this.sidebar.loadActivity(vocab);
+        this.activity = vocab;
     }
     cleanupActivity() {
         if (this.activity) {

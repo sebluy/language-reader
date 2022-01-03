@@ -106,3 +106,7 @@ span.matching-item {
     width: 290px;
     margin: 5px;
 }
+
+.bold {
+    font-weight: bold;
+}

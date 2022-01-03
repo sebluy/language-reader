@@ -16,6 +16,7 @@ export interface ControllerInterface {
     showUnscramble()
     showVocabularyMatching()
     showListening(index?: number)
+    showVocabInContext(index?: number)
 
     addXP(n: number)
 

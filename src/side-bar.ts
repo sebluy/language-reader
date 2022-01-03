@@ -5,6 +5,7 @@ import { Unscramble } from './unscramble.js'
 import { Sentence } from './sentence.js'
 import { ControllerInterface } from './controller-interface.js'
 import { Listening } from './listening.js'
+import { VocabInContext } from './vocab-in-context.js'
 
 export class SideBar {
 
@@ -79,6 +80,8 @@ export class SideBar {
             .addEventListener('click', () => this.controller.showUnscramble())
         document.getElementById('listening')
             .addEventListener('click', () => this.controller.showListening())
+        document.getElementById('vocab-in-context')
+            .addEventListener('click', () => this.controller.showVocabInContext())
 
         document.getElementById('export')
             .addEventListener('click', () => this.controller.exportDatabase())
@@ -246,15 +249,16 @@ export class SideBar {
         let r = activity instanceof Reader
         let us = activity instanceof Unscramble
         let l = activity instanceof Listening
-        this.showElement(this.wordE, r || us || l)
-        this.showElement(this.definitionE, r || us || l)
-        this.showElement(this.googleTranslateB, r || us || l)
-        this.showElement(this.audioE, r || us || l)
+        let v = activity instanceof VocabInContext
+        this.showElement(this.wordE, r || us || l || v)
+        this.showElement(this.definitionE, r || us || l || v)
+        this.showElement(this.googleTranslateB, r || us || l || v)
+        this.showElement(this.audioE, r || us || l || v)
         this.showElement(this.highlightCB, r)
         this.showElement(this.previousPageE, r)
         this.showElement(this.nextPageE, r)
-        this.showElement(this.audioStartE, us || l)
-        this.showElement(this.audioEndE, us || l)
+        this.showElement(this.audioStartE, us || l || v)
+        this.showElement(this.audioEndE, us || l || v)
         this.showElement(this.checkAnswerE, us)
     }
 

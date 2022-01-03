@@ -8,7 +8,9 @@ import { RuntimeData } from './runtime-data.js'
 import { SideBar } from './side-bar.js'
 import { ControllerInterface } from './controller-interface.js'
 import { Listening } from './listening.js'
+import { VocabInContext } from './vocab-in-context.js'
 
+// TODO: how to handle new chapters (new audio file) in page
 // TODO: add a cloze multiple choice activity
 // TODO: add a definition in context multiple choice activity
 // TODO: finish upgrading everything to Typescript
@@ -164,6 +166,15 @@ export class Controller implements ControllerInterface {
         this.sidebar.showSentence(listening.sentence)
         this.sidebar.loadActivity(listening)
         this.activity = listening
+    }
+
+    showVocabInContext(index = 0) {
+        this.cleanupActivity();
+        let vocab = new VocabInContext(this, index)
+        vocab.onClickWord = (word) => this.sidebar.showWord(word)
+        this.sidebar.showSentence(vocab.sentence)
+        this.sidebar.loadActivity(vocab)
+        this.activity = vocab
     }
 
     cleanupActivity() {

@@ -1,12 +1,12 @@
 import { Utility } from './utility.js';
-export class Listening {
+export class VocabInContext {
     constructor(controller, index = 0) {
         this.controller = controller;
         this.languageText = controller.languageText;
         this.index = index % this.languageText.sentences.length;
         let es = Utility.resetMainView();
         this.titleE = es[0];
-        this.titleE.textContent = 'Listening';
+        this.titleE.textContent = 'Vocabulary In Context';
         this.textE = es[1];
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         this.rawSentence = this.languageText.sentences[this.index];
@@ -23,9 +23,9 @@ export class Listening {
     }
     createOptions() {
         let words = Array.from(this.languageText.words);
-        this.options = [this.solution.word];
+        this.options = [this.solution.definition];
         while (this.options.length < 4) {
-            let option = Utility.randomItem(words)[0];
+            let option = Utility.randomItem(words)[1].definition;
             if (this.options.indexOf(option) === -1)
                 this.options.push(option);
         }
@@ -48,12 +48,10 @@ export class Listening {
                 this.textE.appendChild(document.createTextNode(word));
                 return;
             }
-            if (cWord === this.solution.word) {
-                this.textE.appendChild(document.createTextNode('________'));
-                return;
-            }
             const span = document.createElement('span');
             span.innerText = word;
+            if (cWord === this.solution.word)
+                span.classList.add('bold');
             this.textE.appendChild(span);
         });
     }
@@ -69,10 +67,10 @@ export class Listening {
         this.textE.append(div);
     }
     checkAnswer(option) {
-        if (option === this.solution.word) {
+        if (option === this.solution.definition) {
             this.languageText.updateMastery([this.solution.word]);
             this.controller.addXP(1);
-            this.controller.showListening(this.index + 1);
+            this.controller.showVocabInContext(this.index + 1);
         }
     }
     clickWord(e) {
