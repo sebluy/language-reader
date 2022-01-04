@@ -11,6 +11,10 @@ import { Listening } from './listening.js'
 import { VocabInContext } from './vocab-in-context.js'
 import { Cloze } from './cloze.js'
 
+// TODO: fix right sidebar for the various activities
+// TODO: remove sentence mastery and just update all the words for unscramble
+// TODO: disable audio shortcuts when typing in defintions
+// TODO: add a Google translate icon to the right instead of a button
 // TODO: continue textview refactor
 // TODO: keep working on Cloze
 // TODO: change audio time edit to mm:ss
@@ -131,11 +135,12 @@ export class Controller implements ControllerInterface {
     showReader() {
         this.cleanupActivity();
         let reader = new Reader(this)
-        reader.onClickWord = (word) => this.sidebar.showWord(word)
+        reader.onClickWord = (word, sentence) => this.sidebar.showWord(word, sentence)
         this.sidebar.showSentence(undefined)
         this.sidebar.setAudio(reader.getFirstSentence().startTime)
         this.sidebar.loadActivity(reader)
         this.sidebar.onNextWord = () => reader.nextWord()
+        this.sidebar.onNextSentence = () => reader.nextSentence()
         this.sidebar.updateHighlighting = () => this.updateHighlighting()
         this.sidebar.highlightSentence = (i) => reader.highlightSentence(i)
         this.sidebar.unhighlightSentence = (i) => reader.removeSentenceHighlighting(i)
@@ -146,7 +151,7 @@ export class Controller implements ControllerInterface {
     showUnscramble() {
         this.cleanupActivity();
         let unscramble = new Unscramble(this)
-        unscramble.onClickWord = (word) => this.sidebar.showWord(word)
+        unscramble.onClickWord = (word) => this.sidebar.showWord(word.word)
         this.sidebar.showSentence(unscramble.sentence)
         this.sidebar.loadActivity(unscramble)
         this.sidebar.checkAnswer = () => unscramble.checkAnswer()

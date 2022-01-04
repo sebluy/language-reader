@@ -75,7 +75,7 @@ export class LanguageText {
         });
     }
     onLoad() { }
-    updateDefinition(word, definition) {
+    updateWordDefinition(word, definition) {
         const wordData = this.words.get(word);
         if (wordData.definition === definition)
             return;
@@ -88,6 +88,16 @@ export class LanguageText {
         console.log('Updating definition... for ' + word + ' to ' + definition);
         this.db.putWords([wordData]);
         this.onUpdateDefinition(word);
+    }
+    updateSentenceDefinition(sentence, definition) {
+        let sentenceO = this.sentenceMap.get(sentence);
+        if (sentenceO.definition === definition)
+            return;
+        if (sentenceO.definition === '')
+            this.controller.addXP(5);
+        sentenceO.definition = definition;
+        console.log('Updating definition... for ' + sentence + ' to ' + definition);
+        this.db.putSentence(sentenceO);
     }
     onUpdateDefinition(word) { }
     updateMastery(words) {
@@ -142,6 +152,8 @@ export class LanguageText {
         this.sentenceMap.forEach(sentence => {
             this.db.getSentence(sentence.sentence).then(row => {
                 if (row !== undefined) {
+                    if (row.definition !== undefined)
+                        sentence.definition = row.definition;
                     sentence.startTime = row.startTime;
                     sentence.endTime = row.endTime;
                     sentence.mastery = row.mastery;

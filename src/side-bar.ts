@@ -6,6 +6,7 @@ import { Sentence } from './sentence.js'
 import { ControllerInterface } from './controller-interface.js'
 import { Listening } from './listening.js'
 import { VocabInContext } from './vocab-in-context.js'
+import { Cloze } from './cloze.js'
 
 export class SideBar {
 
@@ -20,10 +21,13 @@ export class SideBar {
     marker: number
 
     wordE: HTMLElement
-    definitionE: HTMLInputElement
+    wordDefinitionE: HTMLInputElement
+    googleTranslateWordB: HTMLElement
+    sentenceE: HTMLElement
+    sentenceDefinitionE: HTMLInputElement
+    googleTranslateSentenceB: HTMLElement
     statsE: HTMLElement
     highlightCB: HTMLElement
-    googleTranslateB: HTMLElement
     audioE: HTMLAudioElement
     audioStartE: HTMLInputElement
     audioEndE: HTMLInputElement
@@ -39,11 +43,23 @@ export class SideBar {
     }
 
     setElementsAndListeners() {
+        // TODO: maybe make a widget for these 3 elements, and reuse it for sentences
         this.wordE = document.getElementById('word')
-        this.definitionE = <HTMLInputElement>document.getElementById('definition')
+        this.wordDefinitionE = <HTMLInputElement>document.getElementById('word-definition')
+        this.wordDefinitionE.addEventListener('focusout', () => this.updateWordDefinition())
+        this.wordDefinitionE.addEventListener('keydown', (e) => this.nextWord(e))
+        this.googleTranslateWordB = document.getElementById('google-translate-word')
+        this.googleTranslateWordB.addEventListener('click', () => this.googleTranslateWord())
+
+        this.sentenceE = document.getElementById('sentence')
+        this.sentenceDefinitionE = <HTMLInputElement>document.getElementById('sentence-definition')
+        this.sentenceDefinitionE.addEventListener('focusout', () => this.updateSentenceDefinition())
+        this.sentenceDefinitionE.addEventListener('keydown', (e) => this.nextSentence(e))
+        this.googleTranslateSentenceB = document.getElementById('google-translate-sentence')
+        this.googleTranslateSentenceB.addEventListener('click', () => this.googleTranslateSentence())
+
         this.statsE = document.getElementById('stats')
         this.highlightCB = document.getElementById('highlight')
-        this.googleTranslateB = document.getElementById('google-translate')
         this.audioE = <HTMLAudioElement>document.getElementById('audio')
         this.audioStartE = <HTMLInputElement>document.getElementById('audio-start')
         this.audioEndE = <HTMLInputElement>document.getElementById('audio-end')
@@ -51,13 +67,10 @@ export class SideBar {
         this.nextPageE = document.getElementById('next-page')
         this.checkAnswerE = document.getElementById('check-answer')
 
-        this.definitionE.addEventListener('focusout', () => this.updateDefinition())
-        this.definitionE.addEventListener('keydown', (e) => this.nextWord(e))
         this.highlightCB.addEventListener('click', () => {
             this.highlightingOn = !this.highlightingOn
             this.updateHighlighting();
         })
-        this.googleTranslateB.addEventListener('click', () => this.googleTranslate())
         this.audioStartE.addEventListener('focusout', () => this.updateAudioTimes())
         this.audioEndE.addEventListener('focusout', () => this.updateAudioTimes())
         this.previousPageE.addEventListener('click', (e) => this.controller.changePageBy(-1))
@@ -115,6 +128,7 @@ export class SideBar {
     }
 
     handleKey(e) {
+        if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
         if (e.key === 'p') {
             if (this.audioE.paused) {
                 this.playAudio()
@@ -130,23 +144,30 @@ export class SideBar {
         }
     }
 
-    updateDefinition() {
+    updateWordDefinition() {
         const word = this.wordE.innerHTML
-        const definition = this.definitionE.value
-        this.languageText.updateDefinition(word, definition)
+        const definition = this.wordDefinitionE.value
+        this.languageText.updateWordDefinition(word, definition)
     }
 
-    showWord(word)
-    {
-        word = this.languageText.words.get(word)
-        if (word === undefined) return
-        this.wordE.innerText = word.word
-        this.definitionE.value = word.definition
-        this.definitionE.focus()
+    updateSentenceDefinition() {
+        const sentence = this.sentenceE.innerText
+        const definition = this.sentenceDefinitionE.value
+        this.languageText.updateSentenceDefinition(sentence, definition)
     }
 
-    showSentence(sentence)
-    {
+    showWord(word: string, sentence?: string) {
+        let wordO = this.languageText.words.get(word)
+        let sentenceO = this.languageText.sentenceMap.get(sentence)
+        if (wordO === undefined || sentenceO === undefined) return
+        this.wordE.innerText = wordO.word
+        this.wordDefinitionE.value = wordO.definition
+        this.wordDefinitionE.focus()
+        this.sentenceE.innerText = sentenceO.sentence
+        this.sentenceDefinitionE.value = sentenceO.definition
+    }
+
+    showSentence(sentence) {
         if (sentence === undefined) {
             this.currentSentence = undefined
             this.audioStartE.value = this.audioEndE.value = ''
@@ -163,18 +184,36 @@ export class SideBar {
     nextWord(e) {
         if (e.key === 'Tab') {
             e.preventDefault()
-            this.definitionE.blur()
+            this.wordDefinitionE.blur()
             this.onNextWord()
         }
         e.stopPropagation()
     }
 
-    googleTranslate() {
+    nextSentence(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault()
+            this.sentenceDefinitionE.blur()
+            this.onNextSentence()
+        }
+        e.stopPropagation()
+    }
+
+    googleTranslateWord() {
         const word = this.wordE.innerText
         const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + word
         fetch(url).then(res => res.json()).then(res => {
-            this.definitionE.value = res[0][0][0]
-            this.definitionE.focus()
+            this.wordDefinitionE.value = res[0][0][0]
+            this.wordDefinitionE.focus()
+        })
+    }
+
+    googleTranslateSentence() {
+        const sentence = this.sentenceE.innerText
+        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + sentence
+        fetch(url).then(res => res.json()).then(res => {
+            this.sentenceDefinitionE.value = res[0][0][0]
+            this.sentenceDefinitionE.focus()
         })
     }
 
@@ -254,9 +293,13 @@ export class SideBar {
         let us = activity instanceof Unscramble
         let l = activity instanceof Listening
         let v = activity instanceof VocabInContext
-        this.showElement(this.wordE, r || us || l || v)
-        this.showElement(this.definitionE, r || us || l || v)
-        this.showElement(this.googleTranslateB, r || us || l || v)
+        let c = activity instanceof Cloze
+        this.showElement(this.wordE, r || us || l || v || c)
+        this.showElement(this.wordDefinitionE, r || us || l || v || c)
+        this.showElement(this.googleTranslateWordB, r || us || l || v || c)
+        this.showElement(this.sentenceE, r)
+        this.showElement(this.sentenceDefinitionE, r)
+        this.showElement(this.googleTranslateSentenceB, r)
         this.showElement(this.audioE, r || us || l || v)
         this.showElement(this.highlightCB, r)
         this.showElement(this.previousPageE, r)
@@ -271,6 +314,7 @@ export class SideBar {
     checkAnswer() {}
     updateHighlighting() {}
     onNextWord() {}
+    onNextSentence() {}
 
 }
 

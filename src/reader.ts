@@ -43,14 +43,16 @@ export class Reader implements Activity {
             const oldWordE = document.querySelector('span.selected')
             if (oldWordE) oldWordE.classList.remove('selected')
             e.target.classList.add('selected')
-            const word = Utility.cleanWord(e.target.innerHTML)
+            let word = Utility.cleanWord(e.target.innerText)
+            let sentence = e.target.parentElement.innerText.trim()
             let wordO = this.languageText.words.get(word)
-            if (wordO === undefined) return
-            this.onClickWord(word)
+            let sentenceO = this.languageText.sentenceMap.get(sentence)
+            if (wordO === undefined || sentenceO === undefined) return
+            this.onClickWord(word, sentence)
         }
     }
 
-    onClickWord(word: Word) {}
+    onClickWord(word: string, sentence: string) {}
 
     nextWord() {
         const current = document.querySelector('span.selected')
@@ -61,6 +63,15 @@ export class Reader implements Activity {
             return
         }
         let parentSibling = current.parentNode.nextSibling
+        if (parentSibling && parentSibling.firstChild) {
+            (<HTMLSpanElement>parentSibling.firstChild).click()
+        }
+    }
+
+    nextSentence() {
+        let current = document.querySelector('span.selected')
+        if (!current) return
+        let parentSibling = current.parentElement.nextElementSibling
         if (parentSibling && parentSibling.firstChild) {
             (<HTMLSpanElement>parentSibling.firstChild).click()
         }

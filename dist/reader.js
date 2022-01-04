@@ -26,14 +26,16 @@ export class Reader {
             if (oldWordE)
                 oldWordE.classList.remove('selected');
             e.target.classList.add('selected');
-            const word = Utility.cleanWord(e.target.innerHTML);
+            let word = Utility.cleanWord(e.target.innerText);
+            let sentence = e.target.parentElement.innerText.trim();
             let wordO = this.languageText.words.get(word);
-            if (wordO === undefined)
+            let sentenceO = this.languageText.sentenceMap.get(sentence);
+            if (wordO === undefined || sentenceO === undefined)
                 return;
-            this.onClickWord(word);
+            this.onClickWord(word, sentence);
         }
     }
-    onClickWord(word) { }
+    onClickWord(word, sentence) { }
     nextWord() {
         const current = document.querySelector('span.selected');
         if (!current)
@@ -44,6 +46,15 @@ export class Reader {
             return;
         }
         let parentSibling = current.parentNode.nextSibling;
+        if (parentSibling && parentSibling.firstChild) {
+            parentSibling.firstChild.click();
+        }
+    }
+    nextSentence() {
+        let current = document.querySelector('span.selected');
+        if (!current)
+            return;
+        let parentSibling = current.parentElement.nextElementSibling;
         if (parentSibling && parentSibling.firstChild) {
             parentSibling.firstChild.click();
         }

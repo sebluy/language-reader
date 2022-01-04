@@ -1,6 +1,7 @@
 export class Sentence {
-    constructor(sentence, mastery = 0) {
+    constructor(sentence, definition = '', mastery = 0) {
         this.sentence = sentence;
+        this.definition = definition;
         this.mastery = mastery;
     }
     nextMastery() {

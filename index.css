@@ -42,6 +42,20 @@
     text-align: center;
 }
 
+#sentence {
+    display: block;
+    margin: 10px;
+    text-align: center;
+}
+
+.side-bar textarea {
+    width: 242px;
+    height: 150px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
 .side-bar input {
     width: 242px;
     text-align: center;
@@ -99,7 +113,7 @@ span.matching-item {
 }
 
 .selected {
-    box-shadow: inset 0 0 0 5px yellow;
+    background-color: yellow;
 }
 
 .multiple-choice {

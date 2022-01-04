@@ -1,12 +1,14 @@
 
 export class Sentence {
     sentence: string
+    definition: string
     mastery: number
     startTime: number
     endTime: number
 
-    constructor(sentence, mastery = 0) {
+    constructor(sentence, definition = '', mastery = 0) {
         this.sentence = sentence
+        this.definition = definition
         this.mastery = mastery
     }
 
