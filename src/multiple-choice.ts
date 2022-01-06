@@ -14,6 +14,7 @@ export class MultipleChoice {
     }
 
     createOptions(pool: Array<string>) {
+        // TODO: bug with 2 options showing up twice
         this.options = [this.solution]
         while (this.options.length < 4) {
             let option = Utility.randomItem(pool)

@@ -6,7 +6,7 @@ export class VocabularyMatching {
         this.elementGrid = [];
         this.shuffledElements = [];
         this.selectedIndex = 0;
-        this.textE = Utility.resetMainView('Vocabulary Matching');
+        this.textE = Utility.resetMainView('Vocabulary Matching', 'TODO');
         this.getRandomWords();
         this.buildGrid();
         this.selectElement(this.nextDefinition());

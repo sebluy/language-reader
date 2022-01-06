@@ -7,6 +7,7 @@ export class MultipleChoice {
         document.addEventListener('keydown', this.keyListener);
     }
     createOptions(pool) {
+        // TODO: bug with 2 options showing up twice
         this.options = [this.solution];
         while (this.options.length < 4) {
             let option = Utility.randomItem(pool);

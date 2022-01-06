@@ -4,7 +4,7 @@ export class Unscramble {
         this.controller = controller;
         this.languageText = controller.languageText;
         this.sentence = this.languageText.getNextSentenceByMastery();
-        this.textE = Utility.resetMainView('Unscramble');
+        this.textE = Utility.resetMainView('Unscramble', 'TODO');
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         console.log(this.sentence);
         this.words = this.sentence.getRawWords();
@@ -50,6 +50,9 @@ export class Unscramble {
                 onDrop: () => this.build(this.getCurrentOrder())
             }));
         });
+        let p = document.createElement('p');
+        p.innerText = this.sentence.definition;
+        this.textE.append(p);
     }
     clickWord(e) {
         if (e.target.matches('span')) {

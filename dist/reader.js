@@ -3,7 +3,7 @@ export class Reader {
     constructor(controller) {
         this.controller = controller;
         this.languageText = controller.languageText;
-        this.textE = Utility.resetMainView('Reader');
+        this.textE = Utility.resetMainView('Reader', 'Page ' + (this.controller.runtimeData.currentPage + 1));
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         this.load();
     }

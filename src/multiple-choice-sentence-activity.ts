@@ -22,24 +22,21 @@ export abstract class MultipleChoiceSentenceActivity implements Activity {
         this.controller = controller
         this.languageText = controller.languageText
         this.index = index % this.languageText.sentences.length
-        this.textE = Utility.resetMainView(this.title())
-
         this.pickSentenceAndWord()
+        this.textE = Utility.resetMainView(this.title(), 'Sentence ' + (this.index + 1))
         this.createTextView()
         this.createMultipleChoice()
     }
 
     pickSentenceAndWord() {
-        let i = this.index
-        while (true) {
-            this.rawSentence = this.languageText.sentences[i]
+        for (let i = 0; i <= this.languageText.sentences.length; i += 1) {
+            this.rawSentence = this.languageText.sentences[this.index]
             this.sentence = this.languageText.sentenceMap.get(this.rawSentence.clean)
             this.word = this.languageText.leastMasteredWord(this.rawSentence)
-            if (i === this.index) break
             if (this.word.mastery < Word.MAX_MASTERY) break
-            i = (i + 1) % this.languageText.sentences.length
+            if (i === this.languageText.sentences.length) break;
+            this.index = (this.index + 1) % this.languageText.sentences.length
         }
-        this.index = i
         console.log('Sentence index: ' + this.index)
     }
 

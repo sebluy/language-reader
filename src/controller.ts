@@ -11,6 +11,14 @@ import { Listening } from './listening.js'
 import { VocabInContext } from './vocab-in-context.js'
 import { Cloze } from './cloze.js'
 
+// TODO: add a component for the main view which encapsulates the activity
+// TODO: add some tests
+// TODO: why is cloze not mastering every time?
+// TODO: add the page number to the reader
+// TODO: add the sentence number to the activity
+// TODO: add sentence translation to unscramble
+// TODO: add an auto option that goes through the activities in order
+// TODO: change activity picker to a select field
 // TODO: fix right sidebar for the various activities
 // TODO: remove sentence mastery and just update all the words for unscramble
 // TODO: disable audio shortcuts when typing in defintions

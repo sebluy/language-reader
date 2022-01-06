@@ -1,7 +1,6 @@
 import { Utility } from './utility.js'
 import { LanguageText } from './language-text.js'
 import { RawSentence } from './raw-sentence.js'
-import { Word } from './word.js'
 import { ControllerInterface } from './controller-interface.js'
 import { Activity } from './controller.js'
 
@@ -18,7 +17,7 @@ export class Reader implements Activity {
     constructor(controller) {
         this.controller = controller
         this.languageText = controller.languageText
-        this.textE = Utility.resetMainView('Reader')
+        this.textE = Utility.resetMainView('Reader', 'Page ' + (this.controller.runtimeData.currentPage + 1))
         this.textE.addEventListener('click', (e) => this.clickWord(e))
         this.load()
     }
