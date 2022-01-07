@@ -3,7 +3,7 @@ export class Unscramble {
     constructor(controller) {
         this.controller = controller;
         this.languageText = controller.languageText;
-        this.sentence = this.languageText.getNextSentenceByMastery();
+        this.sentence = null; // TODO: fix this for new mastery
         this.textE = Utility.resetMainView('Unscramble', 'TODO');
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         console.log(this.sentence);
@@ -18,7 +18,6 @@ export class Unscramble {
             if (this.words[i] !== current[i])
                 return;
         }
-        this.sentence.nextMastery();
         this.languageText.updateSentence(this.sentence);
         this.controller.addXP(this.words.length * 3);
         this.controller.showUnscramble();

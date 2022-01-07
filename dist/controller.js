@@ -88,6 +88,22 @@ export class Controller {
             this.sidebar.setAudioSource(url);
         }
     }
+    showActivity(name) {
+        if (name === 'reader')
+            this.showReader();
+        else if (name === 'vocab-in-context')
+            this.showVocabInContext();
+        else if (name === 'vocab-matching')
+            this.showVocabularyMatching();
+        else if (name === 'listening')
+            this.showListening();
+        else if (name === 'listening-2')
+            this.showListening2();
+        else if (name === 'cloze')
+            this.showCloze();
+        else if (name === 'unscramble')
+            this.showUnscramble();
+    }
     showReader() {
         this.cleanupActivity();
         let reader = new Reader(this);

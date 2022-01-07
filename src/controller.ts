@@ -13,18 +13,15 @@ import { Cloze } from './cloze.js'
 import { Listening2 } from './listening2.js'
 
 // TODO: re-architect to make the activity the driver, have it coordinate with the rest
-// TODO: add another listening task with just the audio with multiple choice audio
 // TODO: add a component for the main view which encapsulates the activity
 // TODO: add some tests
-// TODO: why is cloze not mastering every time?
 // TODO: add the page number to the reader
 // TODO: add the sentence number to the activity
-// TODO: add sentence translation to unscramble
 // TODO: add an auto option that goes through the activities in order
 // TODO: change activity picker to a select field
 // TODO: fix right sidebar for the various activities
 // TODO: remove sentence mastery and just update all the words for unscramble
-// TODO: disable audio shortcuts when typing in defintions
+// TODO: disable audio shortcuts when typing in definitions
 // TODO: add a Google translate icon to the right instead of a button
 // TODO: continue textview refactor
 // TODO: keep working on Cloze
@@ -141,6 +138,16 @@ export class Controller implements ControllerInterface {
         } else {
             this.sidebar.setAudioSource(url)
         }
+    }
+
+    showActivity(name: string) {
+        if (name === 'reader') this.showReader()
+        else if (name === 'vocab-in-context') this.showVocabInContext()
+        else if (name === 'vocab-matching') this.showVocabularyMatching()
+        else if (name === 'listening') this.showListening()
+        else if (name === 'listening-2') this.showListening2()
+        else if (name === 'cloze') this.showCloze()
+        else if (name === 'unscramble') this.showUnscramble()
     }
 
     showReader() {

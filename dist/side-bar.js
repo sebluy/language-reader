@@ -48,20 +48,8 @@ export class SideBar {
             .addEventListener('click', () => this.controller.openTextFile());
         document.getElementById('open-audio-file')
             .addEventListener('click', () => this.controller.openAudioFile());
-        document.getElementById('reader')
-            .addEventListener('click', () => this.controller.showReader());
-        document.getElementById('vocab-matching')
-            .addEventListener('click', () => this.controller.showVocabularyMatching());
-        document.getElementById('unscramble')
-            .addEventListener('click', () => this.controller.showUnscramble());
-        document.getElementById('listening')
-            .addEventListener('click', () => this.controller.showListening());
-        document.getElementById('listening-2')
-            .addEventListener('click', () => this.controller.showListening2());
-        document.getElementById('vocab-in-context')
-            .addEventListener('click', () => this.controller.showVocabInContext());
-        document.getElementById('cloze')
-            .addEventListener('click', () => this.controller.showCloze());
+        let select = document.getElementById('activity-select');
+        select.addEventListener('click', () => this.controller.showActivity(select.value));
         document.getElementById('export')
             .addEventListener('click', () => this.controller.exportDatabase());
         document.getElementById('import')
@@ -188,7 +176,6 @@ export class SideBar {
             ['tr', ['td', 'Total Words Translated'], ['td', stats.totalWordsTranslated]],
             ['tr', ['td', 'Words Learned Today'], ['td', stats.wordsLearnedToday]],
             ['tr', ['td', 'Words mastered'], ['td', fp(stats.percentWordsMastered)]],
-            ['tr', ['td', 'Sentences mastered'], ['td', fp(stats.percentSentencesMastered)]],
             ['tr', ['td', 'Today\'s XP'], ['td', runtimeData.xpToday]],
             ['tr', ['td', 'Yesterday\'s XP'], ['td', runtimeData.xpYesterday]]
         ]);

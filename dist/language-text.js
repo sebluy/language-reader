@@ -113,13 +113,8 @@ export class LanguageText {
             numberOfWords += data.count;
             countTranslated += data.getTranslatedCount();
         });
-        let sMastered = 0;
-        this.sentenceMap.forEach((data) => {
-            sMastered += data.mastery;
-        });
         let percentTranslated = countTranslated === 0 ? 0 : countTranslated / numberOfWords;
         let percentWMastered = wMastered / (this.words.size * 5);
-        let percentSMastered = sMastered / (this.sentenceMap.size * 5);
         return {
             numberOfWords: numberOfWords,
             numberOfDistinctWords: this.words.size,
@@ -127,7 +122,6 @@ export class LanguageText {
             wordsLearnedToday: this.wordsLearnedToday,
             percentTranslated: percentTranslated,
             percentWordsMastered: percentWMastered,
-            percentSentencesMastered: percentSMastered,
         };
     }
     extractSentences() {
@@ -156,7 +150,6 @@ export class LanguageText {
                         sentence.definition = row.definition;
                     sentence.startTime = row.startTime;
                     sentence.endTime = row.endTime;
-                    sentence.mastery = row.mastery;
                 }
                 this.markLoaded();
             });
@@ -196,18 +189,6 @@ export class LanguageText {
     updateSentence(sentence) {
         this.sentenceMap.set(sentence.sentence, sentence);
         this.db.putSentence(sentence);
-    }
-    getNextSentenceByMastery() {
-        let values = Array.from(this.sentenceMap.values());
-        if (values.length === 0)
-            return null;
-        let mastery = values.map((v) => v.mastery);
-        let minimum = Math.min(...mastery);
-        for (let i in this.sentences) {
-            let sentenceO = this.sentenceMap.get(this.sentences[i].clean);
-            if (sentenceO.mastery === minimum)
-                return sentenceO;
-        }
     }
     getWordMap(words) {
         let map = new Map();

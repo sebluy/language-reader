@@ -2,9 +2,6 @@ import { MultipleChoice } from './multiple-choice.js';
 import { TextView } from './text-view.js';
 import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
 export class Cloze extends MultipleChoiceSentenceActivity {
-    // TODO: dedupe with listening and vocab in context
-    // TODO: dedupe using text area object?
-    // TODO: add full sentence translation
     title() {
         return 'Cloze';
     }

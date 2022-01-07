@@ -12,6 +12,7 @@ export interface ControllerInterface {
     importDatabase()
     exportDatabase()
 
+    showActivity(name: string)
     showReader()
     showUnscramble()
     showVocabularyMatching()

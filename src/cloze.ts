@@ -4,10 +4,6 @@ import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activ
 
 export class Cloze extends MultipleChoiceSentenceActivity {
 
-    // TODO: dedupe with listening and vocab in context
-    // TODO: dedupe using text area object?
-    // TODO: add full sentence translation
-
     title() {
         return 'Cloze'
     }
