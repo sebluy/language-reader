@@ -7,6 +7,7 @@ import { ControllerInterface } from './controller-interface.js'
 import { Listening } from './listening.js'
 import { VocabInContext } from './vocab-in-context.js'
 import { Cloze } from './cloze.js'
+import { Listening2 } from './listening2.js'
 
 export class SideBar {
 
@@ -35,6 +36,7 @@ export class SideBar {
     nextPageE: HTMLElement
     checkAnswerE: HTMLElement
     listeningE: HTMLElement
+    listening2E: HTMLElement
 
     constructor(controller) {
         this.controller = controller
@@ -93,6 +95,8 @@ export class SideBar {
             .addEventListener('click', () => this.controller.showUnscramble())
         document.getElementById('listening')
             .addEventListener('click', () => this.controller.showListening())
+        document.getElementById('listening-2')
+            .addEventListener('click', () => this.controller.showListening2())
         document.getElementById('vocab-in-context')
             .addEventListener('click', () => this.controller.showVocabInContext())
         document.getElementById('cloze')
@@ -294,18 +298,19 @@ export class SideBar {
         let l = activity instanceof Listening
         let v = activity instanceof VocabInContext
         let c = activity instanceof Cloze
+        let l2 = activity instanceof Listening2
         this.showElement(this.wordE, r || us || l || v || c)
         this.showElement(this.wordDefinitionE, r || us || l || v || c)
         this.showElement(this.googleTranslateWordB, r || us || l || v || c)
         this.showElement(this.sentenceE, r)
         this.showElement(this.sentenceDefinitionE, r)
         this.showElement(this.googleTranslateSentenceB, r)
-        this.showElement(this.audioE, r || us || l || v)
+        this.showElement(this.audioE, r || us || l || v || l2)
         this.showElement(this.highlightCB, r)
         this.showElement(this.previousPageE, r)
         this.showElement(this.nextPageE, r)
-        this.showElement(this.audioStartE, us || l || v)
-        this.showElement(this.audioEndE, us || l || v)
+        this.showElement(this.audioStartE, us || l || v || l2)
+        this.showElement(this.audioEndE, us || l || v || l2)
         this.showElement(this.checkAnswerE, us)
     }
 

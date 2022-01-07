@@ -241,6 +241,10 @@ export class LanguageText {
         return Array.from(this.words).map((v) => v[1].word)
     }
 
+    getSentenceDefinitionArray() {
+        return Array.from(this.sentenceMap).map((v) => v[1].definition)
+    }
+
     getDefinitionArray() {
         return Array.from(this.words).map((v) => v[1].definition)
     }
@@ -249,6 +253,5 @@ export class LanguageText {
         let wordMap = this.getWordMap(rawSentence.getWords())
         return Utility.randomWordsByMastery(wordMap, 1)[0]
     }
-
 
 }

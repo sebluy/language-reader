@@ -9,10 +9,12 @@ export class MultipleChoice {
     createOptions(pool) {
         // TODO: bug with 2 options showing up twice
         this.options = [this.solution];
-        while (this.options.length < 4) {
+        for (let i = 0; i < 20; i += 1) {
             let option = Utility.randomItem(pool);
             if (this.options.indexOf(option) === -1)
                 this.options.push(option);
+            if (this.options.length === 4)
+                break;
         }
         Utility.shuffle(this.options);
     }

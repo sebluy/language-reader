@@ -18,6 +18,7 @@ import { SideBar } from './side-bar.js';
 import { Listening } from './listening.js';
 import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
+import { Listening2 } from './listening2.js';
 export class Controller {
     constructor() {
         this.db = new LanguageDb();
@@ -123,6 +124,13 @@ export class Controller {
         this.cleanupActivity();
         let listening = new Listening(this, index);
         listening.onClickWord = (word) => this.sidebar.showWord(word);
+        this.sidebar.showSentence(listening.sentence);
+        this.sidebar.loadActivity(listening);
+        this.activity = listening;
+    }
+    showListening2(index = 0) {
+        this.cleanupActivity();
+        let listening = new Listening2(this, index);
         this.sidebar.showSentence(listening.sentence);
         this.sidebar.loadActivity(listening);
         this.activity = listening;

@@ -10,7 +10,10 @@ import { ControllerInterface } from './controller-interface.js'
 import { Listening } from './listening.js'
 import { VocabInContext } from './vocab-in-context.js'
 import { Cloze } from './cloze.js'
+import { Listening2 } from './listening2.js'
 
+// TODO: re-architect to make the activity the driver, have it coordinate with the rest
+// TODO: add another listening task with just the audio with multiple choice audio
 // TODO: add a component for the main view which encapsulates the activity
 // TODO: add some tests
 // TODO: why is cloze not mastering every time?
@@ -178,6 +181,14 @@ export class Controller implements ControllerInterface {
         this.cleanupActivity();
         let listening = new Listening(this, index)
         listening.onClickWord = (word) => this.sidebar.showWord(word)
+        this.sidebar.showSentence(listening.sentence)
+        this.sidebar.loadActivity(listening)
+        this.activity = listening
+    }
+
+    showListening2(index = 0) {
+        this.cleanupActivity();
+        let listening = new Listening2(this, index)
         this.sidebar.showSentence(listening.sentence)
         this.sidebar.loadActivity(listening)
         this.activity = listening

@@ -219,6 +219,9 @@ export class LanguageText {
     getWordStrArray() {
         return Array.from(this.words).map((v) => v[1].word);
     }
+    getSentenceDefinitionArray() {
+        return Array.from(this.sentenceMap).map((v) => v[1].definition);
+    }
     getDefinitionArray() {
         return Array.from(this.words).map((v) => v[1].definition);
     }
