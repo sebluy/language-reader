@@ -7,7 +7,7 @@ export class Cloze extends MultipleChoiceSentenceActivity {
     }
     createTextView() {
         let textView = new TextView(this.rawSentence);
-        textView.onClickWord = this.onClickWord;
+        textView.onClickWord = (word) => this.onClickWord(word);
         textView.renderWord = (word, clean) => {
             if (clean === this.word.word)
                 textView.renderBlank();

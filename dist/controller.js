@@ -19,10 +19,12 @@ import { Listening } from './listening.js';
 import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
+import { MainWindow } from './main-window.js';
 export class Controller {
     constructor() {
         this.db = new LanguageDb();
         this.sidebar = new SideBar(this);
+        this.mainWindow = new MainWindow();
         this.load();
     }
     load() {
@@ -107,7 +109,6 @@ export class Controller {
     showReader() {
         this.cleanupActivity();
         let reader = new Reader(this);
-        reader.onClickWord = (word, sentence) => this.sidebar.showWord(word, sentence);
         this.sidebar.showSentence(undefined);
         this.sidebar.setAudio(reader.getFirstSentence().startTime);
         this.sidebar.loadActivity(reader);

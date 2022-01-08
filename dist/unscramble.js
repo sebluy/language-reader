@@ -4,7 +4,8 @@ export class Unscramble {
         this.controller = controller;
         this.languageText = controller.languageText;
         this.sentence = null; // TODO: fix this for new mastery
-        this.textE = Utility.resetMainView('Unscramble', 'TODO');
+        this.controller.mainWindow.reset('Unscramble', 'TODO');
+        this.textE = this.controller.mainWindow.contentDiv;
         this.textE.addEventListener('click', (e) => this.clickWord(e));
         console.log(this.sentence);
         this.words = this.sentence.getRawWords();

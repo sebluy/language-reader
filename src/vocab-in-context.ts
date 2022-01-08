@@ -10,7 +10,7 @@ export class VocabInContext extends MultipleChoiceSentenceActivity {
 
     createTextView() {
         let textView = new TextView(this.rawSentence)
-        textView.onClickWord = this.onClickWord
+        textView.onClickWord = (word) => this.onClickWord(word)
         textView.renderWord = (word, clean) => {
             if (clean === this.word.word) textView.renderBoldWord(word)
             else textView.defaultRenderWord(word)

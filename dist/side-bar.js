@@ -5,6 +5,7 @@ import { Listening } from './listening.js';
 import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
+import { DefinitionInput } from './definition-input.js';
 export class SideBar {
     constructor(controller) {
         this.controller = controller;
@@ -12,19 +13,18 @@ export class SideBar {
         this.setElementsAndListeners();
     }
     setElementsAndListeners() {
-        // TODO: maybe make a widget for these 3 elements, and reuse it for sentences
-        this.wordE = document.getElementById('word');
-        this.wordDefinitionE = document.getElementById('word-definition');
-        this.wordDefinitionE.addEventListener('focusout', () => this.updateWordDefinition());
-        this.wordDefinitionE.addEventListener('keydown', (e) => this.nextWord(e));
-        this.googleTranslateWordB = document.getElementById('google-translate-word');
-        this.googleTranslateWordB.addEventListener('click', () => this.googleTranslateWord());
-        this.sentenceE = document.getElementById('sentence');
-        this.sentenceDefinitionE = document.getElementById('sentence-definition');
-        this.sentenceDefinitionE.addEventListener('focusout', () => this.updateSentenceDefinition());
-        this.sentenceDefinitionE.addEventListener('keydown', (e) => this.nextSentence(e));
-        this.googleTranslateSentenceB = document.getElementById('google-translate-sentence');
-        this.googleTranslateSentenceB.addEventListener('click', () => this.googleTranslateSentence());
+        this.wordDefinitionE = new DefinitionInput(document.getElementById('word-definition'));
+        this.wordDefinitionE.onUpdateDefinition = (text, definition) => {
+            this.languageText.updateWordDefinition(text, definition);
+        };
+        this.wordDefinitionE.onNext = () => this.onNextWord();
+        this.wordDefinitionE.render();
+        this.sentenceDefinitionE = new DefinitionInput(document.getElementById('sentence-definition'));
+        this.sentenceDefinitionE.onUpdateDefinition = (text, definition) => {
+            this.languageText.updateSentenceDefinition(text, definition);
+        };
+        this.sentenceDefinitionE.onNext = () => this.onNextSentence();
+        this.sentenceDefinitionE.render('textarea');
         this.statsE = document.getElementById('stats');
         this.highlightCB = document.getElementById('highlight');
         this.audioE = document.getElementById('audio');
@@ -98,26 +98,13 @@ export class SideBar {
             this.markAudio();
         }
     }
-    updateWordDefinition() {
-        const word = this.wordE.innerHTML;
-        const definition = this.wordDefinitionE.value;
-        this.languageText.updateWordDefinition(word, definition);
-    }
-    updateSentenceDefinition() {
-        const sentence = this.sentenceE.innerText;
-        const definition = this.sentenceDefinitionE.value;
-        this.languageText.updateSentenceDefinition(sentence, definition);
-    }
     showWord(word, sentence) {
         let wordO = this.languageText.words.get(word);
         let sentenceO = this.languageText.sentenceMap.get(sentence);
-        if (wordO === undefined || sentenceO === undefined)
-            return;
-        this.wordE.innerText = wordO.word;
-        this.wordDefinitionE.value = wordO.definition;
-        this.wordDefinitionE.focus();
-        this.sentenceE.innerText = sentenceO.sentence;
-        this.sentenceDefinitionE.value = sentenceO.definition;
+        if (wordO !== undefined)
+            this.wordDefinitionE.show(wordO.word, wordO.definition);
+        if (sentenceO !== undefined)
+            this.sentenceDefinitionE.show(sentenceO.sentence, sentenceO.definition, false);
     }
     showSentence(sentence) {
         if (sentence === undefined) {
@@ -132,38 +119,6 @@ export class SideBar {
         this.setAudio(sentence.startTime, sentence.endTime);
         if (sentence.startTime !== undefined)
             this.playAudio();
-    }
-    nextWord(e) {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            this.wordDefinitionE.blur();
-            this.onNextWord();
-        }
-        e.stopPropagation();
-    }
-    nextSentence(e) {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            this.sentenceDefinitionE.blur();
-            this.onNextSentence();
-        }
-        e.stopPropagation();
-    }
-    googleTranslateWord() {
-        const word = this.wordE.innerText;
-        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + word;
-        fetch(url).then(res => res.json()).then(res => {
-            this.wordDefinitionE.value = res[0][0][0];
-            this.wordDefinitionE.focus();
-        });
-    }
-    googleTranslateSentence() {
-        const sentence = this.sentenceE.innerText;
-        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + sentence;
-        fetch(url).then(res => res.json()).then(res => {
-            this.sentenceDefinitionE.value = res[0][0][0];
-            this.sentenceDefinitionE.focus();
-        });
     }
     updateStats() {
         let stats = this.languageText.updateStats();
@@ -235,12 +190,8 @@ export class SideBar {
         let v = activity instanceof VocabInContext;
         let c = activity instanceof Cloze;
         let l2 = activity instanceof Listening2;
-        this.showElement(this.wordE, r || us || l || v || c);
-        this.showElement(this.wordDefinitionE, r || us || l || v || c);
-        this.showElement(this.googleTranslateWordB, r || us || l || v || c);
-        this.showElement(this.sentenceE, r);
-        this.showElement(this.sentenceDefinitionE, r);
-        this.showElement(this.googleTranslateSentenceB, r);
+        this.showElement(this.wordDefinitionE.parent, r || us || l || v || c);
+        this.showElement(this.sentenceDefinitionE.parent, r);
         this.showElement(this.audioE, r || us || l || v || l2);
         this.showElement(this.highlightCB, r);
         this.showElement(this.previousPageE, r);

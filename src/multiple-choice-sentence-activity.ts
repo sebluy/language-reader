@@ -23,7 +23,8 @@ export abstract class MultipleChoiceSentenceActivity implements Activity {
         this.languageText = controller.languageText
         this.index = index % this.languageText.sentences.length
         this.pickSentenceAndWord()
-        this.textE = Utility.resetMainView(this.title(), 'Sentence ' + (this.index + 1))
+        this.controller.mainWindow.reset(this.title(), 'Sentence ' + (this.index + 1))
+        this.textE = this.controller.mainWindow.contentDiv
         this.createTextView()
         this.createMultipleChoice()
     }

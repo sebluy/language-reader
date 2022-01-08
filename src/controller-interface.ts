@@ -1,9 +1,13 @@
 import { RuntimeData } from './runtime-data.js'
 import { LanguageText } from './language-text.js'
+import { MainWindow } from './main-window.js'
+import { SideBar } from './side-bar.js'
 
 export interface ControllerInterface {
+    mainWindow: MainWindow
     runtimeData: RuntimeData
     languageText: LanguageText
+    sidebar: SideBar
 
     openTextFile()
     openAudioFile()

@@ -3,15 +3,17 @@ export class Reader {
     constructor(controller) {
         this.controller = controller;
         this.languageText = controller.languageText;
-        this.textE = Utility.resetMainView('Reader', 'Page ' + (this.controller.runtimeData.currentPage + 1));
-        this.textE.addEventListener('click', (e) => this.clickWord(e));
+        this.paragraphE = document.createElement('p');
+        this.paragraphE.addEventListener('click', (e) => this.clickWord(e));
+        this.controller.mainWindow.reset('Reader', 'Page ' + (this.controller.runtimeData.currentPage + 1));
+        this.controller.mainWindow.contentDiv.append(this.paragraphE);
         this.load();
     }
     cleanup() { }
     load(sentences = null) {
         if (sentences === null)
             this.sentences = this.languageText.sentences;
-        this.textE.innerHTML = '';
+        this.paragraphE.innerHTML = '';
         this.spansByWord = new Map();
         this.spansBySentence = [];
         this.spansBySentenceAndWord = [];
@@ -32,10 +34,9 @@ export class Reader {
             let sentenceO = this.languageText.sentenceMap.get(sentence);
             if (wordO === undefined || sentenceO === undefined)
                 return;
-            this.onClickWord(word, sentence);
+            this.controller.sidebar.showWord(word, sentence);
         }
     }
-    onClickWord(word, sentence) { }
     nextWord() {
         const current = document.querySelector('span.selected');
         if (!current)
@@ -86,7 +87,7 @@ export class Reader {
             let sentenceSpan = document.createElement('span');
             this.spansBySentence.push(sentenceSpan);
             this.spansBySentenceAndWord[i] = new Map();
-            this.textE.appendChild(sentenceSpan);
+            this.paragraphE.appendChild(sentenceSpan);
             wordsAndSpaces.forEach((word) => {
                 if (word.trim() === '') {
                     sentenceSpan.appendChild(document.createTextNode(word));

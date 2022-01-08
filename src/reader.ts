@@ -8,7 +8,7 @@ export class Reader implements Activity {
 
     controller: ControllerInterface
     languageText: LanguageText
-    textE: HTMLElement
+    paragraphE: HTMLElement
     sentences: Array<RawSentence>
     spansByWord: Map<string, Array<HTMLSpanElement>>
     spansBySentence: Array<HTMLSpanElement>
@@ -17,8 +17,10 @@ export class Reader implements Activity {
     constructor(controller) {
         this.controller = controller
         this.languageText = controller.languageText
-        this.textE = Utility.resetMainView('Reader', 'Page ' + (this.controller.runtimeData.currentPage + 1))
-        this.textE.addEventListener('click', (e) => this.clickWord(e))
+        this.paragraphE = document.createElement('p')
+        this.paragraphE.addEventListener('click', (e) => this.clickWord(e))
+        this.controller.mainWindow.reset('Reader', 'Page ' + (this.controller.runtimeData.currentPage + 1))
+        this.controller.mainWindow.contentDiv.append(this.paragraphE)
         this.load()
     }
 
@@ -26,7 +28,7 @@ export class Reader implements Activity {
 
     load(sentences = null) {
         if (sentences === null) this.sentences = this.languageText.sentences
-        this.textE.innerHTML = ''
+        this.paragraphE.innerHTML = ''
         this.spansByWord = new Map()
         this.spansBySentence = []
         this.spansBySentenceAndWord = []
@@ -47,11 +49,9 @@ export class Reader implements Activity {
             let wordO = this.languageText.words.get(word)
             let sentenceO = this.languageText.sentenceMap.get(sentence)
             if (wordO === undefined || sentenceO === undefined) return
-            this.onClickWord(word, sentence)
+            this.controller.sidebar.showWord(word, sentence)
         }
     }
-
-    onClickWord(word: string, sentence: string) {}
 
     nextWord() {
         const current = document.querySelector('span.selected')
@@ -103,7 +103,7 @@ export class Reader implements Activity {
             let sentenceSpan = document.createElement('span')
             this.spansBySentence.push(sentenceSpan)
             this.spansBySentenceAndWord[i] = new Map()
-            this.textE.appendChild(sentenceSpan)
+            this.paragraphE.appendChild(sentenceSpan)
             wordsAndSpaces.forEach((word) => {
                 if (word.trim() === '') {
                     sentenceSpan.appendChild(document.createTextNode(word))

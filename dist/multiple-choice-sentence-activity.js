@@ -1,4 +1,3 @@
-import { Utility } from './utility.js';
 import { Word } from './word.js';
 export class MultipleChoiceSentenceActivity {
     constructor(controller, index = 0) {
@@ -6,7 +5,8 @@ export class MultipleChoiceSentenceActivity {
         this.languageText = controller.languageText;
         this.index = index % this.languageText.sentences.length;
         this.pickSentenceAndWord();
-        this.textE = Utility.resetMainView(this.title(), 'Sentence ' + (this.index + 1));
+        this.controller.mainWindow.reset(this.title(), 'Sentence ' + (this.index + 1));
+        this.textE = this.controller.mainWindow.contentDiv;
         this.createTextView();
         this.createMultipleChoice();
     }

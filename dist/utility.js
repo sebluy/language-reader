@@ -148,15 +148,4 @@ export class Utility {
             file.text().then(text => cb(file.name, text));
         });
     }
-    static resetMainView(title, subTitle) {
-        let mainE = document.getElementById('main');
-        mainE.innerHTML = '';
-        let titleE = document.createElement('h2');
-        titleE.textContent = title;
-        let subTitleE = document.createElement('h3');
-        subTitleE.textContent = subTitle;
-        let textE = document.createElement('p');
-        mainE.append(titleE, subTitleE, textE);
-        return textE;
-    }
 }

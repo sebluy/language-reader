@@ -11,15 +11,18 @@ import { Listening } from './listening.js'
 import { VocabInContext } from './vocab-in-context.js'
 import { Cloze } from './cloze.js'
 import { Listening2 } from './listening2.js'
+import { MainWindow } from './main-window.js'
 
+// TODO: add an activity to play audio and give a multiple choice of words in the sentence
+// TODO: use anonymous classes instead of just overwriting properties
+// TODO: fix right sidebar for the various activities
 // TODO: re-architect to make the activity the driver, have it coordinate with the rest
-// TODO: add a component for the main view which encapsulates the activity
+// TODO: add a component for the "MainWindow" which encapsulates the activity
+// TODO: controller creates basic elements, activity does the rest
 // TODO: add some tests
 // TODO: add the page number to the reader
 // TODO: add the sentence number to the activity
 // TODO: add an auto option that goes through the activities in order
-// TODO: change activity picker to a select field
-// TODO: fix right sidebar for the various activities
 // TODO: remove sentence mastery and just update all the words for unscramble
 // TODO: disable audio shortcuts when typing in definitions
 // TODO: add a Google translate icon to the right instead of a button
@@ -65,12 +68,14 @@ export class Controller implements ControllerInterface {
     db: LanguageDb
     runtimeData: RuntimeData
     sidebar: SideBar
+    mainWindow: MainWindow
     languageText: LanguageText
     activity: Activity
 
     constructor() {
         this.db = new LanguageDb()
         this.sidebar = new SideBar(this)
+        this.mainWindow = new MainWindow()
         this.load();
     }
 
@@ -153,7 +158,6 @@ export class Controller implements ControllerInterface {
     showReader() {
         this.cleanupActivity();
         let reader = new Reader(this)
-        reader.onClickWord = (word, sentence) => this.sidebar.showWord(word, sentence)
         this.sidebar.showSentence(undefined)
         this.sidebar.setAudio(reader.getFirstSentence().startTime)
         this.sidebar.loadActivity(reader)
