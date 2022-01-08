@@ -29,6 +29,8 @@ export abstract class MultipleChoiceSentenceActivity implements Activity {
         this.createMultipleChoice()
     }
 
+    show() {}
+
     pickSentenceAndWord() {
         for (let i = 0; i <= this.languageText.sentences.length; i += 1) {
             this.rawSentence = this.languageText.sentences[this.index]

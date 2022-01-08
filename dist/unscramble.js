@@ -13,6 +13,11 @@ export class Unscramble {
         Utility.shuffle(shuffled);
         this.build(shuffled);
     }
+    show() {
+        let sidebar = this.controller.sidebar;
+        sidebar.showSentence(this.sentence);
+        sidebar.checkAnswer = () => this.checkAnswer();
+    }
     checkAnswer() {
         let current = this.getCurrentOrder();
         for (let i = 0; i < this.words.length; i++) {
@@ -21,7 +26,7 @@ export class Unscramble {
         }
         this.languageText.updateSentence(this.sentence);
         this.controller.addXP(this.words.length * 3);
-        this.controller.showUnscramble();
+        this.controller.showActivity(new Unscramble(this.controller));
     }
     getCurrentOrder() {
         let els = this.textE.getElementsByClassName('matching-item');
@@ -60,9 +65,8 @@ export class Unscramble {
             let wordO = this.languageText.words.get(word);
             if (wordO === undefined)
                 return;
-            this.onClickWord(word);
+            this.controller.sidebar.showWord(word.word);
         }
     }
-    onClickWord(word) { }
     cleanup() { }
 }

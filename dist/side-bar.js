@@ -35,7 +35,7 @@ export class SideBar {
         this.checkAnswerE = document.getElementById('check-answer');
         this.highlightCB.addEventListener('click', () => {
             this.highlightingOn = !this.highlightingOn;
-            this.updateHighlighting();
+            this.updateHighlighting(this.highlightingOn);
         });
         this.audioStartE.addEventListener('focusout', () => this.updateAudioTimes());
         this.audioEndE.addEventListener('focusout', () => this.updateAudioTimes());
@@ -49,7 +49,7 @@ export class SideBar {
         document.getElementById('open-audio-file')
             .addEventListener('click', () => this.controller.openAudioFile());
         let select = document.getElementById('activity-select');
-        select.addEventListener('click', () => this.controller.showActivity(select.value));
+        select.addEventListener('click', () => this.controller.showActivityByName(select.value));
         document.getElementById('export')
             .addEventListener('click', () => this.controller.exportDatabase());
         document.getElementById('import')
@@ -183,7 +183,7 @@ export class SideBar {
         this.audioE.src = source;
     }
     loadActivity(activity) {
-        this.updateStats();
+        // TODO: refactor
         let r = activity instanceof Reader;
         let us = activity instanceof Unscramble;
         let l = activity instanceof Listening;
@@ -203,7 +203,7 @@ export class SideBar {
     highlightSentence(i) { }
     unhighlightSentence(i) { }
     checkAnswer() { }
-    updateHighlighting() { }
+    updateHighlighting(on) { }
     onNextWord() { }
     onNextSentence() { }
 }

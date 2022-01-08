@@ -1,6 +1,9 @@
 import { MultipleChoice } from './multiple-choice.js';
 import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
 export class Listening2 extends MultipleChoiceSentenceActivity {
+    show() {
+        this.controller.sidebar.showSentence(this.sentence);
+    }
     title() {
         return 'Listening 2';
     }
@@ -12,7 +15,7 @@ export class Listening2 extends MultipleChoiceSentenceActivity {
             let words = this.rawSentence.getWords();
             this.languageText.updateMastery(words);
             this.controller.addXP(words.length);
-            this.controller.showListening2(this.index + 1);
+            this.controller.showActivity(new Listening2(this.controller, this.index + 1));
         };
         this.multipleChoice.render(this.textE);
     }

@@ -65,7 +65,7 @@ export class SideBar {
 
         this.highlightCB.addEventListener('click', () => {
             this.highlightingOn = !this.highlightingOn
-            this.updateHighlighting()
+            this.updateHighlighting(this.highlightingOn)
         })
         this.audioStartE.addEventListener('focusout', () => this.updateAudioTimes())
         this.audioEndE.addEventListener('focusout', () => this.updateAudioTimes())
@@ -82,7 +82,7 @@ export class SideBar {
             .addEventListener('click', () => this.controller.openAudioFile())
 
         let select = <HTMLSelectElement>document.getElementById('activity-select')
-        select.addEventListener('click', () => this.controller.showActivity(select.value))
+        select.addEventListener('click', () => this.controller.showActivityByName(select.value))
 
         document.getElementById('export')
             .addEventListener('click', () => this.controller.exportDatabase())
@@ -223,7 +223,7 @@ export class SideBar {
     }
 
     loadActivity(activity: Object) {
-        this.updateStats()
+        // TODO: refactor
         let r = activity instanceof Reader
         let us = activity instanceof Unscramble
         let l = activity instanceof Listening
@@ -244,7 +244,7 @@ export class SideBar {
     highlightSentence(i) {}
     unhighlightSentence(i) {}
     checkAnswer() {}
-    updateHighlighting() {}
+    updateHighlighting(on: boolean) {}
     onNextWord() {}
     onNextSentence() {}
 

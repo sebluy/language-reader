@@ -2,6 +2,7 @@ import { RuntimeData } from './runtime-data.js'
 import { LanguageText } from './language-text.js'
 import { MainWindow } from './main-window.js'
 import { SideBar } from './side-bar.js'
+import { Activity } from './controller.js'
 
 export interface ControllerInterface {
     mainWindow: MainWindow
@@ -16,14 +17,8 @@ export interface ControllerInterface {
     importDatabase()
     exportDatabase()
 
-    showActivity(name: string)
-    showReader()
-    showUnscramble()
-    showVocabularyMatching()
-    showListening(index?: number)
-    showListening2(index?: number)
-    showVocabInContext(index?: number)
-    showCloze(index?: number)
+    showActivityByName(name: string)
+    showActivity(activity: Activity)
 
     addXP(n: number)
 

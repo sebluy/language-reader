@@ -4,13 +4,17 @@ import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activ
 
 export class VocabInContext extends MultipleChoiceSentenceActivity {
 
+    show() {
+        this.controller.sidebar.showSentence(this.sentence)
+    }
+
     title() {
         return 'Vocabulary in Context'
     }
 
     createTextView() {
         let textView = new TextView(this.rawSentence)
-        textView.onClickWord = (word) => this.onClickWord(word)
+        textView.onClickWord = (word) => this.controller.sidebar.showWord(word)
         textView.renderWord = (word, clean) => {
             if (clean === this.word.word) textView.renderBoldWord(word)
             else textView.defaultRenderWord(word)
@@ -23,7 +27,7 @@ export class VocabInContext extends MultipleChoiceSentenceActivity {
         this.multipleChoice.onCorrectAnswer = () => {
             this.languageText.updateMastery([this.word.word])
             this.controller.addXP(1)
-            this.controller.showVocabInContext(this.index + 1)
+            this.controller.showActivity(new VocabInContext(this.controller, this.index + 1))
         }
         this.multipleChoice.render(this.textE)
     }

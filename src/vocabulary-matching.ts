@@ -36,6 +36,8 @@ export class VocabularyMatching implements Activity {
         document.addEventListener('keydown', this.keyListener);
     }
 
+    show() {}
+
     cleanup() {
         document.removeEventListener('keydown', this.keyListener);
     }
@@ -64,7 +66,7 @@ export class VocabularyMatching implements Activity {
             this.languageText.updateMastery(this.words)
         })
         this.controller.addXP(this.definitions.length)
-        this.controller.showVocabularyMatching();
+        this.controller.showActivity(new VocabularyMatching(this.controller));
     }
 
     buildGrid() {

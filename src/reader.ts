@@ -21,19 +21,27 @@ export class Reader implements Activity {
         this.paragraphE.addEventListener('click', (e) => this.clickWord(e))
         this.controller.mainWindow.reset('Reader', 'Page ' + (this.controller.runtimeData.currentPage + 1))
         this.controller.mainWindow.contentDiv.append(this.paragraphE)
-        this.load()
-    }
-
-    cleanup() {}
-
-    load(sentences = null) {
-        if (sentences === null) this.sentences = this.languageText.sentences
+        this.sentences = this.languageText.sentences
         this.paragraphE.innerHTML = ''
         this.spansByWord = new Map()
         this.spansBySentence = []
         this.spansBySentenceAndWord = []
         this.addSentences()
     }
+
+    show() {
+        let sidebar = this.controller.sidebar
+        sidebar.showSentence(undefined)
+        sidebar.setAudio(this.getFirstSentence().startTime)
+        sidebar.onNextWord = () => this.nextWord()
+        sidebar.onNextSentence = () => this.nextSentence()
+        sidebar.updateHighlighting = (on) => this.updateHighlighting(on)
+        sidebar.highlightSentence = (i) => this.highlightSentence(i)
+        sidebar.unhighlightSentence = (i) => this.removeSentenceHighlighting(i)
+        if (sidebar.highlightingOn) this.updateHighlighting(true)
+    }
+
+    cleanup() {}
 
     getFirstSentence() {
         return this.languageText.sentenceMap.get(this.sentences[0].clean)
