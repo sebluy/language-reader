@@ -5,6 +5,8 @@ export class Listening2 extends MultipleChoiceSentenceActivity {
 
     show() {
         this.controller.sidebar.showSentence(this.sentence)
+        this.controller.sidebar.showAudio()
+        this.controller.sidebar.showAudioTimes()
     }
 
     title() {

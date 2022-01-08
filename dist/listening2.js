@@ -3,6 +3,8 @@ import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activ
 export class Listening2 extends MultipleChoiceSentenceActivity {
     show() {
         this.controller.sidebar.showSentence(this.sentence);
+        this.controller.sidebar.showAudio();
+        this.controller.sidebar.showAudioTimes();
     }
     title() {
         return 'Listening 2';

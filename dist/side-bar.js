@@ -1,12 +1,7 @@
 import { Utility } from './utility.js';
-import { Reader } from './reader.js';
-import { Unscramble } from './unscramble.js';
-import { Listening } from './listening.js';
-import { VocabInContext } from './vocab-in-context.js';
-import { Cloze } from './cloze.js';
-import { Listening2 } from './listening2.js';
 import { DefinitionInput } from './definition-input.js';
 export class SideBar {
+    // TODO: extract object for audio
     constructor(controller) {
         this.controller = controller;
         this.highlightingOn = false;
@@ -182,23 +177,43 @@ export class SideBar {
     setAudioSource(source) {
         this.audioE.src = source;
     }
-    loadActivity(activity) {
-        // TODO: refactor
-        let r = activity instanceof Reader;
-        let us = activity instanceof Unscramble;
-        let l = activity instanceof Listening;
-        let v = activity instanceof VocabInContext;
-        let c = activity instanceof Cloze;
-        let l2 = activity instanceof Listening2;
-        this.showElement(this.wordDefinitionE.parent, r || us || l || v || c);
-        this.showElement(this.sentenceDefinitionE.parent, r);
-        this.showElement(this.audioE, r || us || l || v || l2);
-        this.showElement(this.highlightCB, r);
-        this.showElement(this.previousPageE, r);
-        this.showElement(this.nextPageE, r);
-        this.showElement(this.audioStartE, us || l || v || l2);
-        this.showElement(this.audioEndE, us || l || v || l2);
-        this.showElement(this.checkAnswerE, us);
+    hideAll() {
+        this.showElement(this.wordDefinitionE.parent, false);
+        this.showElement(this.sentenceDefinitionE.parent, false);
+        this.showElement(this.audioE, false);
+        this.showElement(this.highlightCB, false);
+        this.showElement(this.previousPageE, false);
+        this.showElement(this.nextPageE, false);
+        this.showElement(this.audioStartE, false);
+        this.showElement(this.audioEndE, false);
+        this.showElement(this.checkAnswerE, false);
+    }
+    showWordDefinition(onNextWord) {
+        this.onNextWord = onNextWord;
+        this.showElement(this.wordDefinitionE.parent, true);
+    }
+    showSentenceDefinition(onNextSentence) {
+        this.onNextSentence = onNextSentence;
+        this.showElement(this.sentenceDefinitionE.parent, true);
+    }
+    showAudio() {
+        this.showElement(this.audioE, true);
+    }
+    showAudioTimes() {
+        this.showElement(this.audioStartE, true);
+        this.showElement(this.audioEndE, true);
+    }
+    showHighlightButton(updateHighlighting) {
+        this.updateHighlighting = updateHighlighting;
+        this.showElement(this.highlightCB, true);
+    }
+    showPageButtons() {
+        this.showElement(this.previousPageE, true);
+        this.showElement(this.nextPageE, true);
+    }
+    showCheckAnswerButton(checkAnswer) {
+        this.checkAnswer = checkAnswer;
+        this.showElement(this.checkAnswerE, true);
     }
     highlightSentence(i) { }
     unhighlightSentence(i) { }

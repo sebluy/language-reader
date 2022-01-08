@@ -4,8 +4,12 @@ import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activ
 
 export class Listening extends MultipleChoiceSentenceActivity {
 
+    // TODO: Fix next word in word definition for these activities
     show(index = 0) {
         this.controller.sidebar.showSentence(this.sentence)
+        this.controller.sidebar.showWordDefinition()
+        this.controller.sidebar.showAudio()
+        this.controller.sidebar.showAudioTimes()
     }
 
     title() {

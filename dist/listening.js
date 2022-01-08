@@ -2,8 +2,12 @@ import { MultipleChoice } from './multiple-choice.js';
 import { TextView } from './text-view.js';
 import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
 export class Listening extends MultipleChoiceSentenceActivity {
+    // TODO: Fix next word in word definition for these activities
     show(index = 0) {
         this.controller.sidebar.showSentence(this.sentence);
+        this.controller.sidebar.showWordDefinition();
+        this.controller.sidebar.showAudio();
+        this.controller.sidebar.showAudioTimes();
     }
     title() {
         return 'Listening';

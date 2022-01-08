@@ -65,6 +65,20 @@ export class TextView {
         }
     }
 
+    nextWord() {
+        const current = document.querySelector('span.selected')
+        if (!current) return
+        let sibling = current.nextElementSibling
+        if (sibling) {
+            (<HTMLSpanElement>sibling).click()
+            return
+        }
+        let parentSibling = current.parentNode.nextSibling
+        if (parentSibling && parentSibling.firstChild) {
+            (<HTMLSpanElement>parentSibling.firstChild).click()
+        }
+    }
+
     onClickWord(word: string) {}
 
 }

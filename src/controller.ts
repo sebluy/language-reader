@@ -158,9 +158,9 @@ export class Controller implements ControllerInterface {
 
     showActivity(activity: Activity) {
         if (this.activity) this.activity.cleanup()
+        this.sidebar.hideAll()
         this.activity = activity
         this.activity.show()
-        this.sidebar.loadActivity(activity)
         this.sidebar.updateStats()
     }
 

@@ -5,7 +5,10 @@ import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activ
 export class VocabInContext extends MultipleChoiceSentenceActivity {
 
     show() {
+        this.controller.sidebar.showWordDefinition()
         this.controller.sidebar.showSentence(this.sentence)
+        this.controller.sidebar.showAudio()
+        this.controller.sidebar.showAudioTimes()
     }
 
     title() {

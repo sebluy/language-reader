@@ -1,7 +1,6 @@
 import { Utility } from './utility.js'
 import { LanguageText } from './language-text.js'
 import { Sentence } from './sentence.js';
-import { Word } from './word.js';
 import { ControllerInterface } from './controller-interface.js'
 import { Activity } from './controller.js'
 
@@ -32,7 +31,9 @@ export class Unscramble implements Activity {
     show() {
         let sidebar = this.controller.sidebar
         sidebar.showSentence(this.sentence)
-        sidebar.checkAnswer = () => this.checkAnswer()
+        sidebar.showAudio()
+        sidebar.showAudioTimes()
+        sidebar.showCheckAnswerButton(() => this.checkAnswer())
     }
 
     checkAnswer() {

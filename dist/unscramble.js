@@ -16,7 +16,9 @@ export class Unscramble {
     show() {
         let sidebar = this.controller.sidebar;
         sidebar.showSentence(this.sentence);
-        sidebar.checkAnswer = () => this.checkAnswer();
+        sidebar.showAudio();
+        sidebar.showAudioTimes();
+        sidebar.showCheckAnswerButton(() => this.checkAnswer());
     }
     checkAnswer() {
         let current = this.getCurrentOrder();

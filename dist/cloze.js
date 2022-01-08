@@ -2,6 +2,9 @@ import { MultipleChoice } from './multiple-choice.js';
 import { TextView } from './text-view.js';
 import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
 export class Cloze extends MultipleChoiceSentenceActivity {
+    show() {
+        this.controller.sidebar.showWordDefinition();
+    }
     title() {
         return 'Cloze';
     }

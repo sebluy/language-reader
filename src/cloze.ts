@@ -4,6 +4,10 @@ import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activ
 
 export class Cloze extends MultipleChoiceSentenceActivity {
 
+    show() {
+        this.controller.sidebar.showWordDefinition()
+    }
+
     title() {
         return 'Cloze'
     }

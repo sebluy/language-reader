@@ -52,5 +52,19 @@ export class TextView {
             this.onClickWord(Utility.cleanWord(e.target.innerHTML));
         }
     }
+    nextWord() {
+        const current = document.querySelector('span.selected');
+        if (!current)
+            return;
+        let sibling = current.nextElementSibling;
+        if (sibling) {
+            sibling.click();
+            return;
+        }
+        let parentSibling = current.parentNode.nextSibling;
+        if (parentSibling && parentSibling.firstChild) {
+            parentSibling.firstChild.click();
+        }
+    }
     onClickWord(word) { }
 }

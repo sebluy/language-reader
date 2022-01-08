@@ -16,11 +16,12 @@ export class Reader {
     }
     show() {
         let sidebar = this.controller.sidebar;
-        sidebar.showSentence(undefined);
+        sidebar.showWordDefinition(() => this.nextWord());
+        sidebar.showSentenceDefinition(() => this.nextSentence());
+        sidebar.showAudio();
         sidebar.setAudio(this.getFirstSentence().startTime);
-        sidebar.onNextWord = () => this.nextWord();
-        sidebar.onNextSentence = () => this.nextSentence();
-        sidebar.updateHighlighting = (on) => this.updateHighlighting(on);
+        sidebar.showPageButtons();
+        sidebar.showHighlightButton((on) => this.updateHighlighting(on));
         sidebar.highlightSentence = (i) => this.highlightSentence(i);
         sidebar.unhighlightSentence = (i) => this.removeSentenceHighlighting(i);
         if (sidebar.highlightingOn)

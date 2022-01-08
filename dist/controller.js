@@ -109,9 +109,9 @@ export class Controller {
     showActivity(activity) {
         if (this.activity)
             this.activity.cleanup();
+        this.sidebar.hideAll();
         this.activity = activity;
         this.activity.show();
-        this.sidebar.loadActivity(activity);
         this.sidebar.updateStats();
     }
     updateHighlighting(word) {
