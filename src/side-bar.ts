@@ -26,6 +26,8 @@ export class SideBar {
     previousPageE: HTMLElement
     nextPageE: HTMLElement
     checkAnswerE: HTMLElement
+    textNameE: HTMLElement
+    audioNameE: HTMLElement
 
     // TODO: extract object for audio
 
@@ -58,6 +60,8 @@ export class SideBar {
         this.previousPageE = document.getElementById('previous-page')
         this.nextPageE = document.getElementById('next-page')
         this.checkAnswerE = document.getElementById('check-answer')
+        this.audioNameE = document.getElementById('audio-name')
+        this.textNameE = document.getElementById('text-name')
 
         this.highlightCB.addEventListener('click', () => {
             this.highlightingOn = !this.highlightingOn
@@ -72,10 +76,8 @@ export class SideBar {
 
         document.getElementById('update-stats').addEventListener('click', () => this.updateStats())
 
-        document.getElementById('open-text-file')
-            .addEventListener('click', () => this.controller.openTextFile())
-        document.getElementById('open-audio-file')
-            .addEventListener('click', () => this.controller.openAudioFile())
+        document.getElementById('open-files')
+            .addEventListener('click', () => this.controller.openFiles())
 
         let select = <HTMLSelectElement>document.getElementById('activity-select')
         select.addEventListener('click', () => this.controller.showActivityByName(select.value))
@@ -262,6 +264,11 @@ export class SideBar {
     showCheckAnswerButton(checkAnswer) {
         this.checkAnswer = checkAnswer
         this.showElement(this.checkAnswerE, true)
+    }
+
+    setNames() {
+        this.textNameE.innerText = this.controller.runtimeData.openTextFile
+        this.audioNameE.innerText = this.controller.runtimeData.openAudioFile
     }
 
     highlightSentence(i) {}

@@ -28,6 +28,8 @@ export class SideBar {
         this.previousPageE = document.getElementById('previous-page');
         this.nextPageE = document.getElementById('next-page');
         this.checkAnswerE = document.getElementById('check-answer');
+        this.audioNameE = document.getElementById('audio-name');
+        this.textNameE = document.getElementById('text-name');
         this.highlightCB.addEventListener('click', () => {
             this.highlightingOn = !this.highlightingOn;
             this.updateHighlighting(this.highlightingOn);
@@ -39,10 +41,8 @@ export class SideBar {
         // TODO: move to unscramble
         this.checkAnswerE.addEventListener('click', (e) => this.checkAnswer());
         document.getElementById('update-stats').addEventListener('click', () => this.updateStats());
-        document.getElementById('open-text-file')
-            .addEventListener('click', () => this.controller.openTextFile());
-        document.getElementById('open-audio-file')
-            .addEventListener('click', () => this.controller.openAudioFile());
+        document.getElementById('open-files')
+            .addEventListener('click', () => this.controller.openFiles());
         let select = document.getElementById('activity-select');
         select.addEventListener('click', () => this.controller.showActivityByName(select.value));
         document.getElementById('export')
@@ -214,6 +214,10 @@ export class SideBar {
     showCheckAnswerButton(checkAnswer) {
         this.checkAnswer = checkAnswer;
         this.showElement(this.checkAnswerE, true);
+    }
+    setNames() {
+        this.textNameE.innerText = this.controller.runtimeData.openTextFile;
+        this.audioNameE.innerText = this.controller.runtimeData.openAudioFile;
     }
     highlightSentence(i) { }
     unhighlightSentence(i) { }

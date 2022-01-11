@@ -10,8 +10,7 @@ export interface ControllerInterface {
     languageText: LanguageText
     sidebar: SideBar
 
-    openTextFile()
-    openAudioFile()
+    openFiles()
     changePageBy(n)
 
     importDatabase()

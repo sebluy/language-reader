@@ -14,10 +14,9 @@ import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
-// TODO: Add filenames to GUI somewhere.
 // TODO: Fix XP for today and yesterday, make it switch at midnight, enforce actual yesterday, etc
-// TODO: open multiple files at once with shift
 
+// TODO: How to integrate more observables. For example, side bar "watches" runtime data for updates.
 // TODO: Fix/hide unscramble? Fill in the blank?
 // TODO: use anonymous classes instead of just overwriting properties
 // TODO: add some tests
@@ -80,6 +79,7 @@ export class Controller implements ControllerInterface {
         console.log(runtimeData)
         runtimeData.updateForNewDay()
         this.runtimeData = runtimeData
+        this.sidebar.setNames()
         if (runtimeData.openTextFile) {
             let text = await this.db.getTextFile()
             this.loadTextFile(text)
@@ -90,15 +90,24 @@ export class Controller implements ControllerInterface {
         }
     }
 
-    openTextFile() {
-        Utility.upload((file) => {
-            file.text().then((text) => {
-                this.runtimeData.openTextFile = file.name
-                this.runtimeData.currentPage = 0
-                this.db.putRuntimeData(this.runtimeData)
-                this.db.putTextFile(text)
-                this.loadTextFile(text)
-            })
+    openTextFile(file) {
+        file.text().then((text) => {
+            this.runtimeData.openTextFile = file.name
+            this.runtimeData.currentPage = 0
+            this.sidebar.setNames()
+            this.db.putRuntimeData(this.runtimeData)
+            this.db.putTextFile(text)
+            this.loadTextFile(text)
+        })
+    }
+
+    openFiles() {
+        Utility.upload((files) => {
+            for (let i = 0; i < files.length; i++) {
+                let file = files[i]
+                if (file.type === 'text/plain') this.openTextFile(file)
+                if (file.type === 'audio/mpeg') this.openAudioFile(file)
+            }
         })
     }
 
@@ -118,13 +127,12 @@ export class Controller implements ControllerInterface {
         this.sidebar.languageText = this.languageText
     }
 
-    openAudioFile() {
-        Utility.upload((file) => {
-            this.runtimeData.openAudioFile = file.name
-            this.db.putRuntimeData(this.runtimeData)
-            this.db.putAudioFile(file)
-            this.loadAudioFile(URL.createObjectURL(file))
-        })
+    openAudioFile(file) {
+        this.runtimeData.openAudioFile = file.name
+        this.sidebar.setNames()
+        this.db.putRuntimeData(this.runtimeData)
+        this.db.putAudioFile(file)
+        this.loadAudioFile(URL.createObjectURL(file))
     }
 
     loadAudioFile(url) {

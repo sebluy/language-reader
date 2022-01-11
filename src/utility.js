@@ -139,18 +139,19 @@ export class Utility {
     static upload(cb) {
         let element = document.createElement('input')
         element.setAttribute('type', 'file')
+        element.setAttribute('multiple', '')
         element.style.display = 'none'
         document.body.appendChild(element)
         element.addEventListener('change', () => {
-            cb(element.files[0])
+            cb(element.files)
             element.remove()
         })
         element.click()
     }
 
     static uploadText(cb) {
-        Utility.upload((file) => {
-            file.text().then(text => cb(file.name, text))
+        Utility.upload((files) => {
+            files[0].text().then(text => cb(files[0].name, text))
         })
     }
 
