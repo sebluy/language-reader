@@ -3,6 +3,7 @@ import { TextView } from './text-view.js';
 import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
 export class VocabInContext extends MultipleChoiceSentenceActivity {
     show() {
+        super.show();
         this.controller.sidebar.showWordDefinition();
         this.controller.sidebar.showSentence(this.sentence);
         this.controller.sidebar.showAudio();
@@ -28,7 +29,7 @@ export class VocabInContext extends MultipleChoiceSentenceActivity {
         this.multipleChoice.onCorrectAnswer = () => {
             this.languageText.updateMastery([this.word.word]);
             this.controller.addXP(1);
-            this.controller.showActivity(new VocabInContext(this.controller, this.index + 1));
+            this.nextActivity();
         };
         this.multipleChoice.render(this.textE);
     }

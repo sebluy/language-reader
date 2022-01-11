@@ -1,19 +1,17 @@
 import { Utility } from './utility.js'
 import { LanguageText } from './language-text.js'
 import { Sentence } from './sentence.js';
-import { ControllerInterface } from './controller-interface.js'
-import { Activity } from './controller.js'
+import { Activity } from './activity.js'
 
-export class Unscramble implements Activity {
+export class Unscramble extends Activity {
 
-    controller: ControllerInterface
     languageText: LanguageText
     textE: HTMLElement
     sentence: Sentence
     words: Array<string>
 
     constructor(controller) {
-        this.controller = controller
+        super(controller)
         this.languageText = controller.languageText
         this.sentence = null // TODO: fix this for new mastery
 
@@ -43,7 +41,7 @@ export class Unscramble implements Activity {
         }
         this.languageText.updateSentence(this.sentence)
         // this.controller.addXP(this.words.length * 3)
-        this.controller.showActivity(new Unscramble(this.controller))
+        this.nextActivity()
     }
 
     getCurrentOrder() {

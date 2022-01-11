@@ -1,7 +1,8 @@
 import { Utility } from './utility.js';
-export class Reader {
+import { Activity } from './activity.js';
+export class Reader extends Activity {
     constructor(controller) {
-        this.controller = controller;
+        super(controller);
         this.languageText = controller.languageText;
         this.paragraphE = document.createElement('p');
         this.paragraphE.addEventListener('click', (e) => this.clickWord(e));

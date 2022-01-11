@@ -1,16 +1,21 @@
 import { Word } from './word.js';
-export class MultipleChoiceSentenceActivity {
+import { Activity } from './activity.js';
+export class MultipleChoiceSentenceActivity extends Activity {
     constructor(controller, index = 0) {
-        this.controller = controller;
+        super(controller);
         this.languageText = controller.languageText;
+        this.setIndex(index);
+    }
+    setIndex(index) {
         this.index = index % this.languageText.sentences.length;
+    }
+    show() {
         this.pickSentenceAndWord();
         this.controller.mainWindow.reset(this.title(), 'Sentence ' + (this.index + 1));
         this.textE = this.controller.mainWindow.contentDiv;
         this.createTextView();
         this.createMultipleChoice();
     }
-    show() { }
     pickSentenceAndWord() {
         for (let i = 0; i <= this.languageText.sentences.length; i += 1) {
             this.rawSentence = this.languageText.sentences[this.index];
@@ -20,12 +25,20 @@ export class MultipleChoiceSentenceActivity {
                 break;
             if (i === this.languageText.sentences.length)
                 break;
-            this.index = (this.index + 1) % this.languageText.sentences.length;
+            this.setIndex(this.index + 1);
         }
         console.log('Sentence index: ' + this.index);
     }
     cleanup() {
         this.multipleChoice.cleanup();
+    }
+    update(last) {
+        if (last instanceof MultipleChoiceSentenceActivity) {
+            this.setIndex(last.index + 1);
+        }
+    }
+    nextActivity() {
+        this.controller.showActivity(new this.constructor(this.controller, this.index + 1));
     }
     onClickWord(word) { }
 }

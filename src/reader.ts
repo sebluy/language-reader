@@ -1,12 +1,10 @@
 import { Utility } from './utility.js'
 import { LanguageText } from './language-text.js'
 import { RawSentence } from './raw-sentence.js'
-import { ControllerInterface } from './controller-interface.js'
-import { Activity } from './controller.js'
+import { Activity } from './activity.js'
 
-export class Reader implements Activity {
+export class Reader extends Activity {
 
-    controller: ControllerInterface
     languageText: LanguageText
     paragraphE: HTMLElement
     sentences: Array<RawSentence>
@@ -15,7 +13,7 @@ export class Reader implements Activity {
     spansBySentenceAndWord: Array<Map<string, Array<HTMLSpanElement>>>
 
     constructor(controller) {
-        this.controller = controller
+        super(controller)
         this.languageText = controller.languageText
         this.paragraphE = document.createElement('p')
         this.paragraphE.addEventListener('click', (e) => this.clickWord(e))

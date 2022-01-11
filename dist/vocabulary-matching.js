@@ -14,6 +14,10 @@ export class VocabularyMatching {
         this.keyListener = (e) => this.handleKey(e);
         document.addEventListener('keydown', this.keyListener);
     }
+    nextActivity() {
+        this.controller.showActivity(new VocabularyMatching(this.controller));
+    }
+    update(last) { }
     show() { }
     cleanup() {
         document.removeEventListener('keydown', this.keyListener);
@@ -40,7 +44,7 @@ export class VocabularyMatching {
             this.languageText.updateMastery(this.words);
         });
         this.controller.addXP(this.definitions.length);
-        this.controller.showActivity(new VocabularyMatching(this.controller));
+        this.nextActivity();
     }
     buildGrid() {
         // let onDrop = () => {

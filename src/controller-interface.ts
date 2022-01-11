@@ -2,7 +2,7 @@ import { RuntimeData } from './runtime-data.js'
 import { LanguageText } from './language-text.js'
 import { MainWindow } from './main-window.js'
 import { SideBar } from './side-bar.js'
-import { Activity } from './controller.js'
+import { Activity } from './activity.js'
 
 export interface ControllerInterface {
     mainWindow: MainWindow

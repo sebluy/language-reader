@@ -12,12 +12,14 @@ import { VocabInContext } from './vocab-in-context.js'
 import { Cloze } from './cloze.js'
 import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
+import { Activity } from './activity.js'
 
 // TODO: Change XP per exercise, 1 per word, fix mastery too.
 // TODO: add an auto option that goes through the activities in order
 // TODO: use full width for vocab matching
 // TODO: Fix XP for today and yesterday, make it switch at midnight, enforce actual yesterday, etc
 // TODO: open multiple files at once with shift
+// TODO: Fix TODO in sub title
 
 // TODO; Hide unscramble?
 // TODO: use anonymous classes instead of just overwriting properties
@@ -58,10 +60,6 @@ import { MainWindow } from './main-window.js'
 // TODO: make it mobile friendly
 // TODO: find a way to sync with multiple clients
 
-export interface Activity {
-    cleanup()
-    show()
-}
 
 export class Controller implements ControllerInterface {
 
@@ -153,6 +151,21 @@ export class Controller implements ControllerInterface {
         else if (name === 'listening-2') this.showActivity(new Listening2(this))
         else if (name === 'cloze') this.showActivity(new Cloze(this))
         else if (name === 'unscramble') this.showActivity(new Unscramble(this))
+        else if (name === 'auto') this.showAuto()
+    }
+
+    showAuto() {
+        let last = this.activity
+        let stats = this.languageText.updateStats()
+        let next
+        if (stats.percentWordsMastered < 0.80) next = new VocabInContext(this)
+        else if (stats.percentWordsMastered < 0.85) next = new Listening(this)
+        else if (stats.percentWordsMastered < 0.90) next = new VocabularyMatching(this)
+        else if (stats.percentWordsMastered < 0.95) next = new Cloze(this)
+        else next = new Listening2(this)
+        next.update(last)
+        next.nextActivity = () => this.showAuto()
+        this.showActivity(next)
     }
 
     showActivity(activity: Activity) {

@@ -3,6 +3,7 @@ import { TextView } from './text-view.js';
 import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
 export class Cloze extends MultipleChoiceSentenceActivity {
     show() {
+        super.show();
         this.controller.sidebar.showWordDefinition();
     }
     title() {
@@ -27,7 +28,7 @@ export class Cloze extends MultipleChoiceSentenceActivity {
         this.multipleChoice.onCorrectAnswer = () => {
             this.languageText.updateMastery([this.word.word]);
             this.controller.addXP(1);
-            this.controller.showActivity(new Cloze(this.controller, this.index + 1));
+            this.nextActivity();
         };
         this.multipleChoice.render(this.textE);
     }

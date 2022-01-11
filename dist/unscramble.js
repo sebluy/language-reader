@@ -1,7 +1,8 @@
 import { Utility } from './utility.js';
-export class Unscramble {
+import { Activity } from './activity.js';
+export class Unscramble extends Activity {
     constructor(controller) {
-        this.controller = controller;
+        super(controller);
         this.languageText = controller.languageText;
         this.sentence = null; // TODO: fix this for new mastery
         this.controller.mainWindow.reset('Unscramble', 'TODO');
@@ -28,7 +29,7 @@ export class Unscramble {
         }
         this.languageText.updateSentence(this.sentence);
         // this.controller.addXP(this.words.length * 3)
-        this.controller.showActivity(new Unscramble(this.controller));
+        this.nextActivity();
     }
     getCurrentOrder() {
         let els = this.textE.getElementsByClassName('matching-item');

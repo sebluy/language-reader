@@ -1,7 +1,7 @@
 import { Utility } from './utility.js'
 import { LanguageText } from './language-text.js'
 import { ControllerInterface } from './controller-interface.js'
-import { Activity } from './controller.js'
+import { Activity } from './activity.js'
 
 export class VocabularyMatching implements Activity {
 
@@ -36,7 +36,13 @@ export class VocabularyMatching implements Activity {
         document.addEventListener('keydown', this.keyListener);
     }
 
-    show() {}
+    nextActivity(): void {
+        this.controller.showActivity(new VocabularyMatching(this.controller));
+    }
+
+    update(last: Activity): void {}
+
+    show(): void {}
 
     cleanup() {
         document.removeEventListener('keydown', this.keyListener);
@@ -66,7 +72,7 @@ export class VocabularyMatching implements Activity {
             this.languageText.updateMastery(this.words)
         })
         this.controller.addXP(this.definitions.length)
-        this.controller.showActivity(new VocabularyMatching(this.controller));
+        this.nextActivity()
     }
 
     buildGrid() {
