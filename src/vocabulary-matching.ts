@@ -25,7 +25,7 @@ export class VocabularyMatching implements Activity {
         this.shuffledElements = []
         this.selectedIndex = 0
 
-        this.controller.mainWindow.reset('Vocabulary Matching', 'TODO')
+        this.controller.mainWindow.reset('Vocabulary Matching', '')
         this.textE = this.controller.mainWindow.contentDiv
 
         this.getRandomWords()

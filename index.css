@@ -81,7 +81,9 @@ label {
 }
 
 td.matching-item {
-    min-width: 100px;
+    min-width: 175px;
+    text-align: center;
+    border-radius: 10px;
 }
 
 .matching-item {
@@ -97,12 +99,13 @@ span.matching-item {
     text-align: center;
 }
 
-.drag-over {
-    border: 1px solid blue;
+p.highlight span {
+    border-radius: 10px;
+    padding: 5px;
 }
 
-.highlight-sentence {
-    background-color: yellow;
+.drag-over {
+    border: 1px solid blue;
 }
 
 #main {
@@ -122,6 +125,8 @@ span.matching-item {
 
 .selected {
     background-color: yellow;
+    border-radius: 10px;
+    padding: 5px;
 }
 
 .multiple-choice {

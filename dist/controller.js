@@ -20,12 +20,10 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
-// TODO: Change XP per exercise, 1 per word, fix mastery too.
-// TODO: add an auto option that goes through the activities in order
-// TODO: use full width for vocab matching
+// TODO: Add filenames to GUI somewhere.
 // TODO: Fix XP for today and yesterday, make it switch at midnight, enforce actual yesterday, etc
 // TODO: open multiple files at once with shift
-// TODO; Hide unscramble?
+// TODO: Fix/hide unscramble? Fill in the blank?
 // TODO: use anonymous classes instead of just overwriting properties
 // TODO: add some tests
 // TODO: remove sentence mastery and just update all the words for unscramble
