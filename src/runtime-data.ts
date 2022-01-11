@@ -6,6 +6,7 @@ export class RuntimeData {
     xpDate: string
     openAudioFile: string
     openTextFile: string
+    wordsLearnedToday: number
 
     static empty() {
         let data = new RuntimeData()
@@ -13,6 +14,7 @@ export class RuntimeData {
         data.xpYesterday = 0
         data.xpDate = (new Date()).toLocaleDateString()
         data.currentPage = 0
+        data.wordsLearnedToday = 0
         return data
     }
 
@@ -22,11 +24,12 @@ export class RuntimeData {
         return data
     }
 
-    updateXP() {
+    updateForNewDay() {
         if (this.xpDate !== (new Date()).toLocaleDateString()) {
             this.xpYesterday = this.xpToday
             this.xpToday = 0
             this.xpDate = (new Date()).toLocaleDateString()
+            this.wordsLearnedToday = 0
         }
     }
 

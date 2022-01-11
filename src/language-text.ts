@@ -8,7 +8,6 @@ import { ControllerInterface } from './controller-interface.js'
 export class LanguageText {
     controller: ControllerInterface
     filename: string
-    wordsLearnedToday: number
     totalWordsTranslated: number
     db: LanguageDb
     pages: Array<string>
@@ -21,7 +20,6 @@ export class LanguageText {
 
     constructor(controller, filename, text, currentPage) {
         this.controller = controller
-        this.wordsLearnedToday = 0
         this.db = controller.db
         this.filename = filename
         this.pages = this.extractPages(text)
@@ -99,7 +97,7 @@ export class LanguageText {
         if (wordData.definition === definition) return
         if (wordData.definition === '') {
             this.totalWordsTranslated += 1
-            this.wordsLearnedToday += 1
+            this.controller.learnNewWords(1)
             this.controller.addXP(5)
         }
         wordData.definition = definition
@@ -139,7 +137,6 @@ export class LanguageText {
             numberOfWords: numberOfWords,
             numberOfDistinctWords: this.words.size,
             totalWordsTranslated: this.totalWordsTranslated,
-            wordsLearnedToday: this.wordsLearnedToday,
             percentTranslated: percentTranslated,
             percentWordsMastered: percentWMastered,
         }

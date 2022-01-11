@@ -12,6 +12,7 @@ export class VocabInContext extends MultipleChoiceSentenceActivity {
         return 'Vocabulary in Context';
     }
     createTextView() {
+        // TODO: use clean sentence for exercises
         let textView = new TextView(this.rawSentence);
         textView.onClickWord = (word) => this.controller.sidebar.showWord(word);
         textView.renderWord = (word, clean) => {

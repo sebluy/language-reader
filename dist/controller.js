@@ -33,7 +33,7 @@ export class Controller {
             if (runtimeData === undefined)
                 runtimeData = RuntimeData.empty();
             console.log(runtimeData);
-            runtimeData.updateXP();
+            runtimeData.updateForNewDay();
             this.runtimeData = runtimeData;
             if (runtimeData.openTextFile) {
                 let text = yield this.db.getTextFile();
@@ -135,6 +135,10 @@ export class Controller {
     }
     addXP(n) {
         this.runtimeData.xpToday += n;
+        this.db.putRuntimeData(this.runtimeData);
+    }
+    learnNewWords(n) {
+        this.runtimeData.wordsLearnedToday += n;
         this.db.putRuntimeData(this.runtimeData);
     }
 }

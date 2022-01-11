@@ -159,7 +159,7 @@ export class SideBar {
                 ['tr', ['td', 'Number of distinct words'], ['td', stats.numberOfDistinctWords]],
                 ['tr', ['td', 'Percent translated'], ['td', fp(stats.percentTranslated)]],
                 ['tr', ['td', 'Total Words Translated'], ['td', stats.totalWordsTranslated]],
-                ['tr', ['td', 'Words Learned Today'], ['td', stats.wordsLearnedToday]],
+                ['tr', ['td', 'Words Learned Today'], ['td', runtimeData.wordsLearnedToday]],
                 ['tr', ['td', 'Words mastered'], ['td', fp(stats.percentWordsMastered)]],
                 ['tr', ['td', 'Today\'s XP'], ['td', runtimeData.xpToday]],
                 ['tr', ['td', 'Yesterday\'s XP'], ['td', runtimeData.xpYesterday]]

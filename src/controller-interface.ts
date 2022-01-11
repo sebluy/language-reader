@@ -21,5 +21,6 @@ export interface ControllerInterface {
     showActivity(activity: Activity)
 
     addXP(n: number)
+    learnNewWords(n: number)
 
 }

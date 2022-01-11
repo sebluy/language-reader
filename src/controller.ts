@@ -13,12 +13,14 @@ import { Cloze } from './cloze.js'
 import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 
-// TODO: add an activity to play audio and give a multiple choice of words in the sentence
+// TODO: Persist words learned today
+// TODO: Fix XP for today and yesterday, make it switch at midnight, enforce actual yesterday, etc
+// TODO: Change XP per exercise, 1 per word
+// TODO; Hide unscramble?
+// TODO: use full width for vocab matching
+// TODO: open multiple files at once with shift
 // TODO: use anonymous classes instead of just overwriting properties
 // TODO: fix right sidebar for the various activities
-// TODO: re-architect to make the activity the driver, have it coordinate with the rest
-// TODO: add a component for the "MainWindow" which encapsulates the activity
-// TODO: controller creates basic elements, activity does the rest
 // TODO: add some tests
 // TODO: add the page number to the reader
 // TODO: add the sentence number to the activity
@@ -84,7 +86,7 @@ export class Controller implements ControllerInterface {
         let runtimeData = await this.db.getRuntimeData()
         if (runtimeData === undefined) runtimeData = RuntimeData.empty()
         console.log(runtimeData)
-        runtimeData.updateXP()
+        runtimeData.updateForNewDay()
         this.runtimeData = runtimeData
         if (runtimeData.openTextFile) {
             let text = await this.db.getTextFile()
@@ -189,6 +191,11 @@ export class Controller implements ControllerInterface {
 
     addXP(n: number) {
         this.runtimeData.xpToday += n
+        this.db.putRuntimeData(this.runtimeData)
+    }
+
+    learnNewWords(n: number) {
+        this.runtimeData.wordsLearnedToday += n
         this.db.putRuntimeData(this.runtimeData)
     }
 
