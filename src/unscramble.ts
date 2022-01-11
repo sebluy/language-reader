@@ -42,7 +42,7 @@ export class Unscramble implements Activity {
             if (this.words[i] !== current[i]) return
         }
         this.languageText.updateSentence(this.sentence)
-        this.controller.addXP(this.words.length * 3)
+        // this.controller.addXP(this.words.length * 3)
         this.controller.showActivity(new Unscramble(this.controller))
     }
 

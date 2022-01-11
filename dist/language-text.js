@@ -81,7 +81,6 @@ export class LanguageText {
         if (wordData.definition === '') {
             this.totalWordsTranslated += 1;
             this.controller.learnNewWords(1);
-            this.controller.addXP(5);
         }
         wordData.definition = definition;
         console.log('Updating definition... for ' + word + ' to ' + definition);
@@ -92,8 +91,6 @@ export class LanguageText {
         let sentenceO = this.sentenceMap.get(sentence);
         if (sentenceO.definition === definition)
             return;
-        if (sentenceO.definition === '')
-            this.controller.addXP(5);
         sentenceO.definition = definition;
         console.log('Updating definition... for ' + sentence + ' to ' + definition);
         this.db.putSentence(sentenceO);

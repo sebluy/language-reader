@@ -13,18 +13,15 @@ import { Cloze } from './cloze.js'
 import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 
-// TODO: Persist words learned today
-// TODO: Fix XP for today and yesterday, make it switch at midnight, enforce actual yesterday, etc
-// TODO: Change XP per exercise, 1 per word
-// TODO; Hide unscramble?
-// TODO: use full width for vocab matching
-// TODO: open multiple files at once with shift
-// TODO: use anonymous classes instead of just overwriting properties
-// TODO: fix right sidebar for the various activities
-// TODO: add some tests
-// TODO: add the page number to the reader
-// TODO: add the sentence number to the activity
+// TODO: Change XP per exercise, 1 per word, fix mastery too.
 // TODO: add an auto option that goes through the activities in order
+// TODO: use full width for vocab matching
+// TODO: Fix XP for today and yesterday, make it switch at midnight, enforce actual yesterday, etc
+// TODO: open multiple files at once with shift
+
+// TODO; Hide unscramble?
+// TODO: use anonymous classes instead of just overwriting properties
+// TODO: add some tests
 // TODO: remove sentence mastery and just update all the words for unscramble
 // TODO: disable audio shortcuts when typing in definitions
 // TODO: add a Google translate icon to the right instead of a button
@@ -196,6 +193,7 @@ export class Controller implements ControllerInterface {
 
     learnNewWords(n: number) {
         this.runtimeData.wordsLearnedToday += n
+        this.runtimeData.xpToday += n
         this.db.putRuntimeData(this.runtimeData)
     }
 

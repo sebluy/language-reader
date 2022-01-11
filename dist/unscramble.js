@@ -27,7 +27,7 @@ export class Unscramble {
                 return;
         }
         this.languageText.updateSentence(this.sentence);
-        this.controller.addXP(this.words.length * 3);
+        // this.controller.addXP(this.words.length * 3)
         this.controller.showActivity(new Unscramble(this.controller));
     }
     getCurrentOrder() {

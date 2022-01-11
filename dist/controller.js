@@ -139,6 +139,7 @@ export class Controller {
     }
     learnNewWords(n) {
         this.runtimeData.wordsLearnedToday += n;
+        this.runtimeData.xpToday += n;
         this.db.putRuntimeData(this.runtimeData);
     }
 }

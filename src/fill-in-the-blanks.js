@@ -19,7 +19,7 @@ export class FillInTheBlanks {
         let onDrop = () => {
             if (this.checkAnswer(words, blanks)) {
                 // words.forEach((word) => this.languageText.updateMastery(word))
-                this.sidebar.addXP(sentences.length * 2)
+                // this.sidebar.addXP(sentences.length * 2)
                 this.sidebar.updateStats()
                 new FillInTheBlanks(this.sidebar)
             }

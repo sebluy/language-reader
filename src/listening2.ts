@@ -19,9 +19,8 @@ export class Listening2 extends MultipleChoiceSentenceActivity {
         let definitions = this.languageText.getSentenceDefinitionArray()
         this.multipleChoice = new MultipleChoice(definitions, this.sentence.definition)
         this.multipleChoice.onCorrectAnswer = () => {
-            let words = this.rawSentence.getWords()
-            this.languageText.updateMastery(words)
-            this.controller.addXP(words.length)
+            this.languageText.updateMastery([this.word.word])
+            this.controller.addXP(1)
             this.controller.showActivity(new Listening2(this.controller, this.index + 1))
         }
         this.multipleChoice.render(this.textE)
