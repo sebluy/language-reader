@@ -14,8 +14,12 @@ import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
+// TODO: Change threshold for matching to 70%.
 // TODO: Fix XP for today and yesterday, make it switch at midnight, enforce actual yesterday, etc
+// TODO: Maybe just change yesterday to last?
+// TODO: Fix next/previous page when out of bounds.
 
+// TODO: Keep sidebar in sync
 // TODO: How to integrate more observables. For example, side bar "watches" runtime data for updates.
 // TODO: Fix/hide unscramble? Fill in the blank?
 // TODO: use anonymous classes instead of just overwriting properties

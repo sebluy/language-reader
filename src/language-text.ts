@@ -26,6 +26,9 @@ export class LanguageText {
         this.setPage(currentPage)
     }
 
+    onLoad() {}
+    onUpdateDefinition(word) {}
+
     setPage(n) {
         this.text = this.pages[n]
         this.expected = 0
@@ -90,8 +93,6 @@ export class LanguageText {
         })
     }
 
-    onLoad() {}
-
     updateWordDefinition(word, definition) {
         const wordData = this.words.get(word)
         if (wordData.definition === definition) return
@@ -112,8 +113,6 @@ export class LanguageText {
         console.log('Updating definition... for ' + sentence + ' to ' + definition)
         this.db.putSentence(sentenceO)
     }
-
-    onUpdateDefinition(word) {}
 
     updateMastery(words) {
         words = words.map((word) => this.words.get(word).nextMastery())

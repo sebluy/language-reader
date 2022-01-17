@@ -157,14 +157,14 @@ export class SideBar {
         let fp = (p) => (p * 100).toFixed(2) + '%'
         let newTable = Utility.createHTML(
             ['tbody',
-                ['tr', ['td', 'Number of words'], ['td', stats.numberOfWords]],
-                ['tr', ['td', 'Number of distinct words'], ['td', stats.numberOfDistinctWords]],
-                ['tr', ['td', 'Percent translated'], ['td', fp(stats.percentTranslated)]],
+                ['tr', ['td', 'Number of Words'], ['td', stats.numberOfWords]],
+                ['tr', ['td', 'Number of Distinct Words'], ['td', stats.numberOfDistinctWords]],
+                ['tr', ['td', 'Percent Translated'], ['td', fp(stats.percentTranslated)]],
                 ['tr', ['td', 'Total Words Translated'], ['td', stats.totalWordsTranslated]],
                 ['tr', ['td', 'Words Learned Today'], ['td', runtimeData.wordsLearnedToday]],
-                ['tr', ['td', 'Words mastered'], ['td', fp(stats.percentWordsMastered)]],
+                ['tr', ['td', 'Words Mastered'], ['td', fp(stats.percentWordsMastered)]],
                 ['tr', ['td', 'Today\'s XP'], ['td', runtimeData.xpToday]],
-                ['tr', ['td', 'Yesterday\'s XP'], ['td', runtimeData.xpYesterday]]
+                ['tr', ['td', 'Yesterday\'s XP'], ['td', runtimeData.xpLast]]
             ]
         )
         this.statsE.replaceChild(newTable, this.statsE.childNodes[0])
