@@ -14,11 +14,9 @@ import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
-// TODO: Change threshold for matching to 70%.
-// TODO: Fix XP for today and yesterday, make it switch at midnight, enforce actual yesterday, etc
-// TODO: Maybe just change yesterday to last?
 // TODO: Fix next/previous page when out of bounds.
 
+// TODO: Fix XP last for day rollover
 // TODO: Keep sidebar in sync
 // TODO: How to integrate more observables. For example, side bar "watches" runtime data for updates.
 // TODO: Fix/hide unscramble? Fill in the blank?
@@ -167,9 +165,9 @@ export class Controller implements ControllerInterface {
         let last = this.activity
         let stats = this.languageText.updateStats()
         let next
-        if (stats.percentWordsMastered < 0.80) next = new VocabInContext(this)
-        else if (stats.percentWordsMastered < 0.85) next = new Listening(this)
-        else if (stats.percentWordsMastered < 0.90) next = new VocabularyMatching(this)
+        if (stats.percentWordsMastered < 0.70) next = new VocabInContext(this)
+        else if (stats.percentWordsMastered < 0.85) next = new VocabularyMatching(this)
+        else if (stats.percentWordsMastered < 0.90) next = new Listening(this)
         else if (stats.percentWordsMastered < 0.95) next = new Cloze(this)
         else next = new Listening2(this)
         next.update(last)
