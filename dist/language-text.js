@@ -10,12 +10,17 @@ export class LanguageText {
         this.pages = this.extractPages(text);
         this.setPage(currentPage);
     }
+    onLoad() { }
+    onUpdateDefinition(word) { }
     setPage(n) {
+        if (n < 0 || n >= this.pages.length)
+            return false;
         this.text = this.pages[n];
         this.expected = 0;
         this.loaded = 0;
         this.extractSentences();
         this.extractWords();
+        return true;
     }
     extractPages(text) {
         let idealLength = 1000;
@@ -73,7 +78,6 @@ export class LanguageText {
             this.markLoaded();
         });
     }
-    onLoad() { }
     updateWordDefinition(word, definition) {
         const wordData = this.words.get(word);
         if (wordData.definition === definition)
@@ -95,7 +99,6 @@ export class LanguageText {
         console.log('Updating definition... for ' + sentence + ' to ' + definition);
         this.db.putSentence(sentenceO);
     }
-    onUpdateDefinition(word) { }
     updateMastery(words) {
         words = words.map((word) => this.words.get(word).nextMastery());
         this.db.putWords(words);

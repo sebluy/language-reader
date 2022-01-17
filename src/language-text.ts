@@ -29,12 +29,14 @@ export class LanguageText {
     onLoad() {}
     onUpdateDefinition(word) {}
 
-    setPage(n) {
+    setPage(n: number): boolean {
+        if (n < 0 || n >= this.pages.length) return false;
         this.text = this.pages[n]
         this.expected = 0
         this.loaded = 0
         this.extractSentences()
         this.extractWords()
+        return true;
     }
 
     extractPages(text) {

@@ -201,9 +201,11 @@ export class Controller implements ControllerInterface {
     }
 
     changePageBy(n) {
-        this.runtimeData.currentPage += n
+        let newPage = this.runtimeData.currentPage + n
+        let success = this.languageText.setPage(newPage)
+        if (!success) return
+        this.runtimeData.currentPage = newPage
         this.db.putRuntimeData(this.runtimeData)
-        this.languageText.setPage(this.runtimeData.currentPage)
     }
 
     addXP(n: number) {

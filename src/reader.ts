@@ -2,7 +2,8 @@ import { Utility } from './utility.js'
 import { LanguageText } from './language-text.js'
 import { RawSentence } from './raw-sentence.js'
 import { Activity } from './activity.js'
-import { Word } from "./word.js"
+import { Word } from './word.js'
+import { SideBar } from './side-bar.js'
 
 export class Reader extends Activity {
 
@@ -25,15 +26,15 @@ export class Reader extends Activity {
         this.spansByWord = new Map()
         this.spansBySentence = []
         this.spansBySentenceAndWord = []
-        this.addSentences()
     }
 
     show() {
+        this.addSentences()
         let sidebar = this.controller.sidebar
+        this.setAudio(sidebar)
         sidebar.showWordDefinition(() => this.nextWord())
         sidebar.showSentenceDefinition(() => this.nextSentence())
         sidebar.showAudio()
-        sidebar.setAudio(this.getFirstSentence().startTime)
         sidebar.showPageButtons()
         sidebar.showHighlightButton((on) => this.updateHighlighting(on))
         sidebar.highlightSentence = (i) => this.highlightSentence(i)
@@ -43,8 +44,13 @@ export class Reader extends Activity {
 
     cleanup() {}
 
-    getFirstSentence() {
-        return this.languageText.sentenceMap.get(this.sentences[0].clean)
+    setAudio(sidebar: SideBar) {
+        if (this.sentences.length === 0) return
+        let first = this.sentences[0].clean
+        let last = this.sentences[this.sentences.length - 1].clean
+        let start = this.languageText.sentenceMap.get(first).startTime
+        let end = this.languageText.sentenceMap.get(last).endTime
+        sidebar.setAudio(start, end)
     }
 
     clickWord(e) {

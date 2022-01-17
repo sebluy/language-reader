@@ -164,7 +164,7 @@ export class SideBar {
                 ['tr', ['td', 'Words Learned Today'], ['td', runtimeData.wordsLearnedToday]],
                 ['tr', ['td', 'Words Mastered'], ['td', fp(stats.percentWordsMastered)]],
                 ['tr', ['td', 'Today\'s XP'], ['td', runtimeData.xpToday]],
-                ['tr', ['td', 'Yesterday\'s XP'], ['td', runtimeData.xpLast]]
+                ['tr', ['td', 'Last XP'], ['td', runtimeData.xpLast]]
             ]
         )
         this.statsE.replaceChild(newTable, this.statsE.childNodes[0])
