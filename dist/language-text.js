@@ -208,4 +208,12 @@ export class LanguageText {
         let wordMap = this.getWordMap(rawSentence.getWords());
         return Utility.randomWordsByMastery(wordMap, 1)[0];
     }
+    leastMastery() {
+        let min = Word.MAX_MASTERY;
+        Array.from(this.words).forEach(([k, v]) => {
+            if (v.definition !== '' && v.mastery < min)
+                min = v.mastery;
+        });
+        return min;
+    }
 }

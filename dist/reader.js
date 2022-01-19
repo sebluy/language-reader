@@ -1,6 +1,6 @@
 import { Utility } from './utility.js';
 import { Activity } from './activity.js';
-import { Word } from "./word.js";
+import { Word } from './word.js';
 export class Reader extends Activity {
     constructor(controller) {
         super(controller);

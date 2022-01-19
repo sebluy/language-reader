@@ -34,15 +34,15 @@ export abstract class MultipleChoiceSentenceActivity extends Activity {
     }
 
     pickSentenceAndWord() {
+        let leastMastery = this.languageText.leastMastery()
         for (let i = 0; i <= this.languageText.sentences.length; i += 1) {
             this.rawSentence = this.languageText.sentences[this.index]
             this.sentence = this.languageText.sentenceMap.get(this.rawSentence.clean)
             this.word = this.languageText.leastMasteredWord(this.rawSentence)
-            if (this.word.mastery < Word.MAX_MASTERY) break
+            if (this.word.mastery === leastMastery) break
             if (i === this.languageText.sentences.length) break;
             this.setIndex(this.index + 1)
         }
-        console.log('Sentence index: ' + this.index)
     }
 
     cleanup() {

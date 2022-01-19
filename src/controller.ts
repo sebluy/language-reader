@@ -14,7 +14,7 @@ import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
-// TODO: Fix next/previous page when out of bounds.
+// TODO: Find someway to prevent the same sentence coming up over and over again during the listening.
 
 // TODO: Fix XP last for day rollover
 // TODO: Keep sidebar in sync

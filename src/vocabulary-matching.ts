@@ -163,6 +163,7 @@ export class VocabularyMatching implements Activity {
         let source = this.selectedElement
         let [x1, y1] = this.selectedCoord
         let [x2, y2] = [x1 + xOff, y1 + yOff]
+        // TODO: fix bug for y2 === undefined
         if (this.elementGrid[y2][x2] === undefined) return
         let dest = this.elementGrid[y2][x2]
         this.swap(source, dest)

@@ -20,7 +20,7 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
-// TODO: Fix next/previous page when out of bounds.
+// TODO: Find someway to prevent the same sentence coming up over and over again during the listening.
 // TODO: Fix XP last for day rollover
 // TODO: Keep sidebar in sync
 // TODO: How to integrate more observables. For example, side bar "watches" runtime data for updates.
