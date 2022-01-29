@@ -1,8 +1,10 @@
 import { MultipleChoice } from './multiple-choice.js'
 import { TextView } from './text-view.js'
-import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
+import { SentenceActivity } from './sentence-activity.js';
 
-export class Listening extends MultipleChoiceSentenceActivity {
+export class Listening extends SentenceActivity {
+
+    multipleChoice: MultipleChoice
 
     // TODO: Fix next word in word definition for these activities
     show(index = 0) {
@@ -11,10 +13,16 @@ export class Listening extends MultipleChoiceSentenceActivity {
         this.controller.sidebar.showWordDefinition()
         this.controller.sidebar.showAudio()
         this.controller.sidebar.showAudioTimes()
+        this.createTextView()
+        this.createMultipleChoice()
     }
 
     title() {
         return 'Listening'
+    }
+
+    cleanup() {
+        this.multipleChoice.cleanup()
     }
 
     createTextView() {

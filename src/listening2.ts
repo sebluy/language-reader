@@ -1,20 +1,25 @@
 import { MultipleChoice } from './multiple-choice.js'
-import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
+import { SentenceActivity } from './sentence-activity.js';
 
-export class Listening2 extends MultipleChoiceSentenceActivity {
+export class Listening2 extends SentenceActivity {
+
+    multipleChoice: MultipleChoice
 
     show() {
         super.show()
         this.controller.sidebar.showSentence(this.sentence)
         this.controller.sidebar.showAudio()
         this.controller.sidebar.showAudioTimes()
+        this.createMultipleChoice()
     }
 
     title() {
         return 'Listening 2'
     }
 
-    createTextView() {}
+    cleanup() {
+        this.multipleChoice.cleanup()
+    }
 
     createMultipleChoice() {
         let definitions = this.languageText.getSentenceDefinitionArray()

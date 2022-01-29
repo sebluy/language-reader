@@ -27,7 +27,6 @@ export class SideBar {
         this.audioEndE = document.getElementById('audio-end');
         this.previousPageE = document.getElementById('previous-page');
         this.nextPageE = document.getElementById('next-page');
-        this.checkAnswerE = document.getElementById('check-answer');
         this.audioNameE = document.getElementById('audio-name');
         this.textNameE = document.getElementById('text-name');
         this.highlightCB.addEventListener('click', () => {
@@ -38,8 +37,6 @@ export class SideBar {
         this.audioEndE.addEventListener('focusout', () => this.updateAudioTimes());
         this.previousPageE.addEventListener('click', (e) => this.controller.changePageBy(-1));
         this.nextPageE.addEventListener('click', (e) => this.controller.changePageBy(1));
-        // TODO: move to unscramble
-        this.checkAnswerE.addEventListener('click', (e) => this.checkAnswer());
         document.getElementById('update-stats').addEventListener('click', () => this.updateStats());
         document.getElementById('open-files')
             .addEventListener('click', () => this.controller.openFiles());
@@ -186,7 +183,6 @@ export class SideBar {
         this.showElement(this.nextPageE, false);
         this.showElement(this.audioStartE, false);
         this.showElement(this.audioEndE, false);
-        this.showElement(this.checkAnswerE, false);
     }
     showWordDefinition(onNextWord) {
         this.onNextWord = onNextWord;
@@ -210,10 +206,6 @@ export class SideBar {
     showPageButtons() {
         this.showElement(this.previousPageE, true);
         this.showElement(this.nextPageE, true);
-    }
-    showCheckAnswerButton(checkAnswer) {
-        this.checkAnswer = checkAnswer;
-        this.showElement(this.checkAnswerE, true);
     }
     setNames() {
         this.textNameE.innerText = this.controller.runtimeData.openTextFile;

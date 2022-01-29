@@ -1,16 +1,19 @@
 import { MultipleChoice } from './multiple-choice.js';
-import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
-export class Listening2 extends MultipleChoiceSentenceActivity {
+import { SentenceActivity } from './sentence-activity.js';
+export class Listening2 extends SentenceActivity {
     show() {
         super.show();
         this.controller.sidebar.showSentence(this.sentence);
         this.controller.sidebar.showAudio();
         this.controller.sidebar.showAudioTimes();
+        this.createMultipleChoice();
     }
     title() {
         return 'Listening 2';
     }
-    createTextView() { }
+    cleanup() {
+        this.multipleChoice.cleanup();
+    }
     createMultipleChoice() {
         let definitions = this.languageText.getSentenceDefinitionArray();
         this.multipleChoice = new MultipleChoice(definitions, this.sentence.definition);

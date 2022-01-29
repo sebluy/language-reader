@@ -1,13 +1,18 @@
 import { MultipleChoice } from './multiple-choice.js';
 import { TextView } from './text-view.js';
-import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
-export class VocabInContext extends MultipleChoiceSentenceActivity {
+import { SentenceActivity } from './sentence-activity.js';
+export class VocabInContext extends SentenceActivity {
     show() {
         super.show();
         this.controller.sidebar.showWordDefinition();
         this.controller.sidebar.showSentence(this.sentence);
         this.controller.sidebar.showAudio();
         this.controller.sidebar.showAudioTimes();
+        this.createTextView();
+        this.createMultipleChoice();
+    }
+    cleanup() {
+        this.multipleChoice.cleanup();
     }
     title() {
         return 'Vocabulary in Context';

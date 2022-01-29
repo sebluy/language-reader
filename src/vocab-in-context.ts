@@ -1,8 +1,10 @@
 import { MultipleChoice } from './multiple-choice.js'
 import { TextView } from './text-view.js'
-import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js'
+import { SentenceActivity } from './sentence-activity.js'
 
-export class VocabInContext extends MultipleChoiceSentenceActivity {
+export class VocabInContext extends SentenceActivity {
+
+    multipleChoice: MultipleChoice
 
     show() {
         super.show()
@@ -10,6 +12,12 @@ export class VocabInContext extends MultipleChoiceSentenceActivity {
         this.controller.sidebar.showSentence(this.sentence)
         this.controller.sidebar.showAudio()
         this.controller.sidebar.showAudioTimes()
+        this.createTextView()
+        this.createMultipleChoice()
+    }
+
+    cleanup() {
+        this.multipleChoice.cleanup()
     }
 
     title() {

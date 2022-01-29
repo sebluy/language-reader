@@ -113,7 +113,6 @@ export class Utility {
         });
         el.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', e.target.id);
-            // e.target.classList.remove('incorrect-match')
         });
         return el;
     }

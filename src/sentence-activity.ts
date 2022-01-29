@@ -3,9 +3,9 @@ import { Sentence } from './sentence.js';
 import { Word } from './word.js';
 import { RawSentence } from './raw-sentence.js'
 import { Activity } from './activity.js'
-import { MultipleChoice } from './multiple-choice.js'
 
-export abstract class MultipleChoiceSentenceActivity extends Activity {
+// TODO: change this to just sentence activity
+export abstract class SentenceActivity extends Activity {
 
     languageText: LanguageText
     textE: HTMLElement
@@ -13,7 +13,6 @@ export abstract class MultipleChoiceSentenceActivity extends Activity {
     rawSentence: RawSentence
     index: number
     word: Word
-    multipleChoice: MultipleChoice
 
     constructor(controller, index = 0) {
         super(controller)
@@ -29,8 +28,6 @@ export abstract class MultipleChoiceSentenceActivity extends Activity {
         this.pickSentenceAndWord()
         this.controller.mainWindow.reset(this.title(), 'Sentence ' + (this.index + 1))
         this.textE = this.controller.mainWindow.contentDiv
-        this.createTextView()
-        this.createMultipleChoice()
     }
 
     pickSentenceAndWord() {
@@ -45,12 +42,8 @@ export abstract class MultipleChoiceSentenceActivity extends Activity {
         }
     }
 
-    cleanup() {
-        this.multipleChoice.cleanup()
-    }
-
     update(last: Activity) {
-        if (last instanceof MultipleChoiceSentenceActivity) {
+        if (last instanceof SentenceActivity) {
             this.setIndex(last.index + 1)
         }
     }
@@ -62,7 +55,5 @@ export abstract class MultipleChoiceSentenceActivity extends Activity {
     onClickWord(word: string) {}
 
     abstract title(): string
-    abstract createTextView()
-    abstract createMultipleChoice()
 
 }

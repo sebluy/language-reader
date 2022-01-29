@@ -1,16 +1,24 @@
 import { MultipleChoice } from './multiple-choice.js'
 import { TextView } from './text-view.js'
-import { MultipleChoiceSentenceActivity } from './multiple-choice-sentence-activity.js';
+import { SentenceActivity } from './sentence-activity.js';
 
-export class Cloze extends MultipleChoiceSentenceActivity {
+export class Cloze extends SentenceActivity {
+
+    multipleChoice: MultipleChoice
 
     show() {
         super.show()
         this.controller.sidebar.showWordDefinition()
+        this.createTextView()
+        this.createMultipleChoice()
     }
 
     title() {
         return 'Cloze'
+    }
+
+    cleanup() {
+        this.multipleChoice.cleanup()
     }
 
     createTextView() {
