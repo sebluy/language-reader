@@ -153,11 +153,10 @@ export class SideBar {
         let fp = (p) => (p * 100).toFixed(2) + '%'
         let newTable = Utility.createHTML(
             ['tbody',
-                ['tr', ['td', 'Number of Words'], ['td', stats.numberOfWords]],
-                ['tr', ['td', 'Number of Distinct Words'], ['td', stats.numberOfDistinctWords]],
-                ['tr', ['td', 'Percent Translated'], ['td', fp(stats.percentTranslated)]],
                 ['tr', ['td', 'Total Words Translated'], ['td', stats.totalWordsTranslated]],
+                ['tr', ['td', 'New Words'], ['td', stats.newWords]],
                 ['tr', ['td', 'Words Learned Today'], ['td', runtimeData.wordsLearnedToday]],
+                ['tr', ['td', 'Percent Translated'], ['td', fp(stats.percentTranslated)]],
                 ['tr', ['td', 'Words Mastered'], ['td', fp(stats.percentWordsMastered)]],
                 ['tr', ['td', 'Today\'s XP'], ['td', runtimeData.xpToday]],
                 ['tr', ['td', 'Last XP'], ['td', runtimeData.xpLast]]

@@ -16,5 +16,8 @@ export class Word {
             return 0;
         return this.count;
     }
+    getNewCount() {
+        return this.definition === '' ? 1 : 0;
+    }
 }
 Word.MAX_MASTERY = 5;

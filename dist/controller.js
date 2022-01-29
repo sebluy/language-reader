@@ -20,6 +20,16 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
+// TODO: new idea: Android App
+// TODO: import database from reader
+// TODO: show a random sentence:
+// TODO: swipe left if you know it
+// TODO: swipe right if you don't
+// TODO: if you swipe right, show translation, alongside "word-for-word" translation
+// TODO: Maybe just focus on translation and less on the rest?
+// TODO: Separate activities out more.
+// TODO: Do more of one at a time instead of by page.
+// TODO: Add an option to use all unmastered instead of just from page.
 // TODO: Find someway to prevent the same sentence coming up over and over again during the listening.
 // TODO: Fix XP last for day rollover
 // TODO: Keep sidebar in sync
@@ -164,14 +174,18 @@ export class Controller {
         let next;
         if (stats.percentWordsMastered < 0.70)
             next = new VocabInContext(this);
+        else if (stats.percentWordsMastered < 0.80)
+            next = new Listening(this);
         else if (stats.percentWordsMastered < 0.85)
             next = new VocabularyMatching(this);
         else if (stats.percentWordsMastered < 0.90)
-            next = new Listening(this);
+            next = new Unscramble(this);
         else if (stats.percentWordsMastered < 0.95)
             next = new Cloze(this);
-        else
+        else if (stats.percentWordsMastered < 1.00)
             next = new Listening2(this);
+        else
+            next = new Reader(this);
         next.update(last);
         next.nextActivity = () => this.showAuto();
         this.showActivity(next);

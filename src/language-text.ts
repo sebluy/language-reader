@@ -125,16 +125,17 @@ export class LanguageText {
         let countTranslated = 0
         let wMastered = 0
         let numberOfWords = 0
+        let newWords = 0
         this.words.forEach((data) => {
             wMastered += data.mastery
             numberOfWords += data.count
             countTranslated += data.getTranslatedCount()
+            newWords += data.getNewCount()
         })
         let percentTranslated = countTranslated === 0 ? 0 : countTranslated / numberOfWords
         let percentWMastered = wMastered / (this.words.size * 5)
         return {
-            numberOfWords: numberOfWords,
-            numberOfDistinctWords: this.words.size,
+            newWords: newWords,
             totalWordsTranslated: this.totalWordsTranslated,
             percentTranslated: percentTranslated,
             percentWordsMastered: percentWMastered,

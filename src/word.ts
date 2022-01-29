@@ -23,4 +23,8 @@ export class Word {
         return this.count
     }
 
+    getNewCount() {
+        return this.definition === '' ? 1 : 0;
+    }
+
 }
