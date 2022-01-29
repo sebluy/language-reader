@@ -30,9 +30,9 @@ export class Cloze extends SentenceActivity {
         }
         textView.render(this.textE)
 
-        let p = document.createElement('p')
-        p.innerText = this.sentence.definition
-        this.textE.append(p)
+//        let p = document.createElement('p')
+//        p.innerText = this.sentence.definition
+//        this.textE.append(p)
     }
 
     createMultipleChoice() {
