@@ -36,10 +36,12 @@
 #stats {
     font-size: medium;
     text-align: left;
+    min-width: 250px;
 }
 
 #stats td {
     border: 1px solid black;
+    font-size: small;
     padding: 5px;
 }
 
