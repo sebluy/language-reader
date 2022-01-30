@@ -20,6 +20,9 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
+// TODO: how to improve listening comprehension?
+// TODO: simply by listening with or without the english text and repeating the audio for a sentence several times
+// TODO: but maybe it's better to focus on reading first
 // TODO: new idea: Android App
 // TODO: import database from reader
 // TODO: show a random sentence:
@@ -174,7 +177,7 @@ export class Controller {
         let next;
         if (stats.percentWordsMastered < 0.70)
             next = new VocabInContext(this);
-        else if (stats.percentWordsMastered < 0.80)
+        else if (stats.percentWordsMastered < 0.75)
             next = new Listening(this);
         else if (stats.percentWordsMastered < 0.85)
             next = new VocabularyMatching(this);

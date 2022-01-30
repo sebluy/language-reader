@@ -14,6 +14,10 @@ import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
+// TODO: how to improve listening comprehension?
+// TODO: simply by listening with or without the english text and repeating the audio for a sentence several times
+// TODO: but maybe it's better to focus on reading first
+
 // TODO: new idea: Android App
 // TODO: import database from reader
 // TODO: show a random sentence:
@@ -177,7 +181,7 @@ export class Controller implements ControllerInterface {
         let stats = this.languageText.updateStats()
         let next
         if (stats.percentWordsMastered < 0.70) next = new VocabInContext(this)
-        else if (stats.percentWordsMastered < 0.80) next = new Listening(this)
+        else if (stats.percentWordsMastered < 0.75) next = new Listening(this)
         else if (stats.percentWordsMastered < 0.85) next = new VocabularyMatching(this)
         else if (stats.percentWordsMastered < 0.90) next = new Unscramble(this)
         else if (stats.percentWordsMastered < 0.95) next = new Cloze(this)
