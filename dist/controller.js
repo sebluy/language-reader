@@ -179,14 +179,14 @@ export class Controller {
             next = new VocabInContext(this);
         else if (stats.percentWordsMastered < 0.75)
             next = new Listening(this);
-        else if (stats.percentWordsMastered < 0.85)
-            next = new VocabularyMatching(this);
-        else if (stats.percentWordsMastered < 0.90)
+        else if (stats.percentWordsMastered < 0.80)
             next = new Unscramble(this);
-        else if (stats.percentWordsMastered < 0.95)
+        else if (stats.percentWordsMastered < 0.85)
+            next = new Listening2(this);
+        else if (stats.percentWordsMastered < 0.90)
             next = new Cloze(this);
         else if (stats.percentWordsMastered < 1.00)
-            next = new Listening2(this);
+            next = new VocabularyMatching(this);
         else
             next = new Reader(this);
         next.update(last);
