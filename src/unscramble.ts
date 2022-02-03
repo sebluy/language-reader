@@ -31,6 +31,7 @@ export class Unscramble extends SentenceActivity {
         }
         view.onClickWord = (word) => this.controller.sidebar.showWord(word)
         view.render()
+        if (view.checkAnswer()) view.onCorrectAnswer()
     }
 
     cleanup() {}

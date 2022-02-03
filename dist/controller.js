@@ -175,16 +175,15 @@ export class Controller {
         let last = this.activity;
         let stats = this.languageText.updateStats();
         let next;
+        // TODO: Make this user adjustable?
         if (stats.percentWordsMastered < 0.70)
             next = new VocabInContext(this);
         else if (stats.percentWordsMastered < 0.75)
-            next = new Listening(this);
+            next = new Cloze(this);
         else if (stats.percentWordsMastered < 0.80)
             next = new Unscramble(this);
-        else if (stats.percentWordsMastered < 0.85)
-            next = new Listening2(this);
         else if (stats.percentWordsMastered < 0.90)
-            next = new Cloze(this);
+            next = new Listening2(this);
         else if (stats.percentWordsMastered < 1.00)
             next = new VocabularyMatching(this);
         else

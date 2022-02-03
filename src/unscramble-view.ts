@@ -6,6 +6,7 @@ export class UnscrambleView {
     words: Array<string>
     current: Array<string>
     p: HTMLElement
+    SCRAMBLE_COUNT: number = 5
 
     constructor(parent, words, word) {
         this.p = document.createElement('p')
@@ -17,19 +18,16 @@ export class UnscrambleView {
     }
 
     buildCurrent() {
-        if (this.words.length <= 1) {
-            this.current = []
-            return
-        }
         this.current = [...this.words]
-        let index = this.words.indexOf(this.word)
-        let randomIndex = index
-        while (this.current[randomIndex] === this.current[index]) {
-            randomIndex = Math.floor(Math.random() * this.words.length)
+        if (this.current.length <= 1) return
+        let currentIndex = this.words.indexOf(this.word)
+        for (let i = 0; i < this.SCRAMBLE_COUNT; i++) {
+            let randomIndex = Math.floor(Math.random() * this.words.length)
+            let temp = this.current[currentIndex]
+            this.current[currentIndex] = this.current[randomIndex]
+            this.current[randomIndex] = temp
+            currentIndex = randomIndex;
         }
-        let temp = this.current[index]
-        this.current[index] = this.current[randomIndex]
-        this.current[randomIndex] = temp
     }
 
     checkAnswer() {
