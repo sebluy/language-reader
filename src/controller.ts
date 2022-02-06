@@ -15,9 +15,7 @@ import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
 // TODO: Use React? Vue?
-// TODO: Fix long audio load slowing down page.
 
-// TODO: move the sidebar with the content
 // TODO: clean up interface with blank DB
 
 // TODO: how to improve listening comprehension?
@@ -156,20 +154,12 @@ export class Controller implements ControllerInterface {
         this.sidebar.setNames()
         this.db.putRuntimeData(this.runtimeData)
         this.db.putAudioFile(file)
-        this.loadAudioFile(URL.createObjectURL(file))
+        this.loadAudioFile(file)
     }
 
-    loadAudioFile(url) {
-        if (url === undefined) return
-        if (url instanceof File) {
-            let reader = new FileReader()
-            reader.readAsDataURL(url)
-            reader.onload = () => {
-                if (typeof reader.result === 'string') this.sidebar.setAudioSource(reader.result)
-            }
-        } else {
-            this.sidebar.setAudioSource(url)
-        }
+    loadAudioFile(file) {
+        if (file === undefined) return
+        this.sidebar.setAudioSource(URL.createObjectURL(file))
     }
 
     showActivityByName(name: string) {

@@ -32,6 +32,7 @@ export class DefinitionInput {
         }
         e.stopPropagation();
     }
+    // TODO: escape ;
     googleTranslate() {
         const text = this.textE.innerText;
         const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl='

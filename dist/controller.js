@@ -20,8 +20,9 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
-// TODO: add more languages? Spanish!
 // TODO: Use React? Vue?
+// TODO: Fix long audio load slowing down page.
+// TODO: move the sidebar with the content
 // TODO: clean up interface with blank DB
 // TODO: how to improve listening comprehension?
 // TODO: simply by listening with or without the english text and repeating the audio for a sentence several times
@@ -140,22 +141,12 @@ export class Controller {
         this.sidebar.setNames();
         this.db.putRuntimeData(this.runtimeData);
         this.db.putAudioFile(file);
-        this.loadAudioFile(URL.createObjectURL(file));
+        this.loadAudioFile(file);
     }
-    loadAudioFile(url) {
-        if (url === undefined)
+    loadAudioFile(file) {
+        if (file === undefined)
             return;
-        if (url instanceof File) {
-            let reader = new FileReader();
-            reader.readAsDataURL(url);
-            reader.onload = () => {
-                if (typeof reader.result === 'string')
-                    this.sidebar.setAudioSource(reader.result);
-            };
-        }
-        else {
-            this.sidebar.setAudioSource(url);
-        }
+        this.sidebar.setAudioSource(URL.createObjectURL(file));
     }
     showActivityByName(name) {
         if (name === 'reader')
