@@ -14,6 +14,11 @@ import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
+// TODO: Use React? Vue?
+
+// TODO: move the sidebar with the content
+// TODO: clean up interface with blank DB
+
 // TODO: how to improve listening comprehension?
 // TODO: simply by listening with or without the english text and repeating the audio for a sentence several times
 // TODO: but maybe it's better to focus on reading first
@@ -97,6 +102,7 @@ export class Controller implements ControllerInterface {
         runtimeData.updateForNewDay()
         this.runtimeData = runtimeData
         this.sidebar.setNames()
+        this.sidebar.setLanguage(runtimeData.language)
         if (runtimeData.openTextFile) {
             let text = await this.db.getTextFile()
             this.loadTextFile(text)
@@ -233,6 +239,11 @@ export class Controller implements ControllerInterface {
     learnNewWords(n: number) {
         this.runtimeData.wordsLearnedToday += n
         this.runtimeData.xpToday += n
+        this.db.putRuntimeData(this.runtimeData)
+    }
+
+    updateLanguage(language: string) {
+        this.runtimeData.language = language
         this.db.putRuntimeData(this.runtimeData)
     }
 

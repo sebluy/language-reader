@@ -34,7 +34,8 @@ export class DefinitionInput {
     }
     googleTranslate() {
         const text = this.textE.innerText;
-        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=cs&tl=en&dt=t&q=' + text;
+        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl='
+            + this.language + '&tl=en&dt=t&q=' + text;
         fetch(url).then(res => res.json()).then(res => {
             this.definitionE.value = res[0][0][0];
             this.definitionE.focus();

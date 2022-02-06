@@ -6,6 +6,7 @@ export class RuntimeData {
         data.xpDate = (new Date()).toLocaleDateString();
         data.currentPage = 0;
         data.wordsLearnedToday = 0;
+        data.language = 'es';
         return data;
     }
     static fromObject(o) {

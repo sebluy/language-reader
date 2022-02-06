@@ -27,6 +27,7 @@ export class SideBar {
     nextPageE: HTMLElement
     textNameE: HTMLElement
     audioNameE: HTMLElement
+    languageE: HTMLInputElement
 
     // TODO: extract object for audio
 
@@ -60,6 +61,7 @@ export class SideBar {
         this.nextPageE = document.getElementById('next-page')
         this.audioNameE = document.getElementById('audio-name')
         this.textNameE = document.getElementById('text-name')
+        this.languageE = <HTMLInputElement>document.getElementById('language')
 
         this.highlightCB.addEventListener('click', () => {
             this.highlightingOn = !this.highlightingOn
@@ -69,6 +71,9 @@ export class SideBar {
         this.audioEndE.addEventListener('focusout', () => this.updateAudioTimes())
         this.previousPageE.addEventListener('click', (e) => this.controller.changePageBy(-1))
         this.nextPageE.addEventListener('click', (e) => this.controller.changePageBy(1))
+        this.languageE.addEventListener('focusout', (e) => {
+            this.controller.updateLanguage(this.languageE.value)
+        })
 
         document.getElementById('update-stats').addEventListener('click', () => this.updateStats())
 
@@ -256,13 +261,20 @@ export class SideBar {
     }
 
     setNames() {
-        this.textNameE.innerText = this.controller.runtimeData.openTextFile
-        this.audioNameE.innerText = this.controller.runtimeData.openAudioFile
+        let tf = this.controller.runtimeData.openTextFile
+        let af = this.controller.runtimeData.openAudioFile
+        this.textNameE.innerText = tf || 'Please open file.'
+        this.audioNameE.innerText = af || 'Please open file.'
+    }
+
+    setLanguage(language: string) {
+        this.languageE.value = language
+        this.wordDefinitionE.language = language
+        this.sentenceDefinitionE.language = language
     }
 
     highlightSentence(i) {}
     unhighlightSentence(i) {}
-    checkAnswer() {}
     updateHighlighting(on: boolean) {}
     onNextWord() {}
     onNextSentence() {}

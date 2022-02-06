@@ -29,6 +29,7 @@ export class SideBar {
         this.nextPageE = document.getElementById('next-page');
         this.audioNameE = document.getElementById('audio-name');
         this.textNameE = document.getElementById('text-name');
+        this.languageE = document.getElementById('language');
         this.highlightCB.addEventListener('click', () => {
             this.highlightingOn = !this.highlightingOn;
             this.updateHighlighting(this.highlightingOn);
@@ -37,6 +38,9 @@ export class SideBar {
         this.audioEndE.addEventListener('focusout', () => this.updateAudioTimes());
         this.previousPageE.addEventListener('click', (e) => this.controller.changePageBy(-1));
         this.nextPageE.addEventListener('click', (e) => this.controller.changePageBy(1));
+        this.languageE.addEventListener('focusout', (e) => {
+            this.controller.updateLanguage(this.languageE.value);
+        });
         document.getElementById('update-stats').addEventListener('click', () => this.updateStats());
         document.getElementById('open-files')
             .addEventListener('click', () => this.controller.openFiles());
@@ -207,12 +211,18 @@ export class SideBar {
         this.showElement(this.nextPageE, true);
     }
     setNames() {
-        this.textNameE.innerText = this.controller.runtimeData.openTextFile;
-        this.audioNameE.innerText = this.controller.runtimeData.openAudioFile;
+        let tf = this.controller.runtimeData.openTextFile;
+        let af = this.controller.runtimeData.openAudioFile;
+        this.textNameE.innerText = tf || 'Please open file.';
+        this.audioNameE.innerText = af || 'Please open file.';
+    }
+    setLanguage(language) {
+        this.languageE.value = language;
+        this.wordDefinitionE.language = language;
+        this.sentenceDefinitionE.language = language;
     }
     highlightSentence(i) { }
     unhighlightSentence(i) { }
-    checkAnswer() { }
     updateHighlighting(on) { }
     onNextWord() { }
     onNextSentence() { }

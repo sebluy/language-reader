@@ -20,6 +20,9 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
+// TODO: add more languages? Spanish!
+// TODO: Use React? Vue?
+// TODO: clean up interface with blank DB
 // TODO: how to improve listening comprehension?
 // TODO: simply by listening with or without the english text and repeating the audio for a sentence several times
 // TODO: but maybe it's better to focus on reading first
@@ -89,6 +92,7 @@ export class Controller {
             runtimeData.updateForNewDay();
             this.runtimeData = runtimeData;
             this.sidebar.setNames();
+            this.sidebar.setLanguage(runtimeData.language);
             if (runtimeData.openTextFile) {
                 let text = yield this.db.getTextFile();
                 this.loadTextFile(text);
@@ -229,6 +233,10 @@ export class Controller {
     learnNewWords(n) {
         this.runtimeData.wordsLearnedToday += n;
         this.runtimeData.xpToday += n;
+        this.db.putRuntimeData(this.runtimeData);
+    }
+    updateLanguage(language) {
+        this.runtimeData.language = language;
         this.db.putRuntimeData(this.runtimeData);
     }
 }

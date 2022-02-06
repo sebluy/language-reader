@@ -27,25 +27,25 @@ export class LanguageText {
         let pages = [];
         let pageStart = 0;
         let lastTab = 0;
-        let nextTab = 0;
+        let nextNewline = 0;
         let i = 0;
         while (true) {
             i++;
             if (i === 1000)
                 break;
-            nextTab = text.indexOf("\t", lastTab + 1);
-            if (nextTab === -1) {
+            nextNewline = text.indexOf("\n", lastTab + 1);
+            if (nextNewline === -1) {
                 pages.push(text.substring(pageStart));
                 break;
             }
-            if (nextTab - pageStart > idealLength) {
+            if (nextNewline - pageStart > idealLength) {
                 let diffA = Math.abs(lastTab - pageStart - idealLength);
-                let diffB = Math.abs(nextTab - pageStart - idealLength);
-                let pageEnd = diffA < diffB ? lastTab : nextTab;
+                let diffB = Math.abs(nextNewline - pageStart - idealLength);
+                let pageEnd = diffA < diffB ? lastTab : nextNewline;
                 pages.push(text.substring(pageStart, pageEnd));
                 pageStart = pageEnd;
             }
-            lastTab = nextTab;
+            lastTab = nextNewline;
         }
         return pages;
     }

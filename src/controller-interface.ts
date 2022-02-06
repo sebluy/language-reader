@@ -21,5 +21,5 @@ export interface ControllerInterface {
 
     addXP(n: number)
     learnNewWords(n: number)
-
+    updateLanguage(language: string): void
 }

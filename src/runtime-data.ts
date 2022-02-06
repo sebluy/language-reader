@@ -7,6 +7,7 @@ export class RuntimeData {
     openAudioFile: string
     openTextFile: string
     wordsLearnedToday: number
+    language: string
 
     static empty() {
         let data = new RuntimeData()
@@ -15,6 +16,7 @@ export class RuntimeData {
         data.xpDate = (new Date()).toLocaleDateString()
         data.currentPage = 0
         data.wordsLearnedToday = 0
+        data.language = 'es'
         return data
     }
 
