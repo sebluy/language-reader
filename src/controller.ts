@@ -15,6 +15,7 @@ import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
 // TODO: Use React? Vue?
+// TODO: Fix long audio load slowing down page.
 
 // TODO: move the sidebar with the content
 // TODO: clean up interface with blank DB
