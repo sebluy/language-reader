@@ -15,9 +15,10 @@ export class Utility {
         return random;
     }
     static cleanWord(word) {
-        const punctuation = /[,.!?"“„‘‚:\-–;…()]+/;
-        const regex = new RegExp('^' + punctuation.source + '|' + punctuation.source + '$', 'g');
-        return word.replaceAll(regex, '').toLowerCase();
+        let match = word.match(/\p{Letter}+/u);
+        if (match)
+            return match[0].toLowerCase();
+        return '';
     }
     static shuffle(a) {
         for (let i = a.length - 1; i > 0; i--) {

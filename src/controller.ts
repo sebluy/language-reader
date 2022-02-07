@@ -14,6 +14,7 @@ import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
+// TODO: Fix google translate with ;
 // TODO: Use React? Vue?
 
 // TODO: clean up interface with blank DB

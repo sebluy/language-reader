@@ -20,9 +20,8 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
+// TODO: Fix google translate with ;
 // TODO: Use React? Vue?
-// TODO: Fix long audio load slowing down page.
-// TODO: move the sidebar with the content
 // TODO: clean up interface with blank DB
 // TODO: how to improve listening comprehension?
 // TODO: simply by listening with or without the english text and repeating the audio for a sentence several times
