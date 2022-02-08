@@ -20,7 +20,6 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
-// TODO: Fix google translate with ;
 // TODO: Use React? Vue?
 // TODO: clean up interface with blank DB
 // TODO: how to improve listening comprehension?
@@ -85,6 +84,7 @@ export class Controller {
     }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.setMidnightTimerForRuntimeData();
             let runtimeData = yield this.db.getRuntimeData();
             if (runtimeData === undefined)
                 runtimeData = RuntimeData.empty();
@@ -228,6 +228,18 @@ export class Controller {
     updateLanguage(language) {
         this.runtimeData.language = language;
         this.db.putRuntimeData(this.runtimeData);
+    }
+    setMidnightTimerForRuntimeData() {
+        let now = new Date();
+        let midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        let timeToMidnight = midnight.getTime() - now.getTime();
+        console.log('Now ' + now);
+        console.log('Will execute in ' + timeToMidnight);
+        setTimeout(() => {
+            this.setMidnightTimerForRuntimeData();
+            this.runtimeData.updateForNewDay();
+            this.sidebar.updateStats();
+        }, timeToMidnight);
     }
 }
 new Controller();

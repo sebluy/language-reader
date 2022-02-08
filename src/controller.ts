@@ -14,7 +14,6 @@ import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
-// TODO: Fix google translate with ;
 // TODO: Use React? Vue?
 
 // TODO: clean up interface with blank DB
@@ -96,6 +95,7 @@ export class Controller implements ControllerInterface {
     }
 
     async load() {
+        this.setMidnightTimerForRuntimeData()
         let runtimeData = await this.db.getRuntimeData()
         if (runtimeData === undefined) runtimeData = RuntimeData.empty()
         console.log(runtimeData)
@@ -237,6 +237,19 @@ export class Controller implements ControllerInterface {
     updateLanguage(language: string) {
         this.runtimeData.language = language
         this.db.putRuntimeData(this.runtimeData)
+    }
+
+    setMidnightTimerForRuntimeData() {
+        let now = new Date()
+        let midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+        let timeToMidnight = midnight.getTime() - now.getTime()
+        console.log('Now ' + now)
+        console.log('Will execute in ' + timeToMidnight)
+        setTimeout(() => {
+            this.setMidnightTimerForRuntimeData()
+            this.runtimeData.updateForNewDay()
+            this.sidebar.updateStats()
+        }, timeToMidnight)
     }
 
 }
