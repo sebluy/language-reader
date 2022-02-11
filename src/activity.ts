@@ -1,4 +1,4 @@
-import { ControllerInterface } from './controller-interface.js'
+import { ControllerInterface } from './controller-interface'
 
 export class Activity {
 

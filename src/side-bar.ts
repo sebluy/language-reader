@@ -1,8 +1,10 @@
-import { Utility } from './utility.js'
-import { LanguageText } from './language-text.js'
-import { Sentence } from './sentence.js'
-import { ControllerInterface } from './controller-interface.js'
-import { DefinitionInput } from './definition-input.js'
+import { Utility } from './utility'
+import { LanguageText } from './language-text'
+import { Sentence } from './sentence'
+import { ControllerInterface } from './controller-interface'
+import { DefinitionInput } from './definition-input'
+import * as ReactDOM from 'react-dom'
+import * as React from 'react'
 
 export class SideBar {
 
@@ -16,8 +18,8 @@ export class SideBar {
     currentSentence: Sentence
     marker: number
 
-    wordDefinitionE: DefinitionInput
-    sentenceDefinitionE: DefinitionInput
+    // wordDefinitionE: DefinitionInput
+    // sentenceDefinitionE: DefinitionInput
     statsE: HTMLElement
     highlightCB: HTMLElement
     audioE: HTMLAudioElement
@@ -38,19 +40,20 @@ export class SideBar {
     }
 
     setElementsAndListeners() {
-        this.wordDefinitionE = new DefinitionInput(document.getElementById('word-definition'))
-        this.wordDefinitionE.onUpdateDefinition = (text, definition) => {
-            this.languageText.updateWordDefinition(text, definition)
-        }
-        this.wordDefinitionE.onNext = () => this.onNextWord()
-        this.wordDefinitionE.render()
-
-        this.sentenceDefinitionE = new DefinitionInput(document.getElementById('sentence-definition'))
-        this.sentenceDefinitionE.onUpdateDefinition = (text, definition) => {
-            this.languageText.updateSentenceDefinition(text, definition)
-        }
-        this.sentenceDefinitionE.onNext = () => this.onNextSentence()
-        this.sentenceDefinitionE.render('textarea')
+        let definitions = document.getElementById('definitions')
+        ReactDOM.render(React.createElement(DefinitionInput), definitions)
+        ReactDOM.render(React.createElement(DefinitionInput), definitions)
+        // this.wordDefinitionE.onUpdateDefinition = (text, definition) => {
+        //     this.languageText.updateWordDefinition(text, definition)
+        // }
+        // this.wordDefinitionE.onNext = () => this.onNextWord()
+        // this.wordDefinitionE.render()
+        //
+        // this.sentenceDefinitionE.onUpdateDefinition = (text, definition) => {
+        //     this.languageText.updateSentenceDefinition(text, definition)
+        // }
+        // this.sentenceDefinitionE.onNext = () => this.onNextSentence()
+        // this.sentenceDefinitionE.render('textarea')
 
         this.statsE = document.getElementById('stats')
         this.highlightCB = document.getElementById('highlight')
@@ -132,10 +135,10 @@ export class SideBar {
     showWord(word: string, sentence?: string) {
         let wordO = this.languageText.words.get(word)
         let sentenceO = this.languageText.sentenceMap.get(sentence)
-        if (wordO !== undefined)
-            this.wordDefinitionE.show(wordO.word, wordO.definition)
-        if (sentenceO !== undefined)
-            this.sentenceDefinitionE.show(sentenceO.sentence, sentenceO.definition, false)
+        // if (wordO !== undefined)
+            // this.wordDefinitionE.show(wordO.word, wordO.definition)
+        // if (sentenceO !== undefined)
+            // this.sentenceDefinitionE.show(sentenceO.sentence, sentenceO.definition, false)
     }
 
     showSentence(sentence) {
@@ -221,8 +224,8 @@ export class SideBar {
     }
 
     hideAll() {
-        this.showElement(this.wordDefinitionE.parent, false)
-        this.showElement(this.sentenceDefinitionE.parent, false)
+        // this.showElement(this.wordDefinitionE.parent, false)
+        // this.showElement(this.sentenceDefinitionE.parent, false)
         this.showElement(this.audioE, false)
         this.showElement(this.highlightCB, false)
         this.showElement(this.previousPageE, false)
@@ -233,12 +236,12 @@ export class SideBar {
 
     showWordDefinition(onNextWord?) {
         this.onNextWord = onNextWord
-        this.showElement(this.wordDefinitionE.parent, true)
+        // this.showElement(this.wordDefinitionE.parent, true)
     }
 
     showSentenceDefinition(onNextSentence?) {
         this.onNextSentence = onNextSentence
-        this.showElement(this.sentenceDefinitionE.parent, true)
+        // this.showElement(this.sentenceDefinitionE.parent, true)
     }
 
     showAudio() {
@@ -269,8 +272,8 @@ export class SideBar {
 
     setLanguage(language: string) {
         this.languageE.value = language
-        this.wordDefinitionE.language = language
-        this.sentenceDefinitionE.language = language
+        // this.wordDefinitionE.language = language
+        // this.sentenceDefinitionE.language = language
     }
 
     highlightSentence(i) {}

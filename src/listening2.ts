@@ -1,5 +1,5 @@
-import { MultipleChoice } from './multiple-choice.js'
-import { SentenceActivity } from './sentence-activity.js';
+import { MultipleChoice } from './multiple-choice'
+import { SentenceActivity } from './sentence-activity';
 
 export class Listening2 extends SentenceActivity {
 

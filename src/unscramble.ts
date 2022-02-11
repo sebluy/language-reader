@@ -1,5 +1,5 @@
-import { UnscrambleView } from './unscramble-view.js'
-import { SentenceActivity } from './sentence-activity.js'
+import { UnscrambleView } from './unscramble-view'
+import { SentenceActivity } from './sentence-activity'
 
 export class Unscramble extends SentenceActivity {
 

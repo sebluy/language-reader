@@ -1,5 +1,5 @@
-import { Utility } from './utility.js'
-import { RawSentence } from './raw-sentence.js'
+import { Utility } from './utility'
+import { RawSentence } from './raw-sentence'
 
 export class TextView {
 

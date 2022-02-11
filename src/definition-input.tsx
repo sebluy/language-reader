@@ -1,29 +1,34 @@
+import * as React from 'react'
 
-export class DefinitionInput {
+export class DefinitionInput extends React.Component {
 
-    parent: HTMLElement
     textE: HTMLElement
     definitionE: HTMLInputElement
     language: string
 
-    constructor(parent: HTMLElement) {
-        this.parent = parent
+    render() {
+        return (
+            <div>
+                <span>...</span>
+                <input type="text"/>
+                <button>Google Translate</button>
+            </div>
+        );
     }
 
-    render(definitionElement: string = 'input') {
-        this.textE = document.createElement('span')
-        this.textE.innerText = '...'
-
-        this.definitionE = <HTMLInputElement>document.createElement(definitionElement)
-        this.definitionE.addEventListener('focusout', () => this.updateDefinition())
-        this.definitionE.addEventListener('keydown', (e) => this.next(e))
-
-        let googleTranslateB = document.createElement('button')
-        googleTranslateB.innerText = 'Google Translate'
-        googleTranslateB.addEventListener('click', () => this.googleTranslate())
-
-        this.parent.append(this.textE, this.definitionE, googleTranslateB)
-    }
+    // render(definitionElement: string = 'input') {
+    //     this.textE = document.createElement('span')
+    //     this.textE.innerText = '...'
+    //
+    //     this.definitionE = <HTMLInputElement>document.createElement(definitionElement)
+    //     this.definitionE.addEventListener('focusout', () => this.updateDefinition())
+    //     this.definitionE.addEventListener('keydown', (e) => this.next(e))
+    //
+    //     let googleTranslateB = document.createElement('button')
+    //     googleTranslateB.innerText = 'Google Translate'
+    //     googleTranslateB.addEventListener('click', () => this.googleTranslate())
+    //
+    // }
 
     updateDefinition() {
         let text = this.textE.innerText

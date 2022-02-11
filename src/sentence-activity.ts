@@ -1,8 +1,8 @@
-import { LanguageText } from './language-text.js'
-import { Sentence } from './sentence.js';
-import { Word } from './word.js';
-import { RawSentence } from './raw-sentence.js'
-import { Activity } from './activity.js'
+import { LanguageText } from './language-text'
+import { Sentence } from './sentence';
+import { Word } from './word';
+import { RawSentence } from './raw-sentence'
+import { Activity } from './activity'
 
 // TODO: change this to just sentence activity
 export abstract class SentenceActivity extends Activity {

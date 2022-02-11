@@ -1,9 +1,9 @@
-import { Utility } from './utility.js'
-import { LanguageText } from './language-text.js'
-import { RawSentence } from './raw-sentence.js'
-import { Activity } from './activity.js'
-import { Word } from './word.js'
-import { SideBar } from './side-bar.js'
+import { Utility } from './utility'
+import { LanguageText } from './language-text'
+import { RawSentence } from './raw-sentence'
+import { Activity } from './activity'
+import { Word } from './word'
+import { SideBar } from './side-bar'
 
 export class Reader extends Activity {
 

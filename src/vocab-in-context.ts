@@ -1,6 +1,6 @@
-import { MultipleChoice } from './multiple-choice.js'
-import { TextView } from './text-view.js'
-import { SentenceActivity } from './sentence-activity.js'
+import { MultipleChoice } from './multiple-choice'
+import { TextView } from './text-view'
+import { SentenceActivity } from './sentence-activity'
 
 export class VocabInContext extends SentenceActivity {
 

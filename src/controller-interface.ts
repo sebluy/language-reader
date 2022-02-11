@@ -1,8 +1,8 @@
-import { RuntimeData } from './runtime-data.js'
-import { LanguageText } from './language-text.js'
-import { MainWindow } from './main-window.js'
-import { SideBar } from './side-bar.js'
-import { Activity } from './activity.js'
+import { RuntimeData } from './runtime-data'
+import { LanguageText } from './language-text'
+import { MainWindow } from './main-window'
+import { SideBar } from './side-bar'
+import { Activity } from './activity'
 
 export interface ControllerInterface {
     mainWindow: MainWindow

@@ -1,14 +1,14 @@
-import { Benchmark } from './benchmark.js'
-import {RuntimeData} from './runtime-data.js'
-import {Sentence} from './sentence.js'
-import {Word} from './word.js'
+import { Benchmark } from './benchmark'
+import { RuntimeData } from './runtime-data'
+import { Sentence } from './sentence'
+import { Word } from './word'
+import Dexie from 'dexie'
 
 export class LanguageDb {
 
     db: any
 
     constructor() {
-        // @ts-ignore
         this.db = new Dexie('LanguageDB')
         this.db.version(1).stores({
             words: 'word',

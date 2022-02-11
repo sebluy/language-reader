@@ -1,9 +1,9 @@
-import { Utility } from './utility.js'
-import { Word } from './word.js'
-import { Sentence } from './sentence.js'
-import { RawSentence } from './raw-sentence.js'
-import { LanguageDb } from './language-db.js'
-import { ControllerInterface } from './controller-interface.js'
+import { Utility } from './utility'
+import { Word } from './word'
+import { Sentence } from './sentence'
+import { RawSentence } from './raw-sentence'
+import { LanguageDb } from './language-db'
+import { ControllerInterface } from './controller-interface'
 
 export class LanguageText {
     controller: ControllerInterface
