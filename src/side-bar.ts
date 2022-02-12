@@ -18,8 +18,9 @@ export class SideBar {
     currentSentence: Sentence
     marker: number
 
-    // wordDefinitionE: DefinitionInput
-    // sentenceDefinitionE: DefinitionInput
+    wordDefinitionProps: any
+    sentenceDefinitionProps: any
+
     statsE: HTMLElement
     highlightCB: HTMLElement
     audioE: HTMLAudioElement
@@ -39,21 +40,43 @@ export class SideBar {
         this.setElementsAndListeners()
     }
 
-    setElementsAndListeners() {
+    renderDefinitionInputs() {
         let definitions = document.getElementById('definitions')
-        ReactDOM.render(React.createElement(DefinitionInput), definitions)
-        ReactDOM.render(React.createElement(DefinitionInput), definitions)
-        // this.wordDefinitionE.onUpdateDefinition = (text, definition) => {
-        //     this.languageText.updateWordDefinition(text, definition)
-        // }
-        // this.wordDefinitionE.onNext = () => this.onNextWord()
-        // this.wordDefinitionE.render()
-        //
-        // this.sentenceDefinitionE.onUpdateDefinition = (text, definition) => {
-        //     this.languageText.updateSentenceDefinition(text, definition)
-        // }
-        // this.sentenceDefinitionE.onNext = () => this.onNextSentence()
-        // this.sentenceDefinitionE.render('textarea')
+        ReactDOM.render([
+            React.createElement(DefinitionInput, {
+                key: 1,
+                id: 'word-definition',
+                onUpdateDefinition: (text, definition) => {
+                    this.languageText.updateWordDefinition(text, definition)
+                },
+                onNext: () => this.onNextWord(),
+                onDefinitionChange: (value) => {
+                    this.wordDefinitionProps.definition = value
+                    this.renderDefinitionInputs()
+                },
+                ...this.wordDefinitionProps
+            }),
+            React.createElement(DefinitionInput, {
+                key: 2,
+                id: 'sentence-definition',
+                tag: 'textarea',
+                onUpdateDefinition: (text, definition) => {
+                    this.languageText.updateSentenceDefinition(text, definition)
+                },
+                onNext: () => this.onNextSentence(),
+                onDefinitionChange: (value) => {
+                    this.sentenceDefinitionProps.definition = value
+                    this.renderDefinitionInputs()
+                },
+                ...this.sentenceDefinitionProps
+            }),
+        ], definitions)
+    }
+
+    setElementsAndListeners() {
+        this.wordDefinitionProps = {}
+        this.sentenceDefinitionProps = {}
+        this.renderDefinitionInputs()
 
         this.statsE = document.getElementById('stats')
         this.highlightCB = document.getElementById('highlight')
@@ -135,10 +158,12 @@ export class SideBar {
     showWord(word: string, sentence?: string) {
         let wordO = this.languageText.words.get(word)
         let sentenceO = this.languageText.sentenceMap.get(sentence)
-        // if (wordO !== undefined)
-            // this.wordDefinitionE.show(wordO.word, wordO.definition)
-        // if (sentenceO !== undefined)
-            // this.sentenceDefinitionE.show(sentenceO.sentence, sentenceO.definition, false)
+        this.wordDefinitionProps.text = wordO.word
+        this.wordDefinitionProps.definition = wordO.definition
+        this.wordDefinitionProps.focus = true
+        this.sentenceDefinitionProps.text = sentenceO.sentence
+        this.sentenceDefinitionProps.definition = sentenceO.definition
+        this.renderDefinitionInputs()
     }
 
     showSentence(sentence) {
@@ -224,8 +249,9 @@ export class SideBar {
     }
 
     hideAll() {
-        // this.showElement(this.wordDefinitionE.parent, false)
-        // this.showElement(this.sentenceDefinitionE.parent, false)
+        this.wordDefinitionProps.hidden = true
+        this.sentenceDefinitionProps.hidden = true
+        this.renderDefinitionInputs()
         this.showElement(this.audioE, false)
         this.showElement(this.highlightCB, false)
         this.showElement(this.previousPageE, false)
@@ -236,12 +262,14 @@ export class SideBar {
 
     showWordDefinition(onNextWord?) {
         this.onNextWord = onNextWord
-        // this.showElement(this.wordDefinitionE.parent, true)
+        this.wordDefinitionProps.hidden = false
+        this.renderDefinitionInputs()
     }
 
     showSentenceDefinition(onNextSentence?) {
         this.onNextSentence = onNextSentence
-        // this.showElement(this.sentenceDefinitionE.parent, true)
+        this.sentenceDefinitionProps.hidden = false
+        this.renderDefinitionInputs()
     }
 
     showAudio() {
@@ -272,8 +300,9 @@ export class SideBar {
 
     setLanguage(language: string) {
         this.languageE.value = language
-        // this.wordDefinitionE.language = language
-        // this.sentenceDefinitionE.language = language
+        this.wordDefinitionProps.language = language
+        this.sentenceDefinitionProps.language = language
+        this.renderDefinitionInputs()
     }
 
     highlightSentence(i) {}

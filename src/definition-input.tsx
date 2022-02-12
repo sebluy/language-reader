@@ -1,66 +1,67 @@
 import * as React from 'react'
 
-export class DefinitionInput extends React.Component {
+// TODO: add an interface for props
 
-    textE: HTMLElement
-    definitionE: HTMLInputElement
-    language: string
+export class DefinitionInput extends React.Component<any, any> {
+
+    static defaultProps = {
+        tag: 'input',
+        text: '...',
+        definition: '',
+        focus: false,
+        hidden: false,
+    }
+
+    private readonly definition: React.RefObject<any>
+
+    constructor(props) {
+        super(props)
+        this.definition = React.createRef()
+    }
 
     render() {
+        let Tag = this.props.tag
+        if (this.props.hidden) return null
         return (
-            <div>
-                <span>...</span>
-                <input type="text"/>
-                <button>Google Translate</button>
+            <div id={this.props.id}>
+                <span>{this.props.text}</span>
+                <Tag type="text"
+                     ref={this.definition}
+                     onBlur={() => this.props.onUpdateDefinition(this.props.text, this.props.definition)}
+                     onKeyDown={(e) => this.next(e)}
+                     onChange={() => this.props.onDefinitionChange(this.definition.current.value)}
+                     value={this.props.definition}
+                />
+                <button onClick={() => this.googleTranslate()}>Google Translate</button>
             </div>
         );
     }
 
-    // render(definitionElement: string = 'input') {
-    //     this.textE = document.createElement('span')
-    //     this.textE.innerText = '...'
-    //
-    //     this.definitionE = <HTMLInputElement>document.createElement(definitionElement)
-    //     this.definitionE.addEventListener('focusout', () => this.updateDefinition())
-    //     this.definitionE.addEventListener('keydown', (e) => this.next(e))
-    //
-    //     let googleTranslateB = document.createElement('button')
-    //     googleTranslateB.innerText = 'Google Translate'
-    //     googleTranslateB.addEventListener('click', () => this.googleTranslate())
-    //
-    // }
-
-    updateDefinition() {
-        let text = this.textE.innerText
-        let definition = this.definitionE.value
-        this.onUpdateDefinition(text, definition)
+    componentDidMount() {
+        if (this.props.focus) this.definition.current.focus()
     }
 
-    show(text: string, definition: string, focus: boolean = true) {
-        this.textE.innerText = text
-        this.definitionE.value = definition
-        if (focus) this.definitionE.focus()
+    componentDidUpdate() {
+        if (this.props.focus) this.definition.current.focus()
     }
 
     next(e: KeyboardEvent) {
         if (e.key === 'Tab') {
             e.preventDefault()
-            this.definitionE.blur()
-            this.onNext()
+            this.definition.current.blur()
+            this.props.onNext()
         }
         e.stopPropagation()
     }
 
     googleTranslate() {
-        const text = this.textE.innerText
+        const text = this.props.text
         const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl='
-            + this.language + '&tl=en&dt=t&q=' + encodeURI(text)
+            + this.props.language + '&tl=en&dt=t&q=' + encodeURI(text)
         fetch(url).then(res => res.json()).then(res => {
-            this.definitionE.value = res[0].map(([v]) => v).join('')
-            this.definitionE.focus()
+            this.props.onDefinitionChange(res[0].map(([v]) => v).join(''))
+            this.definition.current.focus()
         })
     }
 
-    onUpdateDefinition(text: string, definition: string) {}
-    onNext() {}
 }
