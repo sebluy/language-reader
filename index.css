@@ -1,5 +1,5 @@
 /* Side bar */
-.side-bar {
+.sidebar {
     margin-left: 90px;
     width: 250px;
     position: fixed;
@@ -22,7 +22,7 @@ h1, h2, h3, h4 {
     text-align: center;
 }
 
-.side-bar button {
+.sidebar button {
     text-align: center;
     display: block;
     width: 250px;
@@ -30,7 +30,7 @@ h1, h2, h3, h4 {
     margin-bottom: 5px;
 }
 
-.side-bar select {
+.sidebar select {
     text-align: center;
     display: block;
     width: 250px;
@@ -64,7 +64,7 @@ h1, h2, h3, h4 {
     font-size: smaller;
 }
 
-.side-bar textarea {
+.sidebar textarea {
     width: 242px;
     height: 150px;
     margin-top: 5px;
@@ -72,7 +72,7 @@ h1, h2, h3, h4 {
     text-align: center;
 }
 
-.side-bar input {
+.sidebar input {
     width: 242px;
     text-align: center;
     font-size: x-large;

@@ -13,6 +13,10 @@ import { Cloze } from './cloze'
 import { Listening2 } from './listening2'
 import { MainWindow } from './main-window'
 import { Activity } from './activity'
+import { App } from './app'
+import * as ReactDOM from "react-dom";
+import * as React from "react";
+import {DefinitionInput} from "./definition-input";
 
 // TODO: Use React? Vue?
 
@@ -89,9 +93,11 @@ export class Controller implements ControllerInterface {
 
     constructor() {
         this.db = new LanguageDb()
-        this.sidebar = new SideBar(this)
-        this.mainWindow = new MainWindow()
-        this.load();
+        let body = document.getElementById('react-root')
+        ReactDOM.render(React.createElement(App, {controller: this}), body)
+        // this.sidebar = new SideBar(this)
+        // this.mainWindow = new MainWindow()
+        // this.load();
     }
 
     async load() {
@@ -101,8 +107,8 @@ export class Controller implements ControllerInterface {
         console.log(runtimeData)
         runtimeData.updateForNewDay()
         this.runtimeData = runtimeData
-        this.sidebar.setNames()
-        this.sidebar.setLanguage(runtimeData.language)
+        // this.sidebar.setNames()
+        // this.sidebar.setLanguage(runtimeData.language)
         if (runtimeData.openTextFile) {
             let text = await this.db.getTextFile()
             this.loadTextFile(text)
@@ -110,6 +116,10 @@ export class Controller implements ControllerInterface {
         if (runtimeData.openAudioFile) {
             let audio = await this.db.getAudioFile()
             this.loadAudioFile(audio)
+        }
+        return {
+            runtimeData: runtimeData,
+            reader: {sentences: this.languageText.sentences},
         }
     }
 
@@ -142,12 +152,11 @@ export class Controller implements ControllerInterface {
             text,
             this.runtimeData.currentPage
         )
-        this.languageText.onUpdateDefinition = (word) => this.updateHighlighting(word)
-        this.languageText.onLoad = () => {
-            this.sidebar.updateStats()
-            this.showActivity(new Reader(this))
-        }
-        this.sidebar.languageText = this.languageText
+        // this.languageText.onUpdateDefinition = (word) => this.updateHighlighting(word)
+        // this.languageText.onLoad = () => {
+            // this.sidebar.updateStats()
+            // this.showActivity(new Reader(this))
+        // }
     }
 
     openAudioFile(file) {
@@ -160,7 +169,7 @@ export class Controller implements ControllerInterface {
 
     loadAudioFile(file) {
         if (file === undefined) return
-        this.sidebar.setAudioSource(URL.createObjectURL(file))
+        // this.sidebar.setAudioSource(URL.createObjectURL(file))
     }
 
     showActivityByName(name: string) {

@@ -8,56 +8,7 @@
     <link rel="stylesheet" type="text/css" href="./index.css">
 </head>
 <body>
-<div class="side-bar">
-    <div class="sidebar-group">
-        <h3 id="text-name"></h3>
-        <h4 id="audio-name"></h4>
-        <button id="open-files">Open Files</button>
-        <input id="language" placeholder="Language" type="text"/>
-    </div>
-    <div class="sidebar-group">
-        <select name="activity" id="activity-select">
-            <option value="reader">Reader</option>
-            <option value="auto">Auto</option>
-            <option value="vocab-in-context">Vocabulary in Context</option>
-            <option value="vocab-matching">Vocabulary Matching</option>
-            <option value="listening">Listening</option>
-            <option value="listening-2">Listening 2</option>
-            <option value="cloze">Cloze</option>
-            <option value="unscramble">Unscramble</option>
-        </select>
-    </div>
-    <div class="sidebar-group">
-        <table id="stats"><tbody></tbody></table>
-        <button id="update-stats">Update Stats</button>
-    </div>
-    <div class="sidebar-group">
-        <button id="export">Export Database</button>
-        <button id="import">Import Database</button>
-    </div>
-</div>
-    <div id="main">
-        <h2></h2>
-        <h3></h3>
-        <div></div>
-    </div>
-    <div class="side-bar right">
-        <div class="sidebar-group" id="definitions">
-        </div>
-        <div class="sidebar-group">
-            <audio id="audio" controls></audio>
-            <input type=number step=0.1 id="audio-start"/>
-            <input type=number step=0.1 id="audio-end"/>
-        </div>
-        <div class="sidebar-group">
-            <button id="previous-page">Previous Page</button>
-            <button id="next-page">Next Page</button>
-        </div>
-        <div class="sidebar-group">
-            <button id="highlight">Toggle Highlighting</button>
-        </div>
-    </div>
-
+<div id="react-root"></div>
 <script src="./dist/bundle.js"></script>
 
 </body>
