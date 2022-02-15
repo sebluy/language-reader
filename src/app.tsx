@@ -16,9 +16,10 @@ export class App extends React.Component<any, any> {
         this.setState(state)
     }
 
-    selectWord(word: string) {
+    selectWord(word: string, sentence: string) {
         let wordO = this.props.controller.languageText.words.get(word)
-        let newState = {...this.state, selectedWord: wordO}
+        let sentenceO = this.props.controller.languageText.sentenceMap.get(sentence)
+        let newState = {...this.state, selectedWord: wordO, selectedSentence: sentenceO}
         this.setState(newState)
     }
 
@@ -30,10 +31,11 @@ export class App extends React.Component<any, any> {
                 <MainWindow
                     reader={this.state.reader}
                     selectedWord={this.state.selectedWord}
-                    onSelectWord={(word) => this.selectWord(word)}
+                    onSelectWord={this.selectWord.bind(this)}
                 />
                 <RightSidebar
                     selectedWord={this.state.selectedWord}
+                    selectedSentence={this.state.selectedSentence}
                 />
             </div>
         )

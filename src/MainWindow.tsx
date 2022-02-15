@@ -16,7 +16,7 @@ export class MainWindow extends React.Component<any, any> {
                     <span
                         key={i}
                         className={selectedWord === cWord ? 'selected' : ''}
-                        onClick={() => this.props.onSelectWord(cWord)}>
+                        onClick={() => this.props.onSelectWord(cWord, sentence.clean)}>
                         {word}
                     </span>
                 )
