@@ -16,13 +16,25 @@ export class App extends React.Component<any, any> {
         this.setState(state)
     }
 
+    selectWord(word: string) {
+        let wordO = this.props.controller.languageText.words.get(word)
+        let newState = {...this.state, selectedWord: wordO}
+        this.setState(newState)
+    }
+
     render() {
         console.log(this.state)
         return (
             <div>
                 <Sidebar runtimeData={this.state.runtimeData}/>
-                <MainWindow reader={this.state.reader}/>
-                <RightSidebar/>
+                <MainWindow
+                    reader={this.state.reader}
+                    selectedWord={this.state.selectedWord}
+                    onSelectWord={(word) => this.selectWord(word)}
+                />
+                <RightSidebar
+                    selectedWord={this.state.selectedWord}
+                />
             </div>
         )
     }

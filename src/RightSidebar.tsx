@@ -4,10 +4,15 @@ import { DefinitionInput } from './definition-input'
 export class RightSidebar extends React.Component<any, any> {
 
     render() {
+        let selectedWord = this.props.selectedWord
         return (
             <div className="sidebar right">
                 <div className="sidebar-group">
-                    <DefinitionInput id="word-definition"/>
+                    <DefinitionInput
+                        id="word-definition"
+                        text={selectedWord && selectedWord.word}
+                        definition={selectedWord && selectedWord.definition}
+                    />
                     <DefinitionInput id="sentence-definition" tag="textarea"/>
                 </div>
                 <div className="sidebar-group">
