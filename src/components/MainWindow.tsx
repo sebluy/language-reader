@@ -1,6 +1,6 @@
 import * as React from 'react'
-import {RawSentence} from "./raw-sentence";
-import {Utility} from "./utility";
+import {RawSentence} from "../raw-sentence";
+import {Utility} from "../utility";
 
 export class MainWindow extends React.Component<any, any> {
 

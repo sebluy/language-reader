@@ -2,7 +2,7 @@ import { Utility } from './utility'
 import { LanguageText } from './language-text'
 import { Sentence } from './sentence'
 import { ControllerInterface } from './controller-interface'
-import { DefinitionInput } from './definition-input'
+import { DefinitionInput } from './components/DefinitionInput'
 import * as ReactDOM from 'react-dom'
 import * as React from 'react'
 

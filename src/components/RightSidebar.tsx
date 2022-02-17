@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { DefinitionInput } from './definition-input'
+import { DefinitionInput } from './DefinitionInput'
 
 export class RightSidebar extends React.Component<any, any> {
 
@@ -12,6 +12,7 @@ export class RightSidebar extends React.Component<any, any> {
                     <DefinitionInput
                         id="word-definition"
                         key={selectedWord && selectedWord.word}
+                        language={this.props.language}
                         text={selectedWord && selectedWord.word}
                         definition={selectedWord && selectedWord.definition}
                         onDefinitionUpdate={this.props.onWordDefinitionUpdate}
@@ -21,6 +22,7 @@ export class RightSidebar extends React.Component<any, any> {
                     <DefinitionInput
                         id="sentence-definition"
                         key={selectedSentence && selectedSentence.sentence}
+                        language={this.props.language}
                         text={selectedSentence && selectedSentence.sentence}
                         definition={selectedSentence && selectedSentence.definition}
                         onDefinitionUpdate={this.props.onSentenceDefinitionUpdate}

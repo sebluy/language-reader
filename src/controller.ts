@@ -13,10 +13,10 @@ import { Cloze } from './cloze'
 import { Listening2 } from './listening2'
 import { MainWindow } from './main-window'
 import { Activity } from './activity'
-import { App } from './app'
+import { App } from './components/App'
 import * as ReactDOM from "react-dom";
 import * as React from "react";
-import {DefinitionInput} from "./definition-input";
+import {DefinitionInput} from "./components/DefinitionInput";
 
 // TODO: Use React? Vue?
 

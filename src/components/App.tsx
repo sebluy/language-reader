@@ -2,8 +2,8 @@ import * as React from 'react'
 import { Sidebar } from './Sidebar'
 import { MainWindow } from './MainWindow'
 import { RightSidebar } from './RightSidebar'
-import { RuntimeData } from './runtime-data'
-import { LanguageText } from './language-text'
+import { RuntimeData } from '../runtime-data'
+import { LanguageText } from '../language-text'
 
 export class App extends React.Component<any, any> {
 
@@ -45,6 +45,7 @@ export class App extends React.Component<any, any> {
                     onSelectWord={this.selectWord.bind(this)}
                 />
                 <RightSidebar
+                    language={this.state.runtimeData.language}
                     selectedWord={this.state.selectedWord}
                     selectedSentence={this.state.selectedSentence}
                     onWordDefinitionUpdate={(word, definition) => {

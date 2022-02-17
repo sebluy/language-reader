@@ -32,6 +32,7 @@ export class DefinitionInput extends React.Component<any, any> {
                      onKeyDown={(e) => this.next(e)}
                      onChange={() => this.setState({definition: this.definition.current.value})}
                      value={this.state.definition}
+                     placeholder="Definition"
                 />
                 <button onClick={() => this.googleTranslate()}>Google Translate</button>
             </div>
@@ -60,7 +61,7 @@ export class DefinitionInput extends React.Component<any, any> {
         const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl='
             + this.props.language + '&tl=en&dt=t&q=' + encodeURI(text)
         fetch(url).then(res => res.json()).then(res => {
-            this.props.onDefinitionChange(res[0].map(([v]) => v).join(''))
+            this.setState({definition: (res[0].map(([v]) => v).join(''))})
             this.definition.current.focus()
         })
     }
