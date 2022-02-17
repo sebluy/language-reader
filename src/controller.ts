@@ -119,7 +119,7 @@ export class Controller implements ControllerInterface {
         }
         return {
             runtimeData: runtimeData,
-            reader: {sentences: this.languageText.sentences},
+            languageText: this.languageText
         }
     }
 

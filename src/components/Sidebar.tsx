@@ -8,6 +8,7 @@ export class Sidebar extends React.Component<any, any> {
                 <div className="sidebar-group">
                     <h3>{this.props.runtimeData.openTextFile}</h3>
                     <h4>{this.props.runtimeData.openAudioFile}</h4>
+                    <audio controls/>
                     <button>Open Files</button>
                     <input
                         placeholder="Language"
