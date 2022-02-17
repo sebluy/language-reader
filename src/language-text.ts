@@ -97,6 +97,7 @@ export class LanguageText {
 
     updateWordDefinition(word, definition) {
         const wordData = this.words.get(word)
+        if (wordData === undefined) return
         if (wordData.definition === definition) return
         if (wordData.definition === '') {
             this.totalWordsTranslated += 1
@@ -110,6 +111,7 @@ export class LanguageText {
 
     updateSentenceDefinition(sentence, definition) {
         let sentenceO = this.sentenceMap.get(sentence)
+        if (sentenceO === undefined) return
         if (sentenceO.definition === definition) return
         sentenceO.definition = definition
         console.log('Updating definition... for ' + sentence + ' to ' + definition)

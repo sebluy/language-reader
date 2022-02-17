@@ -5,23 +5,26 @@ import {Utility} from "./utility";
 export class MainWindow extends React.Component<any, any> {
 
     spans(sentences: Array<RawSentence>) {
-        let selectedWord = this.props.selectedWord && this.props.selectedWord.word
-        return sentences.map((sentence, i) => {
+        return sentences.map((sentence, si) => {
             let wordsAndSpaces = sentence.getWordsAndSpaces()
-            let wordSpans = wordsAndSpaces.map((word, i) => {
+            let wi = 0
+            let wordSpans = wordsAndSpaces.map((word) => {
                 if (word.trim() === '') return word;
                 let cWord = Utility.cleanWord(word)
                 if (cWord === '') return word
+                let wi2 = wi
+                wi += 1
+                let selected = this.props.selectedWordIndex === wi2 && this.props.selectedSentenceIndex === si
                 return (
                     <span
-                        key={i}
-                        className={selectedWord === cWord ? 'selected' : ''}
-                        onClick={() => this.props.onSelectWord(cWord, sentence.clean)}>
+                        key={wi2}
+                        className={selected ? 'selected' : ''}
+                        onClick={() => this.props.onSelectWord(cWord, wi2, sentence.clean, si)}>
                         {word}
                     </span>
                 )
             })
-            return <span key={i}>{wordSpans}</span>
+            return <span key={si}>{wordSpans}</span>
         })
     }
 

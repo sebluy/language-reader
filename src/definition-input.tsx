@@ -17,6 +17,7 @@ export class DefinitionInput extends React.Component<any, any> {
     constructor(props) {
         super(props)
         this.definition = React.createRef()
+        this.state = {definition: props.definition}
     }
 
     render() {
@@ -27,10 +28,10 @@ export class DefinitionInput extends React.Component<any, any> {
                 <span>{this.props.text}</span>
                 <Tag type="text"
                      ref={this.definition}
-                     onBlur={() => this.props.onUpdateDefinition(this.props.text, this.props.definition)}
+                     onBlur={() => this.props.onDefinitionUpdate(this.props.text, this.state.definition)}
                      onKeyDown={(e) => this.next(e)}
-                     onChange={() => this.props.onDefinitionChange(this.definition.current.value)}
-                     value={this.props.definition}
+                     onChange={() => this.setState({definition: this.definition.current.value})}
+                     value={this.state.definition}
                 />
                 <button onClick={() => this.googleTranslate()}>Google Translate</button>
             </div>

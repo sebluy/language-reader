@@ -11,13 +11,20 @@ export class RightSidebar extends React.Component<any, any> {
                 <div className="sidebar-group">
                     <DefinitionInput
                         id="word-definition"
+                        key={selectedWord && selectedWord.word}
                         text={selectedWord && selectedWord.word}
                         definition={selectedWord && selectedWord.definition}
+                        onDefinitionUpdate={this.props.onWordDefinitionUpdate}
+                        onNext={this.props.onNextWord}
+                        focus={true}
                     />
                     <DefinitionInput
                         id="sentence-definition"
+                        key={selectedSentence && selectedSentence.sentence}
                         text={selectedSentence && selectedSentence.sentence}
                         definition={selectedSentence && selectedSentence.definition}
+                        onDefinitionUpdate={this.props.onSentenceDefinitionUpdate}
+                        onNext={this.props.onNextSentence}
                         tag="textarea"
                     />
                 </div>
