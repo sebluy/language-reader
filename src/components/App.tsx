@@ -20,10 +20,20 @@ export class App extends React.Component<any, any> {
         return (
             <div>
                 <Sidebar runtimeData={this.state.runtimeData}/>
-                <Reader language={this.state.runtimeData.language}
-                        languageText={this.state.languageText}/>
+                <Reader
+                    key={this.state.runtimeData.currentPage}
+                    language={this.state.runtimeData.language}
+                    languageText={this.state.languageText}
+                    currentPage={this.state.runtimeData.currentPage}
+                    changePageBy={this.changePageBy.bind(this)}
+                />
             </div>
         )
+    }
+
+    changePageBy(n) {
+        this.props.controller.changePageBy(n)
+        this.setState(this.state)
     }
 
 }

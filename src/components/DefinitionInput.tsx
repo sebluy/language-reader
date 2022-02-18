@@ -9,7 +9,6 @@ export class DefinitionInput extends React.Component<any, any> {
         text: '...',
         definition: '',
         focus: false,
-        hidden: false,
     }
 
     private readonly definition: React.RefObject<any>
@@ -22,7 +21,6 @@ export class DefinitionInput extends React.Component<any, any> {
 
     render() {
         let Tag = this.props.tag
-        if (this.props.hidden) return null
         return (
             <div id={this.props.id}>
                 <span>{this.props.text}</span>
@@ -40,11 +38,11 @@ export class DefinitionInput extends React.Component<any, any> {
     }
 
     componentDidMount() {
-        if (this.props.focus && !this.props.hidden) this.definition.current.focus()
+        if (this.props.focus) this.definition.current.focus()
     }
 
     componentDidUpdate() {
-        if (this.props.focus && !this.props.hidden) this.definition.current.focus()
+        if (this.props.focus) this.definition.current.focus()
     }
 
     next(e: KeyboardEvent) {

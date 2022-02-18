@@ -7,6 +7,7 @@ export class Reader extends React.Component<any, any> {
 
     constructor(props) {
         super(props);
+        console.log('Re-initializing state of reader')
         this.state = {}
     }
 
@@ -40,7 +41,7 @@ export class Reader extends React.Component<any, any> {
         return (
             <MainWindow
                 title="Reader"
-                subtitle="Page 1"
+                subtitle={`Page ${this.props.currentPage + 1}`}
                 renderActivity={() => <p>{this.renderSentences()}</p>}
                 renderSidebar={this.renderSidebar.bind(this)}
             />
@@ -63,7 +64,7 @@ export class Reader extends React.Component<any, any> {
                             this.props.languageText.updateWordDefinition(word, definition)
                         }}
                         onNext={this.nextWord.bind(this)}
-                        focus={true}
+                        focus={this.state.selectedWord !== undefined}
                     />
                     <DefinitionInput
                         id="sentence-definition"
@@ -79,8 +80,8 @@ export class Reader extends React.Component<any, any> {
                     />
                 </div>
                 <div className="sidebar-group">
-                    <button>Previous Page</button>
-                    <button>Next Page</button>
+                    <button onClick={() => this.props.changePageBy(-1)}>Previous Page</button>
+                    <button onClick={() => this.props.changePageBy(+1)}>Next Page</button>
                 </div>
                 <div className="sidebar-group">
                     <button>Toggle Highlighting</button>
@@ -116,7 +117,6 @@ export class Reader extends React.Component<any, any> {
         let wordO = this.props.languageText.words.get(word)
         let sentenceO = this.props.languageText.sentenceMap.get(sentence)
         let newState = {
-            ...this.state,
             selectedWord: wordO,
             selectedWordIndex: wordIndex,
             selectedSentence: sentenceO,
