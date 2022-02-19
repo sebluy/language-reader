@@ -109,9 +109,10 @@ export class Controller implements ControllerInterface {
         this.runtimeData = runtimeData
         // this.sidebar.setNames()
         // this.sidebar.setLanguage(runtimeData.language)
+        // TODO: how to handle async text load
         if (runtimeData.openTextFile) {
             let text = await this.db.getTextFile()
-            this.loadTextFile(text)
+            await this.loadTextFile(text)
         }
         if (runtimeData.openAudioFile) {
             let audio = await this.db.getAudioFile()
@@ -145,18 +146,16 @@ export class Controller implements ControllerInterface {
     }
 
     loadTextFile(text) {
-        if (text === undefined) return
+        if (text === undefined) return Promise.resolve()
         this.languageText = new LanguageText(
             this,
             this.runtimeData.openTextFile,
             text,
             this.runtimeData.currentPage
         )
-        // this.languageText.onUpdateDefinition = (word) => this.updateHighlighting(word)
-        // this.languageText.onLoad = () => {
-            // this.sidebar.updateStats()
-            // this.showActivity(new Reader(this))
-        // }
+        return new Promise((resolve) => {
+            this.languageText.onLoad = () => resolve('done')
+        })
     }
 
     openAudioFile(file) {

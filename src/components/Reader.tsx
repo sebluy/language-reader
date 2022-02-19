@@ -2,13 +2,36 @@ import * as React from 'react'
 import { Utility } from '../utility'
 import { MainWindow } from './MainWindow'
 import { DefinitionInput } from './DefinitionInput'
+import { Word } from '../word'
 
 export class Reader extends React.Component<any, any> {
 
     constructor(props) {
         super(props);
-        console.log('Re-initializing state of reader')
-        this.state = {}
+        this.state = {
+            currentPage: props.currentPage,
+            highlighting: false,
+        }
+    }
+
+    static getDerivedStateFromProps(props, state) {
+        if (props.currentPage !== state.currentPage) {
+            return {
+                selectedWord: undefined,
+                selectedWordIndex: undefined,
+                selectedSentence: undefined,
+                selectedSentenceIndex: undefined,
+                currentPage: props.currentPage,
+            }
+        }
+        return null
+    }
+
+    wordHighlighting(word: string) {
+        let wordO = this.props.languageText.words.get(word)
+        if (!this.state.highlighting || wordO.definition === '') return {backgroundColor: ''}
+        let hue = ((wordO.mastery / Word.MAX_MASTERY) * 120).toString(10)
+        return {backgroundColor: 'hsl(' + hue + ',100%,75%)'}
     }
 
     renderSentences() {
@@ -27,6 +50,7 @@ export class Reader extends React.Component<any, any> {
                 return (
                     <span
                         key={wi2}
+                        style={this.wordHighlighting(cWord)}
                         className={selected ? 'selected' : ''}
                         onClick={() => this.selectWord(cWord, wi2, sentence.clean, si)}>
                         {word}
@@ -42,7 +66,11 @@ export class Reader extends React.Component<any, any> {
             <MainWindow
                 title="Reader"
                 subtitle={`Page ${this.props.currentPage + 1}`}
-                renderActivity={() => <p>{this.renderSentences()}</p>}
+                renderActivity={() =>
+                    <p className={this.state.highlighting ? 'highlight' : ''}>
+                        {this.renderSentences()}
+                    </p>
+                }
                 renderSidebar={this.renderSidebar.bind(this)}
             />
         )
@@ -80,11 +108,11 @@ export class Reader extends React.Component<any, any> {
                     />
                 </div>
                 <div className="sidebar-group">
-                    <button onClick={() => this.props.changePageBy(-1)}>Previous Page</button>
-                    <button onClick={() => this.props.changePageBy(+1)}>Next Page</button>
+                    <button onClick={() => this.props.onChangePageBy(-1)}>Previous Page</button>
+                    <button onClick={() => this.props.onChangePageBy(+1)}>Next Page</button>
                 </div>
                 <div className="sidebar-group">
-                    <button>Toggle Highlighting</button>
+                    <button onClick={this.toggleHighlighting.bind(this)}>Toggle Highlighting</button>
                 </div>
             </div>
         )
@@ -123,6 +151,10 @@ export class Reader extends React.Component<any, any> {
             selectedSentenceIndex: sentenceIndex,
         }
         this.setState(newState)
+    }
+
+    toggleHighlighting() {
+        this.setState({highlighting: !this.state.highlighting})
     }
 
 }

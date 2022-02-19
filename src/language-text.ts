@@ -5,6 +5,8 @@ import { RawSentence } from './raw-sentence'
 import { LanguageDb } from './language-db'
 import { ControllerInterface } from './controller-interface'
 
+// TODO: extract TextPage class
+
 export class LanguageText {
     controller: ControllerInterface
     filename: string
