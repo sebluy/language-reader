@@ -1,5 +1,6 @@
 import * as React from 'react'
-import {AudioPlayer} from "./AudioPlayer";
+import { AudioPlayer } from './AudioPlayer'
+import { Statistics } from './Statistics'
 
 export class Sidebar extends React.Component<any, any> {
 
@@ -29,20 +30,7 @@ export class Sidebar extends React.Component<any, any> {
                         <option value="unscramble">Unscramble</option>
                     </select>
                 </div>
-                <div className="sidebar-group">
-                    <table id="stats">
-                        <tbody>
-                            <tr><td>Total Words Translated</td><td>1</td></tr>
-                            <tr><td>New Words</td><td>2</td></tr>
-                            <tr><td>Words Learned Today</td><td>3</td></tr>
-                            <tr><td>Percent Translated</td><td>4</td></tr>
-                            <tr><td>Words Mastered</td><td>5</td></tr>
-                            <tr><td>Today's XP</td><td>6</td></tr>
-                            <tr><td>Last XP</td><td>7</td></tr>
-                        </tbody>
-                    </table>
-                    <button>Update Stats</button>
-                </div>
+                <Statistics {...this.props.statistics}/>
                 <div className="sidebar-group">
                     <button>Export Database</button>
                     <button>Import Database</button>

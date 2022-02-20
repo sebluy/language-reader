@@ -17,9 +17,21 @@ export class App extends React.Component<any, any> {
         let state = await this.props.controller.load()
         state.languageText.onLoad = () => {
             console.log('Language text reloaded')
-            this.setState({languageText: state.languageText})
+            this.setState({statistics: this.updateStats(this.state)})
         }
+        state.statistics = this.updateStats(state)
         this.setState(state)
+    }
+
+    updateStats(state) {
+        let statistics = state.languageText.updateStats()
+        statistics.wordsLearnedToday = state.runtimeData.wordsLearnedToday
+        statistics.xpToday = state.runtimeData.xpToday
+        statistics.xpLast = state.runtimeData.xpLast
+        statistics.update = () => {
+            this.setState({statistics: this.updateStats(this.state)})
+        }
+        return statistics
     }
 
     render() {
@@ -34,6 +46,7 @@ export class App extends React.Component<any, any> {
                 <Sidebar
                     runtimeData={this.state.runtimeData}
                     audio={...audioProps}
+                    statistics={this.state.statistics}
                 />
                 <Reader
                     language={this.state.runtimeData.language}
