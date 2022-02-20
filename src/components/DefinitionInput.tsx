@@ -41,10 +41,6 @@ export class DefinitionInput extends React.Component<any, any> {
         if (this.props.focus) this.definition.current.focus()
     }
 
-    componentDidUpdate() {
-        if (this.props.focus) this.definition.current.focus()
-    }
-
     next(e: KeyboardEvent) {
         if (e.key === 'Tab') {
             e.preventDefault()

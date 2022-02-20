@@ -7,7 +7,10 @@ export class App extends React.Component<any, any> {
 
     constructor(props) {
         super(props)
-        this.state = {runtimeData: RuntimeData.empty()}
+        this.state = {
+            runtimeData: RuntimeData.empty(),
+            audio: {},
+        }
     }
 
     async componentDidMount() {
@@ -21,9 +24,17 @@ export class App extends React.Component<any, any> {
 
     render() {
         console.log(this.state)
+        let audioProps = {
+            ...this.state.audio,
+            play: this.playAudio.bind(this),
+            pause: this.pauseAudio.bind(this)
+        }
         return (
             <div>
-                <Sidebar runtimeData={this.state.runtimeData}/>
+                <Sidebar
+                    runtimeData={this.state.runtimeData}
+                    audio={...audioProps}
+                />
                 <Reader
                     language={this.state.runtimeData.language}
                     languageText={this.state.languageText}
@@ -32,6 +43,14 @@ export class App extends React.Component<any, any> {
                 />
             </div>
         )
+    }
+
+    playAudio() {
+        this.setState({audio: {...this.state.audio, playing: true}})
+    }
+
+    pauseAudio() {
+        this.setState({audio: {...this.state.audio, playing: false}})
     }
 
     changePageBy(n) {

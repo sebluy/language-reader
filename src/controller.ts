@@ -114,13 +114,15 @@ export class Controller implements ControllerInterface {
             let text = await this.db.getTextFile()
             await this.loadTextFile(text)
         }
+        let audioSrc
         if (runtimeData.openAudioFile) {
             let audio = await this.db.getAudioFile()
-            this.loadAudioFile(audio)
+            audioSrc = URL.createObjectURL(audio)
         }
         return {
             runtimeData: runtimeData,
-            languageText: this.languageText
+            languageText: this.languageText,
+            audio: {src: audioSrc}
         }
     }
 
@@ -163,12 +165,7 @@ export class Controller implements ControllerInterface {
         this.sidebar.setNames()
         this.db.putRuntimeData(this.runtimeData)
         this.db.putAudioFile(file)
-        this.loadAudioFile(file)
-    }
-
-    loadAudioFile(file) {
-        if (file === undefined) return
-        // this.sidebar.setAudioSource(URL.createObjectURL(file))
+        // this.loadAudioFile(file)
     }
 
     showActivityByName(name: string) {
