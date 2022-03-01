@@ -175,7 +175,7 @@ export class Controller {
         else if (stats.percentWordsMastered < 0.75)
             next = new Cloze(this);
         else if (stats.percentWordsMastered < 0.80)
-            next = new Unscramble(this);
+            next = new Listening(this);
         else if (stats.percentWordsMastered < 0.90)
             next = new Listening2(this);
         else if (stats.percentWordsMastered < 1.00)
