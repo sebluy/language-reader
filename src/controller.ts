@@ -14,6 +14,7 @@ import { Listening2 } from './listening2.js'
 import { MainWindow } from './main-window.js'
 import { Activity } from './activity.js'
 
+// TODO: Fix bug where multiple choice number keys override audio times inputs
 // TODO: Use React? Vue?
 
 // TODO: clean up interface with blank DB
@@ -129,7 +130,7 @@ export class Controller implements ControllerInterface {
             for (let i = 0; i < files.length; i++) {
                 let file = files[i]
                 if (file.type === 'text/plain') this.openTextFile(file)
-                if (file.type === 'audio/mpeg') this.openAudioFile(file)
+                if (file.type === 'audio/mpeg' || file.type === 'audio/x-m4a') this.openAudioFile(file)
             }
         })
     }

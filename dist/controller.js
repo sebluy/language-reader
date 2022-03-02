@@ -20,6 +20,7 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
+// TODO: Fix bug where multiple choice number keys override audio times inputs
 // TODO: Use React? Vue?
 // TODO: clean up interface with blank DB
 // TODO: how to improve listening comprehension?
@@ -119,7 +120,7 @@ export class Controller {
                 let file = files[i];
                 if (file.type === 'text/plain')
                     this.openTextFile(file);
-                if (file.type === 'audio/mpeg')
+                if (file.type === 'audio/mpeg' || file.type === 'audio/x-m4a')
                     this.openAudioFile(file);
             }
         });

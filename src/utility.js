@@ -54,6 +54,7 @@ export class Utility {
 
     static isEndChar(char)
     {
+        if (char === '...') return false
         return char.match(/[.?!]/) !== null
     }
 
@@ -61,6 +62,10 @@ export class Utility {
     {
         while (true) {
             let char = book.substring(i, i + 1)
+            if (book.substring(i, i + 3) === '...') {
+                i += 3
+                continue
+            }
             if (char === false || char === '') return false
             let match = this.isEndChar(char)
             if (match) break

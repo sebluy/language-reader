@@ -50,11 +50,17 @@ export class Utility {
         return element;
     }
     static isEndChar(char) {
+        if (char === '...')
+            return false;
         return char.match(/[.?!]/) !== null;
     }
     static nextEndPos(book, i) {
         while (true) {
             let char = book.substring(i, i + 1);
+            if (book.substring(i, i + 3) === '...') {
+                i += 3;
+                continue;
+            }
             if (char === false || char === '')
                 return false;
             let match = this.isEndChar(char);
