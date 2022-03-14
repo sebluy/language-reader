@@ -16,6 +16,7 @@ import { Activity } from './activity.js'
 
 // TODO: Fix bug where multiple choice number keys override audio times inputs
 // TODO: Use React? Vue?
+// TODO: Make it look like spotify?
 
 // TODO: clean up interface with blank DB
 
@@ -78,6 +79,7 @@ import { Activity } from './activity.js'
 // TODO: make it mobile friendly
 // TODO: find a way to sync with multiple clients
 
+declare var lifecycle: any;
 
 export class Controller implements ControllerInterface {
 
@@ -87,6 +89,7 @@ export class Controller implements ControllerInterface {
     mainWindow: MainWindow
     languageText: LanguageText
     activity: Activity
+    midnightTimeout: number
 
     constructor() {
         this.db = new LanguageDb()
@@ -96,7 +99,7 @@ export class Controller implements ControllerInterface {
     }
 
     async load() {
-        this.setMidnightTimerForRuntimeData()
+        this.setMidnightWatch()
         let runtimeData = await this.db.getRuntimeData()
         if (runtimeData === undefined) runtimeData = RuntimeData.empty()
         console.log(runtimeData)
@@ -240,17 +243,31 @@ export class Controller implements ControllerInterface {
         this.db.putRuntimeData(this.runtimeData)
     }
 
-    setMidnightTimerForRuntimeData() {
-        let now = new Date()
-        let midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
-        let timeToMidnight = midnight.getTime() - now.getTime()
-        console.log('Now ' + now)
-        console.log('Will execute in ' + timeToMidnight)
-        setTimeout(() => {
-            this.setMidnightTimerForRuntimeData()
+    setMidnightWatch() {
+        // Need to use browser lifecycle to check for new day because setTimeout isn't reliable
+        lifecycle.addEventListener('statechange', (event) => {
+            this.updateForNewDay()
+            this.setMidnightTimer(this.updateForNewDay.bind(this))
+        });
+    }
+
+    updateForNewDay() {
+        if (this.runtimeData.isNewDay()) {
+            console.log('Updating for new day ' + new Date())
             this.runtimeData.updateForNewDay()
             this.sidebar.updateStats()
-        }, timeToMidnight)
+        }
+    }
+
+    setMidnightTimer(f) {
+        let now = new Date()
+        let next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+        let timeToNext = next.getTime() - now.getTime()
+        clearTimeout(this.midnightTimeout)
+        this.midnightTimeout = setTimeout(() => {
+            f()
+            this.setMidnightTimer(f)
+        }, timeToNext)
     }
 
 }

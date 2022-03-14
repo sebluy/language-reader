@@ -20,62 +20,6 @@ import { VocabInContext } from './vocab-in-context.js';
 import { Cloze } from './cloze.js';
 import { Listening2 } from './listening2.js';
 import { MainWindow } from './main-window.js';
-// TODO: Fix bug where multiple choice number keys override audio times inputs
-// TODO: Use React? Vue?
-// TODO: clean up interface with blank DB
-// TODO: how to improve listening comprehension?
-// TODO: simply by listening with or without the english text and repeating the audio for a sentence several times
-// TODO: but maybe it's better to focus on reading first
-// TODO: new idea: Android App
-// TODO: import database from reader
-// TODO: show a random sentence:
-// TODO: swipe left if you know it
-// TODO: swipe right if you don't
-// TODO: if you swipe right, show translation, alongside "word-for-word" translation
-// TODO: Maybe just focus on translation and less on the rest?
-// TODO: Separate activities out more.
-// TODO: Do more of one at a time instead of by page.
-// TODO: Add an option to use all unmastered instead of just from page.
-// TODO: Find someway to prevent the same sentence coming up over and over again during the listening.
-// TODO: Fix XP last for day rollover
-// TODO: Keep sidebar in sync
-// TODO: How to integrate more observables. For example, side bar "watches" runtime data for updates.
-// TODO: Fix/hide unscramble? Fill in the blank?
-// TODO: use anonymous classes instead of just overwriting properties
-// TODO: add some tests
-// TODO: remove sentence mastery and just update all the words for unscramble
-// TODO: disable audio shortcuts when typing in definitions
-// TODO: add a Google translate icon to the right instead of a button
-// TODO: continue textview refactor
-// TODO: keep working on Cloze
-// TODO: change audio time edit to mm:ss
-// TODO: how to handle new chapters (new audio file) in page. Split text files into chapters?
-// TODO: finish upgrading everything to Typescript
-// TODO: cleanup drag and drop for vocabulary matching
-// TODO: use only one activity field instead of having a separate field for each activity
-// TODO: create new widgets or reuse
-// TODO: Fix the span thing with clicking.
-// TODO: new activity: show a sentence (with audio). Give user some options for next sentence (with audio)
-// TODO: write a desktop version (Java?)
-// TODO: upgrade to TypeSript?
-// TODO: Fix sentence parsing for songs
-// TODO: change export to CSV
-// TODO: change fetch/update to get/set
-// TODO: Update the styling to be more pretty/modern.
-// TODO: use async/await more
-// TODO: fix favicon error
-/* TODO: come up with a better way than just random. Some progression through the exercises or something.
-     Think a lesson, instead of just random exercises.
-     Maybe a 5 stage Leitner system.
-     Vocab - Each word goes through 5 levels until mastered. Random from lowest level.
-     Unscramble - Each sentence goes through 5 levels until mastered. In order.
-     Fill in the blanks - Each sentence goes through 5 levels until mastered. In order.
-     Mastery = 1/3 of each.
-*/
-// TODO: Have someway to show the answer if you're wrong.
-// TODO: use an actual dictionary instead of google translate
-// TODO: make it mobile friendly
-// TODO: find a way to sync with multiple clients
 export class Controller {
     constructor() {
         this.db = new LanguageDb();
@@ -85,7 +29,7 @@ export class Controller {
     }
     load() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.setMidnightTimerForRuntimeData();
+            this.setMidnightWatch();
             let runtimeData = yield this.db.getRuntimeData();
             if (runtimeData === undefined)
                 runtimeData = RuntimeData.empty();
@@ -230,17 +174,29 @@ export class Controller {
         this.runtimeData.language = language;
         this.db.putRuntimeData(this.runtimeData);
     }
-    setMidnightTimerForRuntimeData() {
-        let now = new Date();
-        let midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-        let timeToMidnight = midnight.getTime() - now.getTime();
-        console.log('Now ' + now);
-        console.log('Will execute in ' + timeToMidnight);
-        setTimeout(() => {
-            this.setMidnightTimerForRuntimeData();
+    setMidnightWatch() {
+        // Need to use browser lifecycle to check for new day because setTimeout isn't reliable
+        lifecycle.addEventListener('statechange', (event) => {
+            this.updateForNewDay();
+            this.setMidnightTimer(this.updateForNewDay.bind(this));
+        });
+    }
+    updateForNewDay() {
+        if (this.runtimeData.isNewDay()) {
+            console.log('Updating for new day ' + new Date());
             this.runtimeData.updateForNewDay();
             this.sidebar.updateStats();
-        }, timeToMidnight);
+        }
+    }
+    setMidnightTimer(f) {
+        let now = new Date();
+        let next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        let timeToNext = next.getTime() - now.getTime();
+        clearTimeout(this.midnightTimeout);
+        this.midnightTimeout = setTimeout(() => {
+            f();
+            this.setMidnightTimer(f);
+        }, timeToNext);
     }
 }
 new Controller();

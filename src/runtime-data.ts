@@ -27,12 +27,16 @@ export class RuntimeData {
     }
 
     updateForNewDay() {
-        if (this.xpDate !== (new Date()).toLocaleDateString()) {
+        if (this.isNewDay()) {
             this.xpLast = this.xpToday
             this.xpToday = 0
             this.xpDate = (new Date()).toLocaleDateString()
             this.wordsLearnedToday = 0
         }
+    }
+
+    isNewDay() {
+        return this.xpDate !== (new Date()).toLocaleDateString()
     }
 
 }
